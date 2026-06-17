@@ -1,0 +1,173 @@
+@page
+@model ITAssetManager.Pages.IndexModel
+@{
+    ViewData["Title"] = "داشبورد";
+}
+
+<!-- Stats Row -->
+<div class="row g-3 mb-4">
+    <div class="col-6 col-md-3">
+        <div class="stat-card">
+            <div class="d-flex justify-content-between align-items-start">
+                <div>
+                    <div class="text-muted mb-1" style="font-size:0.8rem;">کل تجهیزات</div>
+                    <div class="fw-bold" style="font-size:1.75rem;">@Model.TotalAssets</div>
+                </div>
+                <div class="stat-icon bg-primary bg-opacity-10">
+                    <i class="bi bi-cpu text-primary"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-6 col-md-3">
+        <div class="stat-card">
+            <div class="d-flex justify-content-between align-items-start">
+                <div>
+                    <div class="text-muted mb-1" style="font-size:0.8rem;">فعال</div>
+                    <div class="fw-bold text-success" style="font-size:1.75rem;">@Model.ActiveAssets</div>
+                </div>
+                <div class="stat-icon" style="background:#dcfce7;">
+                    <i class="bi bi-check-circle text-success"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-6 col-md-3">
+        <div class="stat-card">
+            <div class="d-flex justify-content-between align-items-start">
+                <div>
+                    <div class="text-muted mb-1" style="font-size:0.8rem;">در تعمیر</div>
+                    <div class="fw-bold text-warning" style="font-size:1.75rem;">@Model.UnderRepair</div>
+                </div>
+                <div class="stat-icon" style="background:#fef3c7;">
+                    <i class="bi bi-tools text-warning"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-6 col-md-3">
+        <div class="stat-card">
+            <div class="d-flex justify-content-between align-items-start">
+                <div>
+                    <div class="text-muted mb-1" style="font-size:0.8rem;">گارانتی در خطر</div>
+                    <div class="fw-bold text-danger" style="font-size:1.75rem;">@Model.WarrantyExpiringSoon</div>
+                </div>
+                <div class="stat-icon" style="background:#fee2e2;">
+                    <i class="bi bi-shield-exclamation text-danger"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-3">
+    <!-- Recent Assets -->
+    <div class="col-md-7">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <span><i class="bi bi-clock-history me-2"></i>آخرین تجهیزات ثبت‌شده</span>
+                <a href="/Assets" class="btn btn-sm btn-outline-primary">مشاهده همه</a>
+            </div>
+            <div class="card-body p-0">
+                <table class="table table-hover mb-0">
+                    <thead>
+                        <tr>
+                            <th>نام</th>
+                            <th>دسته</th>
+                            <th>بخش</th>
+                            <th>وضعیت</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var asset in Model.RecentAssets)
+                        {
+                            <tr>
+                                <td>
+                                    <a href="/Assets/Details/@asset.Id" class="text-decoration-none fw-medium">
+                                        @asset.Name
+                                    </a>
+                                    @if (!string.IsNullOrEmpty(asset.PropertyTag))
+                                    {
+                                        <br /><small class="text-muted">@asset.PropertyTag</small>
+                                    }
+                                </td>
+                                <td><small>@asset.Category?.Name</small></td>
+                                <td><small>@(asset.Department?.Name ?? asset.Employee?.FullName ?? "-")</small></td>
+                                <td>
+                                    @{
+                                        var (badgeClass, label) = asset.Status switch
+                                        {
+                                            AssetStatus.Active => ("badge-active", "فعال"),
+                                            AssetStatus.Faulty => ("badge-faulty", "معیوب"),
+                                            AssetStatus.UnderRepair => ("badge-repair", "در تعمیر"),
+                                            AssetStatus.Scrapped => ("badge-scrapped", "اسقاط"),
+                                            _ => ("badge-storage", "انبار")
+                                        };
+                                    }
+                                    <span class="badge @badgeClass">@label</span>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Alerts -->
+    <div class="col-md-5">
+        <!-- Warranty Expiring -->
+        @if (Model.WarrantyExpiringSoon > 0)
+        {
+            <div class="card mb-3">
+                <div class="card-header text-warning">
+                    <i class="bi bi-exclamation-triangle me-2"></i>گارانتی در حال انقضا
+                </div>
+                <div class="card-body p-0">
+                    <table class="table table-sm mb-0">
+                        @foreach (var asset in Model.ExpiringWarrantyAssets)
+                        {
+                            var daysLeft = (asset.WarrantyExpiry!.Value - DateTime.Today).Days;
+                            <tr class="@(daysLeft <= 0 ? "warranty-expired" : "warranty-warning")">
+                                <td class="py-2 px-3">
+                                    <div class="fw-medium" style="font-size:0.85rem;">@asset.Name</div>
+                                    <small class="text-muted">@asset.PropertyTag</small>
+                                </td>
+                                <td class="py-2 px-3 text-end">
+                                    <small class="@(daysLeft <= 0 ? "text-danger" : "text-warning") fw-bold">
+                                        @(daysLeft <= 0 ? "منقضی" : $"{daysLeft} روز")
+                                    </small>
+                                </td>
+                            </tr>
+                        }
+                    </table>
+                </div>
+                <div class="card-footer text-center">
+                    <a href="/Reports/Warranty" class="text-decoration-none" style="font-size:0.82rem;">
+                        مشاهده گزارش کامل <i class="bi bi-arrow-left"></i>
+                    </a>
+                </div>
+            </div>
+        }
+
+        <!-- Assets by Category -->
+        <div class="card">
+            <div class="card-header"><i class="bi bi-pie-chart me-2"></i>تجهیزات بر اساس نوع</div>
+            <div class="card-body">
+                @foreach (var cat in Model.AssetsByCategory)
+                {
+                    var pct = Model.TotalAssets > 0 ? (int)((double)cat.Count / Model.TotalAssets * 100) : 0;
+                    <div class="mb-2">
+                        <div class="d-flex justify-content-between mb-1">
+                            <small>@cat.CategoryName</small>
+                            <small class="text-muted">@cat.Count</small>
+                        </div>
+                        <div class="progress" style="height:5px;">
+                            <div class="progress-bar" style="width:@pct%"></div>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,87 @@
+@page
+@model ITAssetManager.Pages.Assignments.CreateModel
+@{
+    ViewData["Title"] = "ثبت جابجایی تجهیز";
+}
+
+<div class="row justify-content-center">
+    <div class="col-lg-7">
+        <div class="card">
+            <div class="card-header">
+                <i class="bi bi-arrow-left-right me-2"></i>ثبت جابجایی تجهیز
+            </div>
+            <div class="card-body">
+                @if (Model.Asset != null)
+                {
+                    <div class="alert alert-info mb-4 d-flex align-items-center gap-3 py-2">
+                        <i class="bi bi-cpu fs-4"></i>
+                        <div>
+                            <strong>@Model.Asset.Name</strong>
+                            @if (!string.IsNullOrEmpty(Model.Asset.PropertyTag))
+                            {
+                                <span class="ms-2 text-muted">| برچسب: @Model.Asset.PropertyTag</span>
+                            }
+                            <div class="small text-muted">
+                                کاربر فعلی: @(Model.Asset.Employee?.FullName ?? Model.Asset.Department?.Name ?? "تخصیص‌نیافته")
+                            </div>
+                        </div>
+                    </div>
+                }
+
+                <form method="post">
+                    <input type="hidden" asp-for="Assignment.AssetId" />
+                    <input type="hidden" asp-for="Assignment.FromEmployeeId" />
+                    <input type="hidden" asp-for="Assignment.FromDepartmentId" />
+                    <input type="hidden" asp-for="Assignment.FromLocation" />
+
+                    @if (Model.Asset == null)
+                    {
+                        <div class="mb-3">
+                            <label class="form-label">تجهیز <span class="text-danger">*</span></label>
+                            <select asp-for="Assignment.AssetId" asp-items="Model.AssetList" class="form-select">
+                                <option value="">انتخاب تجهیز...</option>
+                            </select>
+                        </div>
+                    }
+
+                    <h6 class="text-muted mb-3 border-bottom pb-2"><i class="bi bi-person-check me-2"></i>تخصیص جدید</h6>
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label">کارمند</label>
+                            <select asp-for="Assignment.ToEmployeeId" asp-items="Model.EmployeeList" class="form-select">
+                                <option value="">بدون کارمند</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">بخش</label>
+                            <select asp-for="Assignment.ToDepartmentId" asp-items="Model.DepartmentList" class="form-select">
+                                <option value="">بدون بخش</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">مکان جدید</label>
+                            <input asp-for="Assignment.ToLocation" class="form-control" placeholder="اتاق / طبقه" />
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">دلیل جابجایی</label>
+                            <input asp-for="Assignment.Reason" class="form-control"
+                                placeholder="مثلاً: انتقال به پروژه، خروج کارمند..." />
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label">یادداشت</label>
+                            <textarea asp-for="Assignment.Notes" class="form-control" rows="2"></textarea>
+                        </div>
+                    </div>
+
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-check-lg me-1"></i>ثبت جابجایی
+                        </button>
+                        <a href="@(Model.Asset != null ? $"/Assets/Details/{Model.Asset.Id}" : "/Assignments")"
+                           class="btn btn-outline-secondary">انصراف</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,263 @@
+@page "{id:int}"
+@model ITAssetManager.Pages.Assets.DetailsModel
+@{
+    ViewData["Title"] = Model.Asset.Name;
+}
+
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success alert-dismissible">
+        @TempData["Success"] <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <div>
+        <a href="/Assets" class="text-muted text-decoration-none small">
+            <i class="bi bi-arrow-right me-1"></i>لیست تجهیزات
+        </a>
+        <h5 class="mb-0 mt-1 fw-bold">@Model.Asset.Name</h5>
+        @if (!string.IsNullOrEmpty(Model.Asset.PropertyTag))
+        {
+            <small class="text-muted"><i class="bi bi-tag me-1"></i>برچسب اموال: <strong>@Model.Asset.PropertyTag</strong></small>
+        }
+    </div>
+    <div class="d-flex gap-2">
+        <a href="/Assets/Edit/@Model.Asset.Id" class="btn btn-outline-primary btn-sm">
+            <i class="bi bi-pencil me-1"></i>ویرایش
+        </a>
+        <a href="/Assignments/Create?assetId=@Model.Asset.Id" class="btn btn-primary btn-sm">
+            <i class="bi bi-arrow-left-right me-1"></i>ثبت جابجایی
+        </a>
+    </div>
+</div>
+
+<div class="row g-3">
+    <!-- اطلاعات اصلی -->
+    <div class="col-md-8">
+        <div class="card mb-3">
+            <div class="card-header">اطلاعات تجهیز</div>
+            <div class="card-body">
+                <div class="row g-3">
+                    <div class="col-sm-6">
+                        <label class="text-muted small d-block">برند / مدل</label>
+                        <span>@(Model.Asset.Brand + " " + Model.Asset.Model)</span>
+                    </div>
+                    <div class="col-sm-6">
+                        <label class="text-muted small d-block">دسته‌بندی</label>
+                        <span><i class="bi @(Model.Asset.Category?.Icon) me-1"></i>@Model.Asset.Category?.Name</span>
+                    </div>
+                    <div class="col-sm-6">
+                        <label class="text-muted small d-block">سریال نامبر</label>
+                        <span class="font-monospace">@(Model.Asset.SerialNumber ?? "-")</span>
+                    </div>
+                    <div class="col-sm-6">
+                        <label class="text-muted small d-block">بارکد</label>
+                        <span class="font-monospace">@(Model.Asset.Barcode ?? "-")</span>
+                    </div>
+                    <div class="col-sm-6">
+                        <label class="text-muted small d-block">تاریخ خرید</label>
+                        <span>@(Model.Asset.PurchaseDate?.ToString("yyyy/MM/dd") ?? "-")</span>
+                    </div>
+                    <div class="col-sm-6">
+                        <label class="text-muted small d-block">انقضا گارانتی</label>
+                        @if (Model.Asset.WarrantyExpiry.HasValue)
+                        {
+                            var days = (Model.Asset.WarrantyExpiry.Value - DateTime.Today).Days;
+                            <span class="@(days < 0 ? "text-danger" : days <= 60 ? "text-warning" : "text-success") fw-medium">
+                                @Model.Asset.WarrantyExpiry.Value.ToString("yyyy/MM/dd")
+                                @if (days < 0) { <small>(منقضی)</small> }
+                                else if (days <= 60) { <small>(@days روز مانده)</small> }
+                            </span>
+                        }
+                        else { <span>-</span> }
+                    </div>
+                    @if (!string.IsNullOrEmpty(Model.Asset.Specs))
+                    {
+                        <div class="col-12">
+                            <label class="text-muted small d-block">مشخصات فنی</label>
+                            <span>@Model.Asset.Specs</span>
+                        </div>
+                    }
+                    @if (!string.IsNullOrEmpty(Model.Asset.Notes))
+                    {
+                        <div class="col-12">
+                            <label class="text-muted small d-block">یادداشت</label>
+                            <span>@Model.Asset.Notes</span>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <!-- تاریخچه جابجایی‌ها -->
+        <div class="card mb-3">
+            <div class="card-header d-flex justify-content-between">
+                <span><i class="bi bi-arrow-left-right me-2"></i>تاریخچه جابجایی‌ها</span>
+                <a href="/Assignments/Create?assetId=@Model.Asset.Id" class="btn btn-sm btn-outline-primary">
+                    <i class="bi bi-plus"></i> جابجایی جدید
+                </a>
+            </div>
+            <div class="card-body p-0">
+                @if (!Model.Assignments.Any())
+                {
+                    <p class="text-muted text-center py-3">جابجایی‌ای ثبت نشده</p>
+                }
+                else
+                {
+                    <div class="table-responsive">
+                        <table class="table table-sm mb-0">
+                            <thead>
+                                <tr>
+                                    <th>تاریخ</th>
+                                    <th>از</th>
+                                    <th></th>
+                                    <th>به</th>
+                                    <th>دلیل</th>
+                                    <th>ثبت‌کننده</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var a in Model.Assignments)
+                                {
+                                    <tr>
+                                        <td><small>@a.AssignedAt.ToString("yy/MM/dd")</small></td>
+                                        <td><small>@(a.FromEmployee?.FullName ?? a.FromDepartment?.Name ?? "-")</small></td>
+                                        <td><i class="bi bi-arrow-left text-muted"></i></td>
+                                        <td><small class="fw-medium">@(a.ToEmployee?.FullName ?? a.ToDepartment?.Name ?? "-")</small></td>
+                                        <td><small class="text-muted">@(a.Reason ?? "-")</small></td>
+                                        <td><small class="text-muted">@a.AssignedBy</small></td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                }
+            </div>
+        </div>
+
+        <!-- تاریخچه تعمیرات -->
+        <div class="card">
+            <div class="card-header d-flex justify-content-between">
+                <span><i class="bi bi-tools me-2"></i>تاریخچه تعمیرات</span>
+                <a href="/Maintenance/Create?assetId=@Model.Asset.Id" class="btn btn-sm btn-outline-primary">
+                    <i class="bi bi-plus"></i> ثبت تعمیر
+                </a>
+            </div>
+            <div class="card-body p-0">
+                @if (!Model.MaintenanceLogs.Any())
+                {
+                    <p class="text-muted text-center py-3">تعمیری ثبت نشده</p>
+                }
+                else
+                {
+                    <div class="table-responsive">
+                        <table class="table table-sm mb-0">
+                            <thead>
+                                <tr>
+                                    <th>تاریخ</th>
+                                    <th>نوع</th>
+                                    <th>توضیح</th>
+                                    <th>وضعیت</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var m in Model.MaintenanceLogs)
+                                {
+                                    <tr>
+                                        <td><small>@m.StartDate.ToString("yy/MM/dd")</small></td>
+                                        <td>
+                                            <small>
+                                                @(m.Type switch {
+                                                    MaintenanceType.Repair => "تعمیر",
+                                                    MaintenanceType.Preventive => "پیشگیرانه",
+                                                    MaintenanceType.Upgrade => "ارتقا",
+                                                    _ => "بازرسی"
+                                                })
+                                            </small>
+                                        </td>
+                                        <td><small>@m.Description</small></td>
+                                        <td>
+                                            <span class="badge @(m.IsResolved ? "badge-active" : "badge-repair")">
+                                                @(m.IsResolved ? "حل شده" : "در جریان")
+                                            </span>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+
+    <!-- ستون کناری -->
+    <div class="col-md-4">
+        <!-- وضعیت -->
+        <div class="card mb-3">
+            <div class="card-body text-center py-4">
+                @{
+                    var (statusClass, statusIcon, statusText) = Model.Asset.Status switch
+                    {
+                        AssetStatus.Active => ("text-success", "bi-check-circle-fill", "فعال"),
+                        AssetStatus.Faulty => ("text-danger", "bi-x-circle-fill", "معیوب"),
+                        AssetStatus.UnderRepair => ("text-warning", "bi-tools", "در تعمیر"),
+                        AssetStatus.Scrapped => ("text-secondary", "bi-trash3-fill", "اسقاط"),
+                        _ => ("text-info", "bi-archive-fill", "در انبار")
+                    };
+                }
+                <i class="bi @statusIcon @statusClass" style="font-size:2.5rem;"></i>
+                <h5 class="mt-2 @statusClass">@statusText</h5>
+                @if (!string.IsNullOrEmpty(Model.Asset.StatusNote))
+                {
+                    <small class="text-muted">@Model.Asset.StatusNote</small>
+                }
+            </div>
+        </div>
+
+        <!-- تخصیص فعلی -->
+        <div class="card mb-3">
+            <div class="card-header">تخصیص فعلی</div>
+            <div class="card-body">
+                @if (Model.Asset.Employee != null)
+                {
+                    <div class="d-flex align-items-center gap-2 mb-2">
+                        <div class="rounded-circle bg-primary d-flex align-items-center justify-content-center text-white"
+                             style="width:36px;height:36px;font-size:0.85rem;flex-shrink:0;">
+                            @Model.Asset.Employee.FullName.First()
+                        </div>
+                        <div>
+                            <div class="fw-medium">@Model.Asset.Employee.FullName</div>
+                            <small class="text-muted">@Model.Asset.Department?.Name</small>
+                        </div>
+                    </div>
+                }
+                else if (Model.Asset.Department != null)
+                {
+                    <div><i class="bi bi-building me-2"></i>@Model.Asset.Department.Name</div>
+                }
+                else
+                {
+                    <span class="text-muted">تخصیص‌نیافته</span>
+                }
+                @if (!string.IsNullOrEmpty(Model.Asset.Location))
+                {
+                    <div class="mt-2"><i class="bi bi-geo-alt me-1 text-muted"></i><small>@Model.Asset.Location</small></div>
+                }
+            </div>
+        </div>
+
+        <!-- اطلاعات مالی -->
+        @if (Model.Asset.PurchasePrice.HasValue)
+        {
+            <div class="card">
+                <div class="card-header">اطلاعات مالی</div>
+                <div class="card-body">
+                    <small class="text-muted d-block">قیمت خرید</small>
+                    <span class="fw-medium">@Model.Asset.PurchasePrice.Value.ToString("N0") تومان</span>
+                </div>
+            </div>
+        }
+    </div>
+</div>

@@ -1,0 +1,132 @@
+@page
+@model ITAssetManager.Pages.Assets.CreateModel
+@{
+    ViewData["Title"] = "ثبت تجهیز جدید";
+}
+
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="card">
+            <div class="card-header">
+                <i class="bi bi-plus-circle me-2"></i>ثبت تجهیز جدید
+            </div>
+            <div class="card-body">
+                <form method="post">
+                    <div asp-validation-summary="ModelOnly" class="alert alert-danger d-none"></div>
+
+                    <!-- بخش اول: اطلاعات اصلی -->
+                    <h6 class="text-muted mb-3 border-bottom pb-2">اطلاعات اصلی</h6>
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label">نام تجهیز <span class="text-danger">*</span></label>
+                            <input asp-for="Asset.Name" class="form-control" placeholder="مثلاً: لپ‌تاپ دل اداری" />
+                            <span asp-validation-for="Asset.Name" class="text-danger small"></span>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">دسته‌بندی <span class="text-danger">*</span></label>
+                            <select asp-for="Asset.CategoryId" asp-items="Model.CategoryList" class="form-select">
+                                <option value="">انتخاب کنید...</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">برند</label>
+                            <input asp-for="Asset.Brand" class="form-control" placeholder="Dell, HP, Cisco..." />
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">مدل</label>
+                            <input asp-for="Asset.Model" class="form-control" placeholder="مدل دستگاه" />
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">وضعیت</label>
+                            <select asp-for="Asset.Status" class="form-select">
+                                <option value="1">فعال</option>
+                                <option value="2">معیوب</option>
+                                <option value="3">در تعمیر</option>
+                                <option value="5">در انبار</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- بخش دوم: شناسه‌ها -->
+                    <h6 class="text-muted mb-3 border-bottom pb-2">شناسه‌ها</h6>
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-4">
+                            <label class="form-label">
+                                <i class="bi bi-tag me-1"></i>برچسب اموال
+                                <span class="text-muted small">(واحد مالی)</span>
+                            </label>
+                            <input asp-for="Asset.PropertyTag" class="form-control" placeholder="AM-2024-001" />
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">سریال نامبر</label>
+                            <input asp-for="Asset.SerialNumber" class="form-control" placeholder="S/N" />
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">بارکد</label>
+                            <input asp-for="Asset.Barcode" class="form-control" placeholder="بارکد" />
+                        </div>
+                    </div>
+
+                    <!-- بخش سوم: تاریخ‌ها -->
+                    <h6 class="text-muted mb-3 border-bottom pb-2">تاریخ‌ها و مالی</h6>
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-4">
+                            <label class="form-label">تاریخ خرید</label>
+                            <input asp-for="Asset.PurchaseDate" type="date" class="form-control" />
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">انقضا گارانتی</label>
+                            <input asp-for="Asset.WarrantyExpiry" type="date" class="form-control" />
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">قیمت خرید (تومان)</label>
+                            <input asp-for="Asset.PurchasePrice" type="number" class="form-control" placeholder="0" />
+                        </div>
+                    </div>
+
+                    <!-- بخش چهارم: تخصیص -->
+                    <h6 class="text-muted mb-3 border-bottom pb-2">تخصیص</h6>
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-4">
+                            <label class="form-label">بخش</label>
+                            <select asp-for="Asset.DepartmentId" asp-items="Model.DepartmentList" class="form-select">
+                                <option value="">بدون بخش</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">کارمند</label>
+                            <select asp-for="Asset.EmployeeId" asp-items="Model.EmployeeList" class="form-select">
+                                <option value="">بدون کارمند</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">مکان (اتاق/طبقه)</label>
+                            <input asp-for="Asset.Location" class="form-control" placeholder="مثلاً: اتاق 201" />
+                        </div>
+                    </div>
+
+                    <!-- بخش پنجم: مشخصات و توضیحات -->
+                    <h6 class="text-muted mb-3 border-bottom pb-2">مشخصات فنی و یادداشت</h6>
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-6">
+                            <label class="form-label">مشخصات فنی</label>
+                            <textarea asp-for="Asset.Specs" class="form-control" rows="3"
+                                placeholder="RAM, CPU, ظرفیت هارد..."></textarea>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">یادداشت</label>
+                            <textarea asp-for="Asset.Notes" class="form-control" rows="3"></textarea>
+                        </div>
+                    </div>
+
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-check-lg me-1"></i>ذخیره
+                        </button>
+                        <a href="/Assets" class="btn btn-outline-secondary">انصراف</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

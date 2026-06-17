@@ -1,0 +1,71 @@
+@page "{id:int}"
+@model ITAssetManager.Pages.Maintenance.EditModel
+@{
+    ViewData["Title"] = "ویرایش تعمیر";
+}
+
+<div class="row justify-content-center">
+    <div class="col-lg-7">
+        <div class="card">
+            <div class="card-header">
+                <i class="bi bi-pencil me-2"></i>ویرایش تعمیر - @Model.Log.Asset?.Name
+            </div>
+            <div class="card-body">
+                <form method="post">
+                    <input type="hidden" asp-for="Log.Id" />
+                    <input type="hidden" asp-for="Log.AssetId" />
+                    <input type="hidden" asp-for="Log.LoggedBy" />
+
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label">نوع</label>
+                            <select asp-for="Log.Type" class="form-select">
+                                <option value="1">تعمیر</option>
+                                <option value="2">نگهداری پیشگیرانه</option>
+                                <option value="3">ارتقا</option>
+                                <option value="4">بازرسی</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">تکنسین</label>
+                            <input asp-for="Log.TechnicianName" class="form-control" />
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label">توضیح <span class="text-danger">*</span></label>
+                            <textarea asp-for="Log.Description" class="form-control" rows="3"></textarea>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">تاریخ شروع</label>
+                            <input asp-for="Log.StartDate" type="date" class="form-control" />
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">تاریخ پایان</label>
+                            <input asp-for="Log.EndDate" type="date" class="form-control" />
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">هزینه (تومان)</label>
+                            <input asp-for="Log.Cost" type="number" class="form-control" />
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label">راه‌حل / نتیجه</label>
+                            <textarea asp-for="Log.Resolution" class="form-control" rows="2"></textarea>
+                        </div>
+                        <div class="col-12">
+                            <div class="form-check">
+                                <input asp-for="Log.IsResolved" type="checkbox" class="form-check-input" />
+                                <label asp-for="Log.IsResolved" class="form-check-label">مشکل حل شده است</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-check-lg me-1"></i>ذخیره
+                        </button>
+                        <a href="/Assets/Details/@Model.Log.AssetId" class="btn btn-outline-secondary">انصراف</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

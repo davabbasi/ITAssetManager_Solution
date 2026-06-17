@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - مدیریت تجهیزات IT</title>
+
+    <!-- Bootstrap 5 RTL -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.rtl.min.css" />
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
+    <!-- Vazirmatn Font -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/Vazirmatn-font-face.css" />
+
+    <style>
+        :root {
+            --primary: #2563eb;
+            --primary-dark: #1d4ed8;
+            --sidebar-width: 260px;
+            --sidebar-bg: #0f172a;
+            --sidebar-text: #94a3b8;
+            --sidebar-active: #2563eb;
+        }
+
+        body {
+            font-family: 'Vazirmatn', sans-serif;
+            background-color: #f1f5f9;
+            color: #1e293b;
+        }
+
+        /* Sidebar */
+        #sidebar {
+            width: var(--sidebar-width);
+            min-height: 100vh;
+            background: var(--sidebar-bg);
+            position: fixed;
+            right: 0;
+            top: 0;
+            z-index: 1000;
+            transition: all 0.3s;
+            overflow-y: auto;
+        }
+
+        .sidebar-brand {
+            padding: 1.25rem 1.5rem;
+            border-bottom: 1px solid #1e293b;
+        }
+
+        .sidebar-brand h5 {
+            color: #fff;
+            font-weight: 700;
+            margin: 0;
+            font-size: 0.95rem;
+        }
+
+        .sidebar-brand small {
+            color: #64748b;
+            font-size: 0.75rem;
+        }
+
+        .sidebar-section {
+            padding: 1rem 0.75rem 0.25rem;
+            font-size: 0.68rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: #475569;
+            font-weight: 600;
+        }
+
+        .nav-link-item {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            padding: 0.6rem 1.25rem;
+            color: var(--sidebar-text);
+            text-decoration: none;
+            border-radius: 0.5rem;
+            margin: 0.1rem 0.5rem;
+            font-size: 0.875rem;
+            transition: all 0.2s;
+        }
+
+        .nav-link-item:hover {
+            background: #1e293b;
+            color: #fff;
+        }
+
+        .nav-link-item.active {
+            background: var(--sidebar-active);
+            color: #fff;
+        }
+
+        .nav-link-item i {
+            font-size: 1rem;
+            width: 20px;
+            text-align: center;
+        }
+
+        /* Main content */
+        #main-content {
+            margin-right: var(--sidebar-width);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Topbar */
+        #topbar {
+            background: #fff;
+            border-bottom: 1px solid #e2e8f0;
+            padding: 0.75rem 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 900;
+        }
+
+        .page-content {
+            padding: 1.5rem;
+            flex: 1;
+        }
+
+        /* Cards */
+        .card {
+            border: 1px solid #e2e8f0;
+            border-radius: 0.75rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+        }
+
+        .card-header {
+            background: #fff;
+            border-bottom: 1px solid #e2e8f0;
+            padding: 1rem 1.25rem;
+            border-radius: 0.75rem 0.75rem 0 0 !important;
+            font-weight: 600;
+        }
+
+        /* Stat cards */
+        .stat-card {
+            background: #fff;
+            border-radius: 0.75rem;
+            padding: 1.25rem;
+            border: 1px solid #e2e8f0;
+        }
+
+        .stat-card .stat-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 0.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.4rem;
+        }
+
+        /* Status badges */
+        .badge-active { background-color: #dcfce7; color: #16a34a; }
+        .badge-faulty { background-color: #fee2e2; color: #dc2626; }
+        .badge-repair { background-color: #fef3c7; color: #d97706; }
+        .badge-scrapped { background-color: #f1f5f9; color: #64748b; }
+        .badge-storage { background-color: #dbeafe; color: #2563eb; }
+
+        /* Table */
+        .table { font-size: 0.875rem; }
+        .table thead th {
+            background: #f8fafc;
+            font-weight: 600;
+            color: #475569;
+            border-bottom: 2px solid #e2e8f0;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.03em;
+        }
+
+        /* Buttons */
+        .btn-primary { background: var(--primary); border-color: var(--primary); }
+        .btn-primary:hover { background: var(--primary-dark); border-color: var(--primary-dark); }
+
+        /* Search box */
+        .search-box { border-radius: 0.5rem; border: 1px solid #e2e8f0; }
+        .search-box:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(37,99,235,0.1); }
+
+        /* Mobile sidebar toggle */
+        @@media (max-width: 768px) {
+            #sidebar { transform: translateX(100%); }
+            #sidebar.show { transform: translateX(0); }
+            #main-content { margin-right: 0; }
+        }
+
+        /* Warranty alert */
+        .warranty-warning { background: #fef3c7; border-right: 4px solid #f59e0b; }
+        .warranty-expired { background: #fee2e2; border-right: 4px solid #ef4444; }
+    </style>
+</head>
+<body>
+
+@if (User.Identity?.IsAuthenticated == true)
+{
+    <!-- Sidebar -->
+    <div id="sidebar">
+        <div class="sidebar-brand">
+            <h5><i class="bi bi-shield-check text-primary me-2"></i>IT Asset Manager</h5>
+            <small>مدیریت تجهیزات</small>
+        </div>
+
+        <nav class="py-2">
+            <div class="sidebar-section">داشبورد</div>
+            <a href="/" class="nav-link-item @(Context.Request.Path == "/" ? "active" : "")">
+                <i class="bi bi-speedometer2"></i> داشبورد
+            </a>
+
+            <div class="sidebar-section">تجهیزات</div>
+            <a href="/Assets" class="nav-link-item @(Context.Request.Path.StartsWithSegments("/Assets") ? "active" : "")">
+                <i class="bi bi-cpu"></i> لیست تجهیزات
+            </a>
+            <a href="/Assets/Create" class="nav-link-item">
+                <i class="bi bi-plus-circle"></i> ثبت تجهیز جدید
+            </a>
+
+            <div class="sidebar-section">ردیابی</div>
+            <a href="/Assignments" class="nav-link-item @(Context.Request.Path.StartsWithSegments("/Assignments") ? "active" : "")">
+                <i class="bi bi-arrow-left-right"></i> جابجایی‌ها
+            </a>
+            <a href="/Maintenance" class="nav-link-item @(Context.Request.Path.StartsWithSegments("/Maintenance") ? "active" : "")">
+                <i class="bi bi-tools"></i> تعمیرات
+            </a>
+
+            <div class="sidebar-section">گزارش‌ها</div>
+            <a href="/Reports/ByDepartment" class="nav-link-item">
+                <i class="bi bi-building"></i> گزارش بخش‌ها
+            </a>
+            <a href="/Reports/Warranty" class="nav-link-item">
+                <i class="bi bi-shield"></i> گارانتی
+            </a>
+            <a href="/Reports/Scrapped" class="nav-link-item">
+                <i class="bi bi-trash3"></i> اسقاطی‌ها
+            </a>
+
+            @if (User.IsInRole("Admin"))
+            {
+                <div class="sidebar-section">مدیریت</div>
+                <a href="/Admin/Users" class="nav-link-item">
+                    <i class="bi bi-people"></i> کاربران
+                </a>
+                <a href="/Admin/Departments" class="nav-link-item">
+                    <i class="bi bi-building-gear"></i> بخش‌ها
+                </a>
+                <a href="/Admin/Employees" class="nav-link-item">
+                    <i class="bi bi-person-badge"></i> کارمندان
+                </a>
+                <a href="/Admin/Categories" class="nav-link-item">
+                    <i class="bi bi-tags"></i> دسته‌بندی‌ها
+                </a>
+            }
+        </nav>
+    </div>
+
+    <!-- Main Content -->
+    <div id="main-content">
+        <div id="topbar">
+            <div class="d-flex align-items-center gap-2">
+                <button class="btn btn-sm btn-light d-md-none" onclick="toggleSidebar()">
+                    <i class="bi bi-list"></i>
+                </button>
+                <span class="text-muted" style="font-size:0.85rem;">@ViewData["Title"]</span>
+            </div>
+            <div class="d-flex align-items-center gap-3">
+                <span class="text-muted" style="font-size:0.82rem;">
+                    <i class="bi bi-person-circle me-1"></i>@User.Identity?.Name
+                    @if (User.IsInRole("Admin"))
+                    {
+                        <span class="badge bg-primary ms-1" style="font-size:0.65rem;">Admin</span>
+                    }
+                </span>
+                <form method="post" action="/Account/Logout" style="display:inline;">
+                    @Html.AntiForgeryToken()
+                    <button type="submit" class="btn btn-sm btn-outline-secondary">
+                        <i class="bi bi-box-arrow-left"></i> خروج
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <div class="page-content">
+            @RenderBody()
+        </div>
+    </div>
+}
+else
+{
+    @RenderBody()
+}
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    function toggleSidebar() {
+        document.getElementById('sidebar').classList.toggle('show');
+    }
+</script>
+@await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

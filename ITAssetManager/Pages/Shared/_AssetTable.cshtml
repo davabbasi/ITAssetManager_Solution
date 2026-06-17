@@ -1,0 +1,21 @@
+@model List<ITAssetManager.Models.Asset>
+
+<div class="table-responsive">
+    <table class="table table-sm mb-0">
+        <thead>
+            <tr><th>نام</th><th>برچسب اموال</th><th>دسته</th><th>بخش/کاربر</th><th>یادداشت</th></tr>
+        </thead>
+        <tbody>
+            @foreach (var asset in Model)
+            {
+                <tr>
+                    <td><a href="/Assets/Details/@asset.Id" class="text-decoration-none">@asset.Name</a></td>
+                    <td><small>@(asset.PropertyTag ?? "-")</small></td>
+                    <td><small>@asset.Category?.Name</small></td>
+                    <td><small>@(asset.Employee?.FullName ?? asset.Department?.Name ?? "-")</small></td>
+                    <td><small class="text-muted">@(asset.StatusNote ?? "-")</small></td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

@@ -1,0 +1,78 @@
+using ITAssetManager.Data;
+using ITAssetManager.Models;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.EntityFrameworkCore;
+
+namespace ITAssetManager.Pages.Assets;
+
+[Authorize]
+public class CreateModel : PageModel
+{
+    private readonly ApplicationDbContext _context;
+    public CreateModel(ApplicationDbContext context) => _context = context;
+
+    [BindProperty] public Asset Asset { get; set; } = new();
+
+    public SelectList CategoryList { get; set; } = null!;
+    public SelectList DepartmentList { get; set; } = null!;
+    public SelectList EmployeeList { get; set; } = null!;
+
+    public async Task OnGetAsync()
+    {
+        await LoadSelectListsAsync();
+    }
+
+    public async Task<IActionResult> OnPostAsync()
+    {
+        ModelState.Remove("Asset.Category");
+        ModelState.Remove("Asset.Department");
+        ModelState.Remove("Asset.Employee");
+
+        if (!ModelState.IsValid)
+        {
+            await LoadSelectListsAsync();
+            return Page();
+        }
+
+        Asset.CreatedAt = DateTime.Now;
+        _context.Assets.Add(Asset);
+        await _context.SaveChangesAsync();
+
+        // اگر تخصیص داده شده، یک رکورد جابجایی ثبت می‌کنیم
+        if (Asset.EmployeeId.HasValue || Asset.DepartmentId.HasValue)
+        {
+            var assignment = new AssetAssignment
+            {
+                AssetId = Asset.Id,
+                ToEmployeeId = Asset.EmployeeId,
+                ToDepartmentId = Asset.DepartmentId,
+                ToLocation = Asset.Location,
+                AssignedAt = DateTime.Now,
+                Reason = "ثبت اولیه",
+                AssignedBy = User.Identity?.Name
+            };
+            _context.AssetAssignments.Add(assignment);
+            await _context.SaveChangesAsync();
+        }
+
+        TempData["Success"] = "تجهیز با موفقیت ثبت شد.";
+        return RedirectToPage("/Assets/Details", new { id = Asset.Id });
+    }
+
+    private async Task LoadSelectListsAsync()
+    {
+        CategoryList = new SelectList(
+            await _context.AssetCategories.OrderBy(c => c.Name).ToListAsync(), "Id", "Name");
+        DepartmentList = new SelectList(
+            await _context.Departments.Where(d => d.IsActive).OrderBy(d => d.Name).ToListAsync(), "Id", "Name");
+        EmployeeList = new SelectList(
+            await _context.Employees.Where(e => e.IsActive)
+                .Include(e => e.Department)
+                .OrderBy(e => e.FullName)
+                .Select(e => new { e.Id, Name = e.FullName + " - " + e.Department!.Name })
+                .ToListAsync(), "Id", "Name");
+    }
+}

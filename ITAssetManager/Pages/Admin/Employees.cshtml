@@ -1,0 +1,111 @@
+@page
+@model ITAssetManager.Pages.Admin.EmployeesModel
+@{
+    ViewData["Title"] = "مدیریت کارمندان";
+}
+
+<div class="row">
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header">
+                @(Model.EditId.HasValue ? "ویرایش کارمند" : "افزودن کارمند")
+            </div>
+            <div class="card-body">
+                <form method="post">
+                    @if (Model.EditId.HasValue)
+                    {
+                        <input type="hidden" name="editId" value="@Model.EditId" />
+                    }
+                    <div class="mb-3">
+                        <label class="form-label">نام و نام خانوادگی <span class="text-danger">*</span></label>
+                        <input name="fullName" value="@Model.EditFullName" class="form-control" required />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">کد پرسنلی</label>
+                        <input name="employeeCode" value="@Model.EditEmployeeCode" class="form-control" placeholder="مثلاً: EMP-001" />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">سمت</label>
+                        <input name="position" value="@Model.EditPosition" class="form-control" placeholder="مثلاً: کارشناس فروش" />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">بخش <span class="text-danger">*</span></label>
+                        <select name="departmentId" class="form-select" required>
+                            <option value="">انتخاب بخش...</option>
+                            @foreach (var dept in Model.Departments)
+                            {
+                                <option value="@dept.Id" selected="@(Model.EditDepartmentId == dept.Id)">@dept.Name</option>
+                            }
+                        </select>
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-sm">ذخیره</button>
+                    @if (Model.EditId.HasValue)
+                    {
+                        <a href="/Admin/Employees" class="btn btn-outline-secondary btn-sm ms-1">انصراف</a>
+                    }
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-8">
+        <div class="card mb-3">
+            <div class="card-body py-2">
+                <form method="get" class="d-flex gap-2">
+                    <input type="text" name="search" value="@Model.Search"
+                        class="form-control form-control-sm" placeholder="جستجو در نام، کد پرسنلی..." />
+                    <select name="deptFilter" class="form-select form-select-sm" style="max-width:160px;">
+                        <option value="">همه بخش‌ها</option>
+                        @foreach (var dept in Model.Departments)
+                        {
+                            <option value="@dept.Id" selected="@(Model.DeptFilter == dept.Id)">@dept.Name</option>
+                        }
+                    </select>
+                    <button type="submit" class="btn btn-primary btn-sm">جستجو</button>
+                </form>
+            </div>
+        </div>
+        <div class="card">
+            <div class="card-header">لیست کارمندان (@Model.Employees.Count نفر)</div>
+            <div class="card-body p-0">
+                <table class="table table-hover mb-0">
+                    <thead>
+                        <tr><th>نام</th><th>کد پرسنلی</th><th>سمت</th><th>بخش</th><th>وضعیت</th><th></th></tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var emp in Model.Employees)
+                        {
+                            <tr>
+                                <td class="fw-medium">@emp.FullName</td>
+                                <td><small class="text-muted">@(emp.EmployeeCode ?? "-")</small></td>
+                                <td><small>@(emp.Position ?? "-")</small></td>
+                                <td><small>@emp.Department?.Name</small></td>
+                                <td>
+                                    <span class="badge @(emp.IsActive ? "badge-active" : "badge-scrapped")">
+                                        @(emp.IsActive ? "فعال" : "غیرفعال")
+                                    </span>
+                                </td>
+                                <td>
+                                    <div class="d-flex gap-1">
+                                        <a href="/Admin/Employees?editId=@emp.Id" class="btn btn-xs btn-outline-primary" title="ویرایش">
+                                            <i class="bi bi-pencil"></i>
+                                        </a>
+                                        <form method="post" asp-page-handler="ToggleActive" style="display:inline;">
+                                            <input type="hidden" name="id" value="@emp.Id" />
+                                            <button type="submit" class="btn btn-xs @(emp.IsActive ? "btn-outline-warning" : "btn-outline-success")"
+                                                title="@(emp.IsActive ? "غیرفعال‌کردن" : "فعال‌کردن")">
+                                                <i class="bi @(emp.IsActive ? "bi-pause" : "bi-play")"></i>
+                                            </button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>.btn-xs { padding: 0.15rem 0.4rem; font-size: 0.75rem; }</style>

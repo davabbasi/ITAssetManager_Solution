@@ -1,0 +1,171 @@
+@page
+@model ITAssetManager.Pages.Assets.IndexModel
+@{
+    ViewData["Title"] = "لیست تجهیزات";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h5 class="mb-0 fw-bold">تجهیزات IT</h5>
+    <a href="/Assets/Create" class="btn btn-primary btn-sm">
+        <i class="bi bi-plus-lg me-1"></i>ثبت تجهیز جدید
+    </a>
+</div>
+
+<!-- Filters -->
+<div class="card mb-3">
+    <div class="card-body py-2">
+        <form method="get" class="row g-2 align-items-end">
+            <div class="col-md-4">
+                <input type="text" name="search" value="@Model.Search"
+                    class="form-control form-control-sm search-box"
+                    placeholder="جستجو در نام، سریال، بارکد، برچسب اموال..." />
+            </div>
+            <div class="col-md-2">
+                <select name="categoryId" class="form-select form-select-sm">
+                    <option value="">همه دسته‌ها</option>
+                    @foreach (var cat in Model.Categories)
+                    {
+                        <option value="@cat.Id" selected="@(Model.CategoryId == cat.Id)">@cat.Name</option>
+                    }
+                </select>
+            </div>
+            <div class="col-md-2">
+                <select name="status" class="form-select form-select-sm">
+                    <option value="">همه وضعیت‌ها</option>
+                    <option value="1" selected="@(Model.Status == 1)">فعال</option>
+                    <option value="2" selected="@(Model.Status == 2)">معیوب</option>
+                    <option value="3" selected="@(Model.Status == 3)">در تعمیر</option>
+                    <option value="4" selected="@(Model.Status == 4)">اسقاط</option>
+                    <option value="5" selected="@(Model.Status == 5)">انبار</option>
+                </select>
+            </div>
+            <div class="col-md-2">
+                <select name="departmentId" class="form-select form-select-sm">
+                    <option value="">همه بخش‌ها</option>
+                    @foreach (var dept in Model.Departments)
+                    {
+                        <option value="@dept.Id" selected="@(Model.DepartmentId == dept.Id)">@dept.Name</option>
+                    }
+                </select>
+            </div>
+            <div class="col-md-2 d-flex gap-1">
+                <button type="submit" class="btn btn-primary btn-sm flex-fill">
+                    <i class="bi bi-search"></i> جستجو
+                </button>
+                <a href="/Assets" class="btn btn-outline-secondary btn-sm">
+                    <i class="bi bi-x"></i>
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Results -->
+<div class="card">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <span><i class="bi bi-table me-2"></i>@Model.TotalCount تجهیز</span>
+    </div>
+    <div class="card-body p-0">
+        @if (!Model.Assets.Any())
+        {
+            <div class="text-center py-5 text-muted">
+                <i class="bi bi-inbox" style="font-size:2.5rem;"></i>
+                <p class="mt-2">تجهیزی یافت نشد</p>
+            </div>
+        }
+        else
+        {
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead>
+                        <tr>
+                            <th>برچسب اموال</th>
+                            <th>نام / مدل</th>
+                            <th>دسته</th>
+                            <th>سریال</th>
+                            <th>بخش / کاربر</th>
+                            <th>وضعیت</th>
+                            <th>گارانتی</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var asset in Model.Assets)
+                        {
+                            var warrantyStatus = "";
+                            var warrantyLabel = "-";
+                            if (asset.WarrantyExpiry.HasValue)
+                            {
+                                var days = (asset.WarrantyExpiry.Value - DateTime.Today).Days;
+                                if (days < 0) { warrantyStatus = "text-danger"; warrantyLabel = "منقضی"; }
+                                else if (days <= 60) { warrantyStatus = "text-warning"; warrantyLabel = $"{days}روز"; }
+                                else { warrantyStatus = "text-success"; warrantyLabel = asset.WarrantyExpiry.Value.ToString("yy/MM/dd"); }
+                            }
+                            <tr>
+                                <td class="fw-medium" style="font-size:0.82rem;">
+                                    @(asset.PropertyTag ?? "-")
+                                </td>
+                                <td>
+                                    <a href="/Assets/Details/@asset.Id" class="text-decoration-none fw-medium">
+                                        @asset.Name
+                                    </a>
+                                    @if (!string.IsNullOrEmpty(asset.Brand) || !string.IsNullOrEmpty(asset.Model))
+                                    {
+                                        <br /><small class="text-muted">@asset.Brand @asset.Model</small>
+                                    }
+                                </td>
+                                <td>
+                                    <small><i class="bi @(asset.Category?.Icon ?? "bi-box") me-1"></i>@asset.Category?.Name</small>
+                                </td>
+                                <td><small class="text-muted">@(asset.SerialNumber ?? "-")</small></td>
+                                <td>
+                                    @if (asset.Employee != null)
+                                    {
+                                        <small><i class="bi bi-person me-1"></i>@asset.Employee.FullName</small>
+                                        <br /><small class="text-muted">@asset.Department?.Name</small>
+                                    }
+                                    else if (asset.Department != null)
+                                    {
+                                        <small><i class="bi bi-building me-1"></i>@asset.Department.Name</small>
+                                    }
+                                    else
+                                    {
+                                        <small class="text-muted">تخصیص‌نیافته</small>
+                                    }
+                                </td>
+                                <td>
+                                    @{
+                                        var (bc, lbl) = asset.Status switch
+                                        {
+                                            AssetStatus.Active => ("badge-active", "فعال"),
+                                            AssetStatus.Faulty => ("badge-faulty", "معیوب"),
+                                            AssetStatus.UnderRepair => ("badge-repair", "در تعمیر"),
+                                            AssetStatus.Scrapped => ("badge-scrapped", "اسقاط"),
+                                            _ => ("badge-storage", "انبار")
+                                        };
+                                    }
+                                    <span class="badge @bc">@lbl</span>
+                                </td>
+                                <td class="@warrantyStatus" style="font-size:0.8rem;">@warrantyLabel</td>
+                                <td>
+                                    <div class="d-flex gap-1">
+                                        <a href="/Assets/Details/@asset.Id" class="btn btn-xs btn-outline-secondary" title="جزئیات">
+                                            <i class="bi bi-eye"></i>
+                                        </a>
+                                        <a href="/Assets/Edit/@asset.Id" class="btn btn-xs btn-outline-primary" title="ویرایش">
+                                            <i class="bi bi-pencil"></i>
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+    </div>
+</div>
+
+<style>
+.btn-xs { padding: 0.15rem 0.4rem; font-size: 0.75rem; }
+</style>

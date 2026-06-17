@@ -1,0 +1,65 @@
+@page
+@model ITAssetManager.Pages.Admin.DepartmentsModel
+@{
+    ViewData["Title"] = "مدیریت بخش‌ها";
+}
+
+<div class="row">
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header">
+                @(Model.EditId.HasValue ? "ویرایش بخش" : "افزودن بخش")
+            </div>
+            <div class="card-body">
+                <form method="post">
+                    @if (Model.EditId.HasValue)
+                    {
+                        <input type="hidden" name="editId" value="@Model.EditId" />
+                    }
+                    <div class="mb-3">
+                        <label class="form-label">نام بخش <span class="text-danger">*</span></label>
+                        <input name="name" value="@Model.EditName" class="form-control" required placeholder="مثلاً: واحد فروش" />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">توضیح</label>
+                        <input name="description" value="@Model.EditDescription" class="form-control" />
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-sm">ذخیره</button>
+                    @if (Model.EditId.HasValue)
+                    {
+                        <a href="/Admin/Departments" class="btn btn-outline-secondary btn-sm ms-1">انصراف</a>
+                    }
+                </form>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">لیست بخش‌ها</div>
+            <div class="card-body p-0">
+                <table class="table table-hover mb-0">
+                    <thead><tr><th>نام</th><th>توضیح</th><th>وضعیت</th><th></th></tr></thead>
+                    <tbody>
+                        @foreach (var dept in Model.Departments)
+                        {
+                            <tr>
+                                <td class="fw-medium">@dept.Name</td>
+                                <td><small class="text-muted">@(dept.Description ?? "-")</small></td>
+                                <td><span class="badge @(dept.IsActive ? "badge-active" : "badge-scrapped")">
+                                    @(dept.IsActive ? "فعال" : "غیرفعال")
+                                </span></td>
+                                <td>
+                                    <a href="/Admin/Departments?editId=@dept.Id" class="btn btn-xs btn-outline-primary">
+                                        <i class="bi bi-pencil"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>.btn-xs { padding: 0.15rem 0.4rem; font-size: 0.75rem; }</style>

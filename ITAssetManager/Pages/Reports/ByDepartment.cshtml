@@ -1,0 +1,60 @@
+@page
+@model ITAssetManager.Pages.Reports.ByDepartmentModel
+@{
+    ViewData["Title"] = "گزارش بخش‌ها";
+}
+
+<h5 class="mb-3 fw-bold"><i class="bi bi-building me-2"></i>گزارش تجهیزات به تفکیک بخش</h5>
+
+@foreach (var dept in Model.DepartmentData)
+{
+    <div class="card mb-3">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <span class="fw-bold"><i class="bi bi-building me-2"></i>@dept.DepartmentName</span>
+            <span class="badge bg-primary">@dept.Assets.Count تجهیز</span>
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-sm mb-0">
+                    <thead>
+                        <tr><th>نام</th><th>دسته</th><th>برچسب اموال</th><th>کاربر</th><th>وضعیت</th><th>گارانتی</th></tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var asset in dept.Assets)
+                        {
+                            <tr>
+                                <td><a href="/Assets/Details/@asset.Id" class="text-decoration-none">@asset.Name</a></td>
+                                <td><small>@asset.Category?.Name</small></td>
+                                <td><small>@(asset.PropertyTag ?? "-")</small></td>
+                                <td><small>@(asset.Employee?.FullName ?? "-")</small></td>
+                                <td>
+                                    @{
+                                        var (bc, lbl) = asset.Status switch
+                                        {
+                                            AssetStatus.Active => ("badge-active", "فعال"),
+                                            AssetStatus.Faulty => ("badge-faulty", "معیوب"),
+                                            AssetStatus.UnderRepair => ("badge-repair", "در تعمیر"),
+                                            AssetStatus.Scrapped => ("badge-scrapped", "اسقاط"),
+                                            _ => ("badge-storage", "انبار")
+                                        };
+                                    }
+                                    <span class="badge @bc">@lbl</span>
+                                </td>
+                                <td>
+                                    @if (asset.WarrantyExpiry.HasValue)
+                                    {
+                                        var d = (asset.WarrantyExpiry.Value - DateTime.Today).Days;
+                                        <small class="@(d < 0 ? "text-danger" : d <= 60 ? "text-warning" : "text-success")">
+                                            @(d < 0 ? "منقضی" : d + " روز")
+                                        </small>
+                                    }
+                                    else { <small class="text-muted">-</small> }
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+}

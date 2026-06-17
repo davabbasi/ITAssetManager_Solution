@@ -1,0 +1,93 @@
+@page
+@model ITAssetManager.Pages.Reports.WarrantyModel
+@{
+    ViewData["Title"] = "گزارش گارانتی";
+}
+
+<h5 class="mb-3 fw-bold"><i class="bi bi-shield me-2"></i>گزارش گارانتی تجهیزات</h5>
+
+<div class="row g-3 mb-4">
+    <div class="col-md-3">
+        <div class="stat-card text-center">
+            <div class="text-danger fs-4"><i class="bi bi-shield-x"></i></div>
+            <div class="fw-bold fs-5 text-danger">@Model.Expired</div>
+            <small class="text-muted">منقضی شده</small>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="stat-card text-center">
+            <div class="text-warning fs-4"><i class="bi bi-shield-exclamation"></i></div>
+            <div class="fw-bold fs-5 text-warning">@Model.ExpiringSoon30</div>
+            <small class="text-muted">انقضا تا ۳۰ روز</small>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="stat-card text-center">
+            <div class="text-info fs-4"><i class="bi bi-shield-half"></i></div>
+            <div class="fw-bold fs-5 text-info">@Model.ExpiringSoon90</div>
+            <small class="text-muted">انقضا تا ۹۰ روز</small>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="stat-card text-center">
+            <div class="text-success fs-4"><i class="bi bi-shield-check"></i></div>
+            <div class="fw-bold fs-5 text-success">@Model.Valid</div>
+            <small class="text-muted">گارانتی معتبر</small>
+        </div>
+    </div>
+</div>
+
+<!-- منقضی شده -->
+@if (Model.ExpiredAssets.Any())
+{
+    <div class="card mb-3">
+        <div class="card-header text-danger"><i class="bi bi-x-circle me-2"></i>گارانتی منقضی شده (@Model.ExpiredAssets.Count)</div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-sm mb-0">
+                    <thead><tr><th>تجهیز</th><th>برچسب اموال</th><th>بخش/کاربر</th><th>تاریخ انقضا</th><th>مدت انقضا</th></tr></thead>
+                    <tbody>
+                        @foreach (var a in Model.ExpiredAssets)
+                        {
+                            <tr class="table-danger">
+                                <td><a href="/Assets/Details/@a.Id" class="text-decoration-none">@a.Name</a></td>
+                                <td><small>@(a.PropertyTag ?? "-")</small></td>
+                                <td><small>@(a.Employee?.FullName ?? a.Department?.Name ?? "-")</small></td>
+                                <td class="text-danger">@a.WarrantyExpiry!.Value.ToString("yyyy/MM/dd")</td>
+                                <td class="text-danger"><small>@Math.Abs((a.WarrantyExpiry.Value - DateTime.Today).Days) روز پیش</small></td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+}
+
+<!-- در حال انقضا -->
+@if (Model.ExpiringSoonAssets.Any())
+{
+    <div class="card mb-3">
+        <div class="card-header text-warning"><i class="bi bi-exclamation-triangle me-2"></i>در حال انقضا - ۹۰ روز آینده (@Model.ExpiringSoonAssets.Count)</div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-sm mb-0">
+                    <thead><tr><th>تجهیز</th><th>برچسب اموال</th><th>بخش/کاربر</th><th>تاریخ انقضا</th><th>روز مانده</th></tr></thead>
+                    <tbody>
+                        @foreach (var a in Model.ExpiringSoonAssets)
+                        {
+                            var days = (a.WarrantyExpiry!.Value - DateTime.Today).Days;
+                            <tr class="@(days <= 30 ? "table-warning" : "")">
+                                <td><a href="/Assets/Details/@a.Id" class="text-decoration-none">@a.Name</a></td>
+                                <td><small>@(a.PropertyTag ?? "-")</small></td>
+                                <td><small>@(a.Employee?.FullName ?? a.Department?.Name ?? "-")</small></td>
+                                <td>@a.WarrantyExpiry.Value.ToString("yyyy/MM/dd")</td>
+                                <td><span class="badge @(days <= 30 ? "badge-faulty" : "badge-repair")">@days روز</span></td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+}

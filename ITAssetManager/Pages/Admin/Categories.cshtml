@@ -1,0 +1,83 @@
+@page
+@model ITAssetManager.Pages.Admin.CategoriesModel
+@{
+    ViewData["Title"] = "دسته‌بندی تجهیزات";
+}
+
+<div class="row">
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header">
+                @(Model.EditId.HasValue ? "ویرایش دسته‌بندی" : "افزودن دسته‌بندی")
+            </div>
+            <div class="card-body">
+                <form method="post">
+                    @if (Model.EditId.HasValue)
+                    {
+                        <input type="hidden" name="editId" value="@Model.EditId" />
+                    }
+                    <div class="mb-3">
+                        <label class="form-label">نام <span class="text-danger">*</span></label>
+                        <input name="name" value="@Model.EditName" class="form-control" required />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">آیکون Bootstrap</label>
+                        <div class="input-group">
+                            <span class="input-group-text" id="iconPreview">
+                                <i class="bi @(Model.EditIcon ?? "bi-box")"></i>
+                            </span>
+                            <input name="icon" id="iconInput" value="@(Model.EditIcon ?? "bi-box")"
+                                class="form-control" placeholder="مثلاً: bi-laptop" />
+                        </div>
+                        <small class="text-muted">
+                            از <a href="https://icons.getbootstrap.com" target="_blank">Bootstrap Icons</a> انتخاب کنید
+                        </small>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">توضیح</label>
+                        <input name="description" value="@Model.EditDescription" class="form-control" />
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-sm">ذخیره</button>
+                    @if (Model.EditId.HasValue)
+                    {
+                        <a href="/Admin/Categories" class="btn btn-outline-secondary btn-sm ms-1">انصراف</a>
+                    }
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">دسته‌بندی‌ها</div>
+            <div class="card-body p-0">
+                <table class="table table-hover mb-0">
+                    <thead><tr><th>آیکون</th><th>نام</th><th>توضیح</th><th>تعداد</th><th></th></tr></thead>
+                    <tbody>
+                        @foreach (var cat in Model.Categories)
+                        {
+                            <tr>
+                                <td><i class="bi @cat.Icon fs-5 text-primary"></i></td>
+                                <td class="fw-medium">@cat.Name</td>
+                                <td><small class="text-muted">@(cat.Description ?? "-")</small></td>
+                                <td><span class="badge bg-light text-dark">@cat.Assets.Count</span></td>
+                                <td>
+                                    <a href="/Admin/Categories?editId=@cat.Id" class="btn btn-xs btn-outline-primary">
+                                        <i class="bi bi-pencil"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>.btn-xs { padding: 0.15rem 0.4rem; font-size: 0.75rem; }</style>
+<script>
+    document.getElementById('iconInput')?.addEventListener('input', function() {
+        document.querySelector('#iconPreview i').className = 'bi ' + this.value;
+    });
+</script>
