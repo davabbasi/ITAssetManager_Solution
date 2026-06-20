@@ -23,6 +23,10 @@ public class DetailsModel : PageModel
             .Include(a => a.Category)
             .Include(a => a.Department)
             .Include(a => a.Employee)
+            .Include(a => a.SpecValues)
+            .ThenInclude(sv => sv.SpecDefinition)
+            .Include(a => a.SpecValues)
+            .ThenInclude(sv => sv.SpecValue)
             .FirstOrDefaultAsync(a => a.Id == id);
 
         if (asset == null) return NotFound();

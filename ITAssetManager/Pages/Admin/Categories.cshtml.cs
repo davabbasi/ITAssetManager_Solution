@@ -15,6 +15,9 @@ public class CategoriesModel : PageModel
 
     public List<AssetCategory> Categories { get; set; } = new();
     [BindProperty(SupportsGet = true)] public int? EditId { get; set; }
+
+   
+    public int EditType { get; set; } = 1;
     public string? EditName { get; set; }
     public string? EditIcon { get; set; }
     public string? EditDescription { get; set; }
@@ -26,6 +29,7 @@ public class CategoriesModel : PageModel
             .OrderBy(c => c.Name)
             .ToListAsync();
 
+
         if (EditId.HasValue)
         {
             var cat = await _context.AssetCategories.FindAsync(EditId);
@@ -34,18 +38,26 @@ public class CategoriesModel : PageModel
                 EditName = cat.Name;
                 EditIcon = cat.Icon;
                 EditDescription = cat.Description;
+                EditType = (int)cat.Type;
+
             }
         }
     }
 
-    public async Task<IActionResult> OnPostAsync(int? editId, string name, string? icon, string? description)
+    public async Task<IActionResult> OnPostAsync(int? editId, string name, string? icon, string? description, int type = 1)
     {
         if (string.IsNullOrWhiteSpace(name)) return RedirectToPage();
 
         if (editId.HasValue)
         {
             var cat = await _context.AssetCategories.FindAsync(editId);
-            if (cat != null) { cat.Name = name; cat.Icon = icon ?? "bi-box"; cat.Description = description; }
+            if (cat != null) 
+            { 
+                cat.Name = name; 
+                cat.Icon = icon ?? "bi-box";
+                cat.Description = description;
+                cat.Type = (AssetCategoryType)type;
+            }
         }
         else
         {
@@ -53,8 +65,10 @@ public class CategoriesModel : PageModel
             {
                 Name = name,
                 Icon = icon ?? "bi-box",
-                Description = description
+                Description = description,
+                Type = (AssetCategoryType)type
             });
+
         }
         await _context.SaveChangesAsync();
         return RedirectToPage();

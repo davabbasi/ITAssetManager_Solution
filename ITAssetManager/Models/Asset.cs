@@ -42,11 +42,11 @@ public class Asset
     public string? Location { get; set; } // اتاق/طبقه
 
     // اطلاعات تکمیلی
-    public string? Specs { get; set; } // مشخصات فنی
     public string? Notes { get; set; }
     public DateTime CreatedAt { get; set; } = DateTime.Now;
     public DateTime? UpdatedAt { get; set; }
 
+    public ICollection<AssetSpecValue> SpecValues { get; set; } = new List<AssetSpecValue>();
     public ICollection<AssetAssignment> Assignments { get; set; } = new List<AssetAssignment>();
     public ICollection<MaintenanceLog> MaintenanceLogs { get; set; } = new List<MaintenanceLog>();
 }

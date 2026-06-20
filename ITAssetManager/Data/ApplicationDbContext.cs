@@ -15,7 +15,9 @@ public class ApplicationDbContext : IdentityDbContext
     public DbSet<Asset> Assets { get; set; }
     public DbSet<AssetAssignment> AssetAssignments { get; set; }
     public DbSet<MaintenanceLog> MaintenanceLogs { get; set; }
-
+    public DbSet<SpecDefinition> SpecDefinitions { get; set; }
+    public DbSet<SpecValue> SpecValues { get; set; }
+    public DbSet<AssetSpecValue> AssetSpecValues { get; set; }
     protected override void OnModelCreating(ModelBuilder builder)
     {
         base.OnModelCreating(builder);
@@ -71,6 +73,36 @@ public class ApplicationDbContext : IdentityDbContext
             .HasOne(a => a.ToDepartment)
             .WithMany()
             .HasForeignKey(a => a.ToDepartmentId)
+            .OnDelete(DeleteBehavior.NoAction);
+
+        builder.Entity<SpecDefinition>()
+            .HasOne(s => s.Category)
+            .WithMany()
+            .HasForeignKey(s => s.CategoryId)
+            .OnDelete(DeleteBehavior.NoAction);
+
+        builder.Entity<SpecValue>()
+            .HasOne(s => s.SpecDefinition)
+            .WithMany(d => d.SpecValues)
+            .HasForeignKey(s => s.SpecDefinitionId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        builder.Entity<AssetSpecValue>()
+            .HasOne(a => a.Asset)
+            .WithMany(a => a.SpecValues)
+            .HasForeignKey(a => a.AssetId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        builder.Entity<AssetSpecValue>()
+            .HasOne(a => a.SpecDefinition)
+            .WithMany(d => d.AssetSpecValues)
+            .HasForeignKey(a => a.SpecDefinitionId)
+            .OnDelete(DeleteBehavior.NoAction);
+
+        builder.Entity<AssetSpecValue>()
+            .HasOne(a => a.SpecValue)
+            .WithMany()
+            .HasForeignKey(a => a.SpecValueId)
             .OnDelete(DeleteBehavior.NoAction);
     }
 }

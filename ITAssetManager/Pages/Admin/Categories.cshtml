@@ -21,6 +21,14 @@
                         <input name="name" value="@Model.EditName" class="form-control" required />
                     </div>
                     <div class="mb-3">
+                        <label class="form-label">نوع <span class="text-danger">*</span></label>
+                        <select name="type" class="form-select">
+                            <option value="1" selected="@(Model.EditType == 1)">کالای برچسبی</option>
+                            <option value="2" selected="@(Model.EditType == 2)">قطعات نصبی</option>
+                            <option value="3" selected="@(Model.EditType == 3)">مواد مصرفی</option>
+                        </select>
+                    </div>
+                 @*    <div class="mb-3">
                         <label class="form-label">آیکون Bootstrap</label>
                         <div class="input-group">
                             <span class="input-group-text" id="iconPreview">
@@ -32,7 +40,8 @@
                         <small class="text-muted">
                             از <a href="https://icons.getbootstrap.com" target="_blank">Bootstrap Icons</a> انتخاب کنید
                         </small>
-                    </div>
+                    </div> *@
+
                     <div class="mb-3">
                         <label class="form-label">توضیح</label>
                         <input name="description" value="@Model.EditDescription" class="form-control" />
@@ -52,14 +61,37 @@
             <div class="card-header">دسته‌بندی‌ها</div>
             <div class="card-body p-0">
                 <table class="table table-hover mb-0">
-                    <thead><tr><th>آیکون</th><th>نام</th><th>توضیح</th><th>تعداد</th><th></th></tr></thead>
+                    <thead>
+                        <tr>
+                            <th>نام</th>
+                            <th>توضیح</th>
+                            <th>نوع</th>
+                            <th>تعداد</th>
+                            <th></th>
+                        </tr>
+                     </thead>
                     <tbody>
                         @foreach (var cat in Model.Categories)
                         {
                             <tr>
-                                <td><i class="bi @cat.Icon fs-5 text-primary"></i></td>
+                                
                                 <td class="fw-medium">@cat.Name</td>
                                 <td><small class="text-muted">@(cat.Description ?? "-")</small></td>
+
+                                <td>
+                                    @{
+                                        var (typeBadge, typeLabel) = cat.Type switch
+                                        {
+                                            AssetCategoryType.Tagged => ("bg-primary", "برچسبی"),
+                                            AssetCategoryType.Installed => ("bg-warning text-dark", "نصبی"),
+                                            AssetCategoryType.Consumable => ("bg-success", "مصرفی"),
+                                            _ => ("bg-secondary", "نامشخص")
+                                        };
+                                    }
+                                    <span class="badge @typeBadge">@typeLabel</span>
+                                </td>
+
+
                                 <td><span class="badge bg-light text-dark">@cat.Assets.Count</span></td>
                                 <td>
                                     <a href="/Admin/Categories?editId=@cat.Id" class="btn btn-xs btn-outline-primary">

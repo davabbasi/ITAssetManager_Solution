@@ -39,6 +39,10 @@
             <div class="card-header">اطلاعات تجهیز</div>
             <div class="card-body">
                 <div class="row g-3">
+
+
+
+
                     <div class="col-sm-6">
                         <label class="text-muted small d-block">برند / مدل</label>
                         <span>@(Model.Asset.Brand + " " + Model.Asset.Model)</span>
@@ -72,19 +76,30 @@
                         }
                         else { <span>-</span> }
                     </div>
-                    @if (!string.IsNullOrEmpty(Model.Asset.Specs))
-                    {
-                        <div class="col-12">
-                            <label class="text-muted small d-block">مشخصات فنی</label>
-                            <span>@Model.Asset.Specs</span>
-                        </div>
-                    }
+                  
                     @if (!string.IsNullOrEmpty(Model.Asset.Notes))
                     {
                         <div class="col-12">
                             <label class="text-muted small d-block">یادداشت</label>
                             <span>@Model.Asset.Notes</span>
                         </div>
+                    }
+
+                    @if (Model.Asset.SpecValues.Any())
+                    {
+                        <div class="col-12">
+                            <label class="text-muted small d-block mb-2">مشخصات فنی</label>
+                            <div class="d-flex flex-wrap gap-2">
+                                @foreach (var sv in Model.Asset.SpecValues
+                                .OrderBy(s => s.SpecDefinition?.SortOrder))
+                                {
+                                    <div class="border rounded px-2 py-1" style="font-size:0.85rem;">
+                                        <span class="text-muted">@sv.SpecDefinition?.Name:</span>
+                                        <strong class="ms-1">@sv.SpecValue?.Value</strong>
+                                    </div>
+                                }
+                                </div>
+                                </div>
                     }
                 </div>
             </div>

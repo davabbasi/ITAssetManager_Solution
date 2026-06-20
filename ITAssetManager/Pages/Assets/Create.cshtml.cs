@@ -19,9 +19,12 @@ public class CreateModel : PageModel
     public SelectList CategoryList { get; set; } = null!;
     public SelectList DepartmentList { get; set; } = null!;
     public SelectList EmployeeList { get; set; } = null!;
-
+    public List<SpecDefinition> SpecDefinitions { get; set; } = new();
+    [BindProperty] public Dictionary<int, int> SpecValues { get; set; } = new();
     public async Task OnGetAsync()
     {
+        if (Asset.CategoryId > 0)
+            SpecDefinitions = await LoadSpecsAsync(Asset.CategoryId);
         await LoadSelectListsAsync();
     }
 
@@ -58,6 +61,21 @@ public class CreateModel : PageModel
             await _context.SaveChangesAsync();
         }
 
+        foreach (var (specDefId, specValId) in SpecValues)
+        {
+            if (specValId > 0)
+            {
+                _context.AssetSpecValues.Add(new AssetSpecValue
+                {
+                    AssetId = Asset.Id,
+                    SpecDefinitionId = specDefId,
+                    SpecValueId = specValId
+                });
+            }
+        }
+        await _context.SaveChangesAsync();
+
+
         TempData["Success"] = "تجهیز با موفقیت ثبت شد.";
         return RedirectToPage("/Assets/Details", new { id = Asset.Id });
     }
@@ -74,5 +92,16 @@ public class CreateModel : PageModel
                 .OrderBy(e => e.FullName)
                 .Select(e => new { e.Id, Name = e.FullName + " - " + e.Department!.Name })
                 .ToListAsync(), "Id", "Name");
+        if (Asset.CategoryId > 0)
+            SpecDefinitions = await LoadSpecsAsync(Asset.CategoryId);
+    }
+
+    private async Task<List<SpecDefinition>> LoadSpecsAsync(int categoryId)
+    {
+        return await _context.SpecDefinitions
+            .Include(s => s.SpecValues)
+            .Where(s => s.CategoryId == categoryId)
+            .OrderBy(s => s.SortOrder)
+            .ToListAsync();
     }
 }

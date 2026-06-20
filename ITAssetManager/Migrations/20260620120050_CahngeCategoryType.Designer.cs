@@ -4,6 +4,7 @@ using ITAssetManager.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace ITAssetManager.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260620120050_CahngeCategoryType")]
+    partial class CahngeCategoryType
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -71,6 +74,9 @@ namespace ITAssetManager.Migrations
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<string>("SerialNumber")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Specs")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("Status")
@@ -264,34 +270,6 @@ namespace ITAssetManager.Migrations
                         });
                 });
 
-            modelBuilder.Entity("ITAssetManager.Models.AssetSpecValue", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("AssetId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("SpecDefinitionId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("SpecValueId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("AssetId");
-
-                    b.HasIndex("SpecDefinitionId");
-
-                    b.HasIndex("SpecValueId");
-
-                    b.ToTable("AssetSpecValues");
-                });
-
             modelBuilder.Entity("ITAssetManager.Models.Department", b =>
                 {
                     b.Property<int>("Id")
@@ -393,56 +371,6 @@ namespace ITAssetManager.Migrations
                     b.HasIndex("AssetId");
 
                     b.ToTable("MaintenanceLogs");
-                });
-
-            modelBuilder.Entity("ITAssetManager.Models.SpecDefinition", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("CategoryId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("SortOrder")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("CategoryId");
-
-                    b.ToTable("SpecDefinitions");
-                });
-
-            modelBuilder.Entity("ITAssetManager.Models.SpecValue", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("SortOrder")
-                        .HasColumnType("int");
-
-                    b.Property<int>("SpecDefinitionId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Value")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("SpecDefinitionId");
-
-                    b.ToTable("SpecValues");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
@@ -707,33 +635,6 @@ namespace ITAssetManager.Migrations
                     b.Navigation("ToEmployee");
                 });
 
-            modelBuilder.Entity("ITAssetManager.Models.AssetSpecValue", b =>
-                {
-                    b.HasOne("ITAssetManager.Models.Asset", "Asset")
-                        .WithMany("SpecValues")
-                        .HasForeignKey("AssetId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("ITAssetManager.Models.SpecDefinition", "SpecDefinition")
-                        .WithMany("AssetSpecValues")
-                        .HasForeignKey("SpecDefinitionId")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
-
-                    b.HasOne("ITAssetManager.Models.SpecValue", "SpecValue")
-                        .WithMany()
-                        .HasForeignKey("SpecValueId")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
-
-                    b.Navigation("Asset");
-
-                    b.Navigation("SpecDefinition");
-
-                    b.Navigation("SpecValue");
-                });
-
             modelBuilder.Entity("ITAssetManager.Models.Employee", b =>
                 {
                     b.HasOne("ITAssetManager.Models.Department", "Department")
@@ -754,28 +655,6 @@ namespace ITAssetManager.Migrations
                         .IsRequired();
 
                     b.Navigation("Asset");
-                });
-
-            modelBuilder.Entity("ITAssetManager.Models.SpecDefinition", b =>
-                {
-                    b.HasOne("ITAssetManager.Models.AssetCategory", "Category")
-                        .WithMany()
-                        .HasForeignKey("CategoryId")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
-
-                    b.Navigation("Category");
-                });
-
-            modelBuilder.Entity("ITAssetManager.Models.SpecValue", b =>
-                {
-                    b.HasOne("ITAssetManager.Models.SpecDefinition", "SpecDefinition")
-                        .WithMany("SpecValues")
-                        .HasForeignKey("SpecDefinitionId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("SpecDefinition");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -834,8 +713,6 @@ namespace ITAssetManager.Migrations
                     b.Navigation("Assignments");
 
                     b.Navigation("MaintenanceLogs");
-
-                    b.Navigation("SpecValues");
                 });
 
             modelBuilder.Entity("ITAssetManager.Models.AssetCategory", b =>
@@ -853,13 +730,6 @@ namespace ITAssetManager.Migrations
             modelBuilder.Entity("ITAssetManager.Models.Employee", b =>
                 {
                     b.Navigation("AssetAssignments");
-                });
-
-            modelBuilder.Entity("ITAssetManager.Models.SpecDefinition", b =>
-                {
-                    b.Navigation("AssetSpecValues");
-
-                    b.Navigation("SpecValues");
                 });
 #pragma warning restore 612, 618
         }

@@ -1,0 +1,203 @@
+﻿@page
+@model ITAssetManager.Pages.Admin.SpecsModel
+@{
+    ViewData["Title"] = "مشخصات فنی دسته‌بندی‌ها";
+}
+
+<div class="row">
+    <!-- ستون چپ: فرم‌ها -->
+    <div class="col-md-4">
+
+        <!-- فرم انتخاب دسته‌بندی -->
+        <div class="card mb-3">
+            <div class="card-header">انتخاب دسته‌بندی</div>
+            <div class="card-body">
+                <form method="get">
+                    <div class="mb-2">
+                        <select name="categoryId" class="form-select" onchange="this.form.submit()">
+                            <option value="">انتخاب دسته‌بندی...</option>
+                            @foreach (var cat in Model.Categories)
+                            {
+                                <option value="@cat.Id" selected="@(Model.SelectedCategoryId == cat.Id)">
+                                    @cat.Name
+                                </option>
+                            }
+                        </select>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        @if (Model.SelectedCategoryId.HasValue)
+        {
+            <!-- فرم افزودن مشخصه -->
+            <div class="card mb-3">
+                <div class="card-header">
+                    @(Model.EditSpecId.HasValue ? "ویرایش مشخصه" : "افزودن مشخصه جدید")
+                </div>
+                <div class="card-body">
+                    <form method="post" asp-page-handler="SaveSpec">
+                        <input type="hidden" name="categoryId" value="@Model.SelectedCategoryId" />
+                        @if (Model.EditSpecId.HasValue)
+                        {
+                            <input type="hidden" name="specId" value="@Model.EditSpecId" />
+                        }
+                        <div class="mb-2">
+                            <label class="form-label">نام مشخصه <span class="text-danger">*</span></label>
+                            <input name="specName" value="@Model.EditSpecName"
+                                   class="form-control form-control-sm" placeholder="مثلاً: مارک، رم، هارد1" required />
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">ترتیب نمایش</label>
+                            <input name="sortOrder" type="number" value="@Model.EditSortOrder"
+                                   class="form-control form-control-sm" />
+                        </div>
+                        <div class="d-flex gap-1">
+                            <button type="submit" class="btn btn-primary btn-sm flex-fill">ذخیره</button>
+                            @if (Model.EditSpecId.HasValue)
+                            {
+                                <a href="/Admin/Specs?categoryId=@Model.SelectedCategoryId"
+                                   class="btn btn-outline-secondary btn-sm">انصراف</a>
+                            }
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- فرم افزودن مقدار -->
+            @if (Model.SelectedSpecId.HasValue)
+            {
+                <div class="card">
+                    <div class="card-header">
+                        مقادیر: <strong>@Model.SelectedSpecName</strong>
+                    </div>
+                    <div class="card-body">
+                        <form method="post" asp-page-handler="SaveValue">
+                            <input type="hidden" name="categoryId" value="@Model.SelectedCategoryId" />
+                            <input type="hidden" name="specDefinitionId" value="@Model.SelectedSpecId" />
+                            @if (Model.EditValueId.HasValue)
+                            {
+                                <input type="hidden" name="valueId" value="@Model.EditValueId" />
+                            }
+                            <div class="mb-2">
+                                <label class="form-label">مقدار <span class="text-danger">*</span></label>
+                                <input name="value" value="@Model.EditValueText"
+                                       class="form-control form-control-sm"
+                                       placeholder="مثلاً: Asus، 16GB، 512GB SSD" required />
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">ترتیب نمایش</label>
+                                <input name="sortOrder" type="number" value="@Model.EditValueSortOrder"
+                                       class="form-control form-control-sm" />
+                            </div>
+                            <div class="d-flex gap-1">
+                                <button type="submit" class="btn btn-success btn-sm flex-fill">افزودن مقدار</button>
+                                @if (Model.EditValueId.HasValue)
+                                {
+                                    <a href="/Admin/Specs?categoryId=@Model.SelectedCategoryId&selectedSpecId=@Model.SelectedSpecId"
+                                       class="btn btn-outline-secondary btn-sm">انصراف</a>
+                                }
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            }
+        }
+    </div>
+
+    <!-- ستون راست: لیست مشخصات -->
+    <div class="col-md-8">
+        @if (!Model.SelectedCategoryId.HasValue)
+        {
+            <div class="card">
+                <div class="card-body text-center text-muted py-5">
+                    <i class="bi bi-arrow-right fs-2"></i>
+                    <p class="mt-2">یک دسته‌بندی انتخاب کنید</p>
+                </div>
+            </div>
+        }
+        else
+        {
+            @foreach (var spec in Model.SpecDefinitions)
+            {
+                var isSelected = Model.SelectedSpecId == spec.Id;
+                <div class="card mb-2 @(isSelected ? "border-primary" : "")">
+                    <div class="card-header d-flex justify-content-between align-items-center py-2">
+                        <span class="fw-medium">
+                            <i class="bi bi-tag me-1"></i>@spec.Name
+                            <small class="text-muted ms-1">(ترتیب: @spec.SortOrder)</small>
+                        </span>
+                        <div class="d-flex gap-1">
+                            <a href="/Admin/Specs?categoryId=@Model.SelectedCategoryId&selectedSpecId=@spec.Id"
+                               class="btn btn-xs @(isSelected ? "btn-success" : "btn-outline-success")"
+                               title="مدیریت مقادیر">
+                                <i class="bi bi-list-ul"></i> مقادیر (@spec.SpecValues.Count)
+                            </a>
+                            <a href="/Admin/Specs?categoryId=@Model.SelectedCategoryId&editSpecId=@spec.Id"
+                               class="btn btn-xs btn-outline-primary" title="ویرایش">
+                                <i class="bi bi-pencil"></i>
+                            </a>
+                            <form method="post" asp-page-handler="DeleteSpec"
+                                  onsubmit="return confirm('حذف شود؟')">
+                                <input type="hidden" name="specId" value="@spec.Id" />
+                                <input type="hidden" name="categoryId" value="@Model.SelectedCategoryId" />
+                                <button type="submit" class="btn btn-xs btn-outline-danger">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+
+                    @if (isSelected && spec.SpecValues.Any())
+                    {
+                        <div class="card-body py-2">
+                            <div class="d-flex flex-wrap gap-1">
+                                @foreach (var val in spec.SpecValues.OrderBy(v => v.SortOrder))
+                                {
+                                    <div class="d-flex align-items-center gap-1">
+                                        <span class="badge bg-light text-dark border">@val.Value</span>
+                                        <a href="/Admin/Specs?categoryId=@Model.SelectedCategoryId&selectedSpecId=@spec.Id&editValueId=@val.Id"
+                                           class="text-primary" style="font-size:0.7rem;" title="ویرایش">
+                                            <i class="bi bi-pencil"></i>
+                                        </a>
+                                        <form method="post" asp-page-handler="DeleteValue" style="display:inline;">
+                                            <input type="hidden" name="valueId" value="@val.Id" />
+                                            <input type="hidden" name="categoryId" value="@Model.SelectedCategoryId" />
+                                            <input type="hidden" name="specDefinitionId" value="@spec.Id" />
+                                            <button type="submit" class="btn btn-xs text-danger border-0 p-0"
+                                                    onclick="return confirm('حذف شود؟')"
+                                                    style="background:none;font-size:0.7rem;">
+                                                <i class="bi bi-x-circle"></i>
+                                            </button>
+                                        </form>
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                    }
+                    else if (isSelected)
+                    {
+                        <div class="card-body py-2 text-muted small">
+                            هنوز مقداری تعریف نشده — از فرم سمت چپ اضافه کنید
+                        </div>
+                    }
+                </div>
+            }
+
+            @if (!Model.SpecDefinitions.Any())
+            {
+                <div class="card">
+                    <div class="card-body text-center text-muted py-4">
+                        هنوز مشخصه‌ای برای این دسته‌بندی تعریف نشده
+                    </div>
+                </div>
+            }
+        }
+    </div>
+</div>
+
+<style>
+    .btn-xs {
+        padding: 0.15rem 0.4rem;
+        font-size: 0.75rem;
+    }</style>
