@@ -1,0 +1,30 @@
+﻿@model List<SpecDefinition>
+
+<div class="row g-3 mb-3">
+
+    @foreach (var spec in Model)
+    {
+        <div class="col-md-4">
+
+            <label class="form-label">
+                @spec.Name
+            </label>
+
+            <select name="SpecValues[@spec.Id]"
+                    class="form-select">
+
+                <option value="">انتخاب کنید...</option>
+
+                @foreach (var value in spec.SpecValues)
+                {
+                    <option value="@value.Id">
+                        @value.Value
+                    </option>
+                }
+
+            </select>
+
+        </div>
+    }
+
+</div>

@@ -104,4 +104,15 @@ public class CreateModel : PageModel
             .OrderBy(s => s.SortOrder)
             .ToListAsync();
     }
+
+
+    public async Task<IActionResult> OnGetSpecsAsync(int categoryId)
+    {
+        var specs = await _context.SpecDefinitions
+            .Include(x => x.SpecValues)
+            .Where(x => x.CategoryId == categoryId)
+            .ToListAsync();
+
+        return Partial("_SpecsPartial", specs);
+    }
 }

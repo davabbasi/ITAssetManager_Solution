@@ -24,7 +24,7 @@
                         </div>
                         <div class="col-md-6">
                             <label class="form-label">دسته‌بندی <span class="text-danger">*</span></label>
-                            <select asp-for="Asset.CategoryId" asp-items="Model.CategoryList" class="form-select">
+                            <select id="categorySelect" asp-for="Asset.CategoryId" asp-items="Model.CategoryList" class="form-select">
                                 <option value="">انتخاب کنید...</option>
                             </select>
                         </div>
@@ -73,6 +73,8 @@
                         <div class="col-md-4">
                             <label class="form-label">تاریخ خرید</label>
                             <input asp-for="Asset.PurchaseDate" type="date" class="form-control" />
+                            <input type="text" class="persian-date form-control" />
+
                         </div>
                         <div class="col-md-4">
                             <label class="form-label">انقضا گارانتی</label>
@@ -106,7 +108,6 @@
                     </div>
 
                     <!-- بخش پنجم: مشخصات و توضیحات -->
-                    <!-- بخش مشخصات فنی - جایگزین textarea قبلی -->
                     <h6 class="text-muted mb-3 border-bottom pb-2">مشخصات فنی</h6>
                     <div id="specs-container">
                         @if (Model.SpecDefinitions.Any())
@@ -123,6 +124,11 @@
                                                 <option value="@val.Id">@val.Value</option>
                                             }
                                         </select>
+                                    </div>
+                                    <div id="specs-container">
+                                        <div class="text-muted">
+                                            دسته‌بندی را انتخاب کنید
+                                        </div>
                                     </div>
                                 }
                             </div>
@@ -151,6 +157,37 @@
 
 
 @section Scripts {
+    <script>
+        document.getElementById('categorySelect')
+        .addEventListener('change', async function () {
+
+            const categoryId = this.value;
+
+            if (!categoryId) {
+                document.getElementById('specs-container').innerHTML =
+                    '<div class="text-muted">دسته‌بندی را انتخاب کنید</div>';
+                return;
+            }
+
+            const response = await fetch(
+                `/Assets/Create?handler=Specs&categoryId=${categoryId}`
+            );
+
+            const html = await response.text();
+
+            document.getElementById('specs-container').innerHTML = html;
+        });
+    </script>
+}
+
+
+
+
+
+
+
+
+@* @section Scripts {
     <script>
         document.getElementById('categorySelect').addEventListener('change', function() {
             const categoryId = this.value;
@@ -181,4 +218,4 @@
                 });
         });
     </script>
-}
+} *@

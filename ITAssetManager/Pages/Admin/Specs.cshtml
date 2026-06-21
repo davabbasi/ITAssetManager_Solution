@@ -14,11 +14,12 @@
             <div class="card-body">
                 <form method="get">
                     <div class="mb-2">
-                        <select name="categoryId" class="form-select" onchange="this.form.submit()">
+                        <select asp-for="SelectedCategoryId" class="form-select" onchange="this.form.submit()">
                             <option value="">انتخاب دسته‌بندی...</option>
                             @foreach (var cat in Model.Categories)
                             {
                                 <option value="@cat.Id" selected="@(Model.SelectedCategoryId == cat.Id)">
+                                    
                                     @cat.Name
                                 </option>
                             }
@@ -103,6 +104,7 @@
                 </div>
             }
         }
+   
     </div>
 
     <!-- ستون راست: لیست مشخصات -->
