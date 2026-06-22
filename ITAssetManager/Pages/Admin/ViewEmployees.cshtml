@@ -1,0 +1,42 @@
+﻿@page
+@model ITAssetManager.Pages.Admin.ViewEmployeesModel
+@{
+    ViewData["Title"] = "پرسنل";
+}
+
+<div class="card">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <span><i class="bi bi-people me-2"></i>لیست پرسنل</span>
+        <small class="text-muted">اطلاعات از سیستم پرسنلی</small>
+    </div>
+    <div class="card-body py-2">
+        <input type="text" id="searchEmp" class="form-control form-control-sm mb-3"
+               placeholder="جستجو..." oninput="filterTable(this,'empTable')" />
+    </div>
+    <div class="card-body p-0">
+        <table class="table table-hover mb-0" id="empTable">
+            <thead>
+                <tr><th>نام</th><th>کد پرسنلی</th><th>سمت</th><th>واحد</th></tr>
+            </thead>
+            <tbody>
+                @foreach (var emp in Model.Employees)
+                {
+                    <tr>
+                        <td class="fw-medium">@emp.FullName</td>
+                        <td><small class="text-muted">@(emp.EmployeeCode ?? "-")</small></td>
+                        <td><small>@emp.DepartmentName</small></td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+    function filterTable(input, tableId) {
+        var filter = input.value.toLowerCase();
+        document.querySelectorAll('#' + tableId + ' tbody tr').forEach(function(row) {
+            row.style.display = row.textContent.toLowerCase().includes(filter) ? '' : 'none';
+        });
+    }
+</script>

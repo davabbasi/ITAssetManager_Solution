@@ -18,6 +18,8 @@ public class ApplicationDbContext : IdentityDbContext
     public DbSet<SpecDefinition> SpecDefinitions { get; set; }
     public DbSet<SpecValue> SpecValues { get; set; }
     public DbSet<AssetSpecValue> AssetSpecValues { get; set; }
+    public DbSet<VwEmployee> VwEmployees { get; set; }
+    public DbSet<VwDepartment> VwDepartments { get; set; }
     protected override void OnModelCreating(ModelBuilder builder)
     {
         base.OnModelCreating(builder);
@@ -104,5 +106,8 @@ public class ApplicationDbContext : IdentityDbContext
             .WithMany()
             .HasForeignKey(a => a.SpecValueId)
             .OnDelete(DeleteBehavior.NoAction);
+
+        builder.Entity<VwEmployee>().ToView("vw_Employees").HasKey(e => e.Id);
+        builder.Entity<VwDepartment>().ToView("vw_Departments").HasKey(d => d.Id);
     }
 }
