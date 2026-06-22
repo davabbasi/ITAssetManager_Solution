@@ -1,4 +1,4 @@
-using ITAssetManager.Data;
+﻿using ITAssetManager.Data;
 using ITAssetManager.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -15,20 +15,16 @@ public class SpecsModel : PageModel
 
     public List<AssetCategory> Categories { get; set; } = new();
     public List<SpecDefinition> SpecDefinitions { get; set; } = new();
-
-    [BindProperty(SupportsGet = true)] public int? SelectedCategoryId { get; set; }
-    [BindProperty(SupportsGet = true)] public int? SelectedSpecId { get; set; }
-    [BindProperty(SupportsGet = true)] public int? EditSpecId { get; set; }
-    [BindProperty(SupportsGet = true)] public int? EditValueId { get; set; }
-
-    public string? EditSpecName { get; set; }
-    public int EditSortOrder { get; set; }
+    public List<SpecValue> SpecValues { get; set; } = new();
+    public int? SelectedCategoryId { get; set; }
+    public int? SelectedSpecId { get; set; }
     public string? SelectedSpecName { get; set; }
-    public string? EditValueText { get; set; }
-    public int EditValueSortOrder { get; set; }
 
     public async Task OnGetAsync()
     {
+        SelectedCategoryId = int.TryParse(Request.Query["categoryId"], out var c) ? c : null;
+        SelectedSpecId = int.TryParse(Request.Query["selectedSpecId"], out var s) ? s : null;
+
         Categories = await _context.AssetCategories.OrderBy(c => c.Name).ToListAsync();
 
         if (SelectedCategoryId.HasValue)
@@ -40,71 +36,16 @@ public class SpecsModel : PageModel
                 .ToListAsync();
         }
 
-        if (EditSpecId.HasValue)
-        {
-            var spec = await _context.SpecDefinitions.FindAsync(EditSpecId);
-            if (spec != null) { EditSpecName = spec.Name; EditSortOrder = spec.SortOrder; }
-        }
-
         if (SelectedSpecId.HasValue)
         {
             var spec = await _context.SpecDefinitions.FindAsync(SelectedSpecId);
             SelectedSpecName = spec?.Name;
 
-            if (EditValueId.HasValue)
-            {
-                var val = await _context.SpecValues.FindAsync(EditValueId);
-                if (val != null) { EditValueText = val.Value; EditValueSortOrder = val.SortOrder; }
-            }
+            SpecValues = await _context.SpecValues
+                .Where(v => v.SpecDefinitionId == SelectedSpecId)
+                .OrderBy(v => v.SortOrder).ThenBy(v => v.Value)
+                .ToListAsync();
         }
-    }
-
-    public async Task<IActionResult> OnPostSaveSpecAsync(int categoryId, int? specId,
-        string specName, int sortOrder = 0)
-    {
-        if (string.IsNullOrWhiteSpace(specName))
-            return RedirectToPage(new { categoryId });
-
-        if (specId.HasValue)
-        {
-            var spec = await _context.SpecDefinitions.FindAsync(specId);
-            if (spec != null) { spec.Name = specName; spec.SortOrder = sortOrder; }
-        }
-        else
-        {
-            _context.SpecDefinitions.Add(new SpecDefinition
-            {
-                Name = specName,
-                CategoryId = categoryId,
-                SortOrder = sortOrder
-            });
-        }
-        await _context.SaveChangesAsync();
-        return RedirectToPage(new { categoryId });
-    }
-
-    public async Task<IActionResult> OnPostSaveValueAsync(int categoryId, int specDefinitionId,
-        int? valueId, string value, int sortOrder = 0)
-    {
-        if (string.IsNullOrWhiteSpace(value))
-            return RedirectToPage(new { categoryId, selectedSpecId = specDefinitionId });
-
-        if (valueId.HasValue)
-        {
-            var val = await _context.SpecValues.FindAsync(valueId);
-            if (val != null) { val.Value = value; val.SortOrder = sortOrder; }
-        }
-        else
-        {
-            _context.SpecValues.Add(new SpecValue
-            {
-                Value = value,
-                SpecDefinitionId = specDefinitionId,
-                SortOrder = sortOrder
-            });
-        }
-        await _context.SaveChangesAsync();
-        return RedirectToPage(new { categoryId, selectedSpecId = specDefinitionId });
     }
 
     public async Task<IActionResult> OnPostDeleteSpecAsync(int specId, int categoryId)
@@ -112,14 +53,16 @@ public class SpecsModel : PageModel
         var spec = await _context.SpecDefinitions.FindAsync(specId);
         if (spec != null) _context.SpecDefinitions.Remove(spec);
         await _context.SaveChangesAsync();
+        TempData["Success"] = "مشخصه با موفقیت حذف شد.";
         return RedirectToPage(new { categoryId });
     }
 
-    public async Task<IActionResult> OnPostDeleteValueAsync(int valueId, int categoryId, int specDefinitionId)
+    public async Task<IActionResult> OnPostDeleteValueAsync(int valueId, int categoryId, int specId)
     {
         var val = await _context.SpecValues.FindAsync(valueId);
         if (val != null) _context.SpecValues.Remove(val);
         await _context.SaveChangesAsync();
-        return RedirectToPage(new { categoryId, selectedSpecId = specDefinitionId });
+        TempData["Success"] = "مقدار با موفقیت حذف شد.";
+        return RedirectToPage(new { categoryId, selectedSpecId = specId });
     }
 }

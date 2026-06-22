@@ -1,0 +1,42 @@
+@page
+@model ITAssetManager.Pages.Admin.SpecValueCreateModel
+@{
+    ViewData["Title"] = "ایجاد مقدار جدید";
+}
+
+<div class="row justify-content-center">
+    <div class="col-lg-5">
+        <div class="card">
+            <div class="card-header">
+                <i class="bi bi-plus-circle me-2"></i>ایجاد مقدار جدید
+                <small class="text-muted me-2">— @Model.SpecName</small>
+            </div>
+            <div class="card-body">
+                <form method="post">
+                    <input type="hidden" name="specId" value="@Model.SpecId" />
+                    <input type="hidden" name="categoryId" value="@Model.CategoryId" />
+                    <div class="mb-3">
+                        <label class="form-label">مقدار <span class="text-danger">*</span></label>
+                        <input name="value" class="form-control" required
+                            placeholder="مثلاً: Asus، 16GB، 512GB SSD" autofocus />
+                    </div>
+                    <div class="mb-4">
+                        <label class="form-label">ترتیب نمایش</label>
+                        <input name="sortOrder" type="number" value="0"
+                            class="form-control" style="max-width:120px;" />
+                    </div>
+                    <div class="d-flex gap-2">
+                        <button type="submit" name="action" value="saveAndNew" class="btn btn-outline-primary">
+                            <i class="bi bi-plus-lg me-1"></i>ذخیره و جدید
+                        </button>
+                        <button type="submit" name="action" value="save" class="btn btn-primary">
+                            <i class="bi bi-check-lg me-1"></i>ذخیره
+                        </button>
+                        <a href="/Admin/Specs?categoryId=@Model.CategoryId&selectedSpecId=@Model.SpecId"
+                           class="btn btn-outline-secondary">انصراف</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
