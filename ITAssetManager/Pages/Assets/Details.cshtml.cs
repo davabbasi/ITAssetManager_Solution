@@ -21,8 +21,7 @@ public class DetailsModel : PageModel
     {
         var asset = await _context.Assets
             .Include(a => a.Category)
-            .Include(a => a.Department)
-            .Include(a => a.Employee)
+           
             .Include(a => a.SpecValues)
             .ThenInclude(sv => sv.SpecDefinition)
             .Include(a => a.SpecValues)
@@ -33,10 +32,6 @@ public class DetailsModel : PageModel
         Asset = asset;
 
         Assignments = await _context.AssetAssignments
-            .Include(a => a.FromEmployee)
-            .Include(a => a.ToEmployee)
-            .Include(a => a.FromDepartment)
-            .Include(a => a.ToDepartment)
             .Where(a => a.AssetId == id)
             .OrderByDescending(a => a.AssignedAt)
             .ToListAsync();

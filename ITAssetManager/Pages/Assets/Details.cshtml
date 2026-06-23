@@ -137,9 +137,9 @@
                                 {
                                     <tr>
                                         <td><small>@a.AssignedAt.ToString("yy/MM/dd")</small></td>
-                                        <td><small>@(a.FromEmployee?.FullName ?? a.FromDepartment?.Name ?? "-")</small></td>
+                                        <td><small>@(a.FromEmployeeName ?? a.FromDepartmentName ?? "-")</small></td>
                                         <td><i class="bi bi-arrow-left text-muted"></i></td>
-                                        <td><small class="fw-medium">@(a.ToEmployee?.FullName ?? a.ToDepartment?.Name ?? "-")</small></td>
+                                        <td><small class="fw-medium">@(a.ToEmployeeName ?? a.ToDepartmentName ?? "-")</small></td>
                                         <td><small class="text-muted">@(a.Reason ?? "-")</small></td>
                                         <td><small class="text-muted">@a.AssignedBy</small></td>
                                     </tr>
@@ -235,22 +235,22 @@
         <div class="card mb-3">
             <div class="card-header">تخصیص فعلی</div>
             <div class="card-body">
-                @if (Model.Asset.Employee != null)
+                @if (Model.Asset.EmployeeName != null)
                 {
                     <div class="d-flex align-items-center gap-2 mb-2">
                         <div class="rounded-circle bg-primary d-flex align-items-center justify-content-center text-white"
                              style="width:36px;height:36px;font-size:0.85rem;flex-shrink:0;">
-                            @Model.Asset.Employee.FullName.First()
+                            @Model.Asset.EmployeeName.First()
                         </div>
                         <div>
-                            <div class="fw-medium">@Model.Asset.Employee.FullName</div>
-                            <small class="text-muted">@Model.Asset.Department?.Name</small>
+                            <div class="fw-medium">@Model.Asset.EmployeeName</div>
+                            <small class="text-muted">@Model.Asset.DepartmentName?? "مشخص نشده است" </small>
                         </div>
                     </div>
                 }
-                else if (Model.Asset.Department != null)
+                else if (Model.Asset.DepartmentName != null)
                 {
-                    <div><i class="bi bi-building me-2"></i>@Model.Asset.Department.Name</div>
+                    <div><i class="bi bi-building me-2"></i>@Model.Asset.DepartmentName</div>
                 }
                 else
                 {

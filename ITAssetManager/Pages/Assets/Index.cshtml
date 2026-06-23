@@ -119,14 +119,14 @@
                                 </td>
                                 <td><small class="text-muted">@(asset.SerialNumber ?? "-")</small></td>
                                 <td>
-                                    @if (asset.Employee != null)
+                                    @if (asset.EmployeeName != null)
                                     {
-                                        <small><i class="bi bi-person me-1"></i>@asset.Employee.FullName</small>
-                                        <br /><small class="text-muted">@asset.Department?.Name</small>
+                                        <small><i class="bi bi-person me-1"></i>@asset.EmployeeName</small>
+                                        <br /><small class="text-muted">@asset.DepartmentName</small>
                                     }
-                                    else if (asset.Department != null)
+                                    else if (asset.DepartmentName != null)
                                     {
-                                        <small><i class="bi bi-building me-1"></i>@asset.Department.Name</small>
+                                        <small><i class="bi bi-building me-1"></i>@asset.DepartmentName</small>
                                     }
                                     else
                                     {

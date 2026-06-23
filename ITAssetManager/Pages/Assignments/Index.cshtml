@@ -70,9 +70,9 @@
                                     <br /><small class="text-muted">@a.Asset.PropertyTag</small>
                                 }
                             </td>
-                            <td><small class="text-muted">@(a.FromEmployee?.FullName ?? a.FromDepartment?.Name ?? "-")</small></td>
+                            <td><small class="text-muted">@(a.FromEmployeeName ?? a.FromDepartmentName ?? "-")</small></td>
                             <td><i class="bi bi-arrow-left text-primary"></i></td>
-                            <td><small class="fw-medium">@(a.ToEmployee?.FullName ?? a.ToDepartment?.Name ?? "تخصیص‌نیافته")</small></td>
+                            <td><small class="fw-medium">@(a.ToEmployeeName ?? a.ToDepartmentName ?? "تخصیص‌نیافته")</small></td>
                             <td><small class="text-muted">@(a.ToLocation ?? "-")</small></td>
                             <td><small>@(a.Reason ?? "-")</small></td>
                             <td><small class="text-muted">@a.AssignedBy</small></td>

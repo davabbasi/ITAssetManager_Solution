@@ -12,7 +12,7 @@
                     <td><a href="/Assets/Details/@asset.Id" class="text-decoration-none">@asset.Name</a></td>
                     <td><small>@(asset.PropertyTag ?? "-")</small></td>
                     <td><small>@asset.Category?.Name</small></td>
-                    <td><small>@(asset.Employee?.FullName ?? asset.Department?.Name ?? "-")</small></td>
+                    <td><small>@(asset.EmployeeName ?? asset.DepartmentName ?? "-")</small></td>
                     <td><small class="text-muted">@(asset.StatusNote ?? "-")</small></td>
                 </tr>
             }

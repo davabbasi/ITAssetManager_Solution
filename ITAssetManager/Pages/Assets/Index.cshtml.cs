@@ -15,7 +15,7 @@ public class IndexModel : PageModel
 
     public List<Asset> Assets { get; set; } = new();
     public List<AssetCategory> Categories { get; set; } = new();
-    public List<Department> Departments { get; set; } = new();
+    public List<VwDepartment> Departments { get; set; } = new();
     public int TotalCount { get; set; }
 
     [BindProperty(SupportsGet = true)] public string? Search { get; set; }
@@ -26,12 +26,10 @@ public class IndexModel : PageModel
     public async Task OnGetAsync()
     {
         Categories = await _context.AssetCategories.OrderBy(c => c.Name).ToListAsync();
-        Departments = await _context.Departments.Where(d => d.IsActive).OrderBy(d => d.Name).ToListAsync();
+        Departments = await _context.VwDepartments.OrderBy(d => d.Name).ToListAsync();
 
         var query = _context.Assets
             .Include(a => a.Category)
-            .Include(a => a.Department)
-            .Include(a => a.Employee)
             .AsQueryable();
 
         if (!string.IsNullOrEmpty(Search))

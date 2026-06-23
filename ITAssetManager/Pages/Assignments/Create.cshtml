@@ -22,7 +22,7 @@
                                 <span class="ms-2 text-muted">| برچسب: @Model.Asset.PropertyTag</span>
                             }
                             <div class="small text-muted">
-                                کاربر فعلی: @(Model.Asset.Employee?.FullName ?? Model.Asset.Department?.Name ?? "تخصیص‌نیافته")
+                                کاربر فعلی: @(Model.Asset.EmployeeName ?? Model.Asset.DepartmentName ?? "تخصیص‌نیافته")
                             </div>
                         </div>
                     </div>

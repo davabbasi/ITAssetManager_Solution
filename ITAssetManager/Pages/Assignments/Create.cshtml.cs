@@ -25,8 +25,7 @@ public class CreateModel : PageModel
         if (assetId.HasValue)
         {
             Asset = await _context.Assets
-                .Include(a => a.Employee)
-                .Include(a => a.Department)
+               
                 .FirstOrDefaultAsync(a => a.Id == assetId);
 
             if (Asset != null)
@@ -51,7 +50,7 @@ public class CreateModel : PageModel
         if (!ModelState.IsValid)
         {
             if (Assignment.AssetId > 0)
-                Asset = await _context.Assets.Include(a => a.Employee).Include(a => a.Department)
+                Asset = await _context.Assets
                     .FirstOrDefaultAsync(a => a.Id == Assignment.AssetId);
             await LoadSelectListsAsync();
             return Page();
@@ -67,6 +66,39 @@ public class CreateModel : PageModel
         {
             asset.EmployeeId = Assignment.ToEmployeeId;
             asset.DepartmentId = Assignment.ToDepartmentId;
+            asset.Location = Assignment.ToLocation;
+            asset.UpdatedAt = DateTime.Now;
+        }
+
+        // قبل از _context.AssetAssignments.Add(Assignment):
+        if (Assignment.ToEmployeeId.HasValue)
+        {
+            var emp = await _context.VwEmployees.FindAsync(Assignment.ToEmployeeId);
+            Assignment.ToEmployeeName = emp?.FullName;
+        }
+        if (Assignment.ToDepartmentId.HasValue)
+        {
+            var dept = await _context.VwDepartments.FindAsync(Assignment.ToDepartmentId);
+            Assignment.ToDepartmentName = dept?.Name;
+        }
+        if (Assignment.FromEmployeeId.HasValue)
+        {
+            var emp = await _context.VwEmployees.FindAsync(Assignment.FromEmployeeId);
+            Assignment.FromEmployeeName = emp?.FullName;
+        }
+        if (Assignment.FromDepartmentId.HasValue)
+        {
+            var dept = await _context.VwDepartments.FindAsync(Assignment.FromDepartmentId);
+            Assignment.FromDepartmentName = dept?.Name;
+        }
+
+        // آپدیت Asset هم اسم رو ذخیره کن:
+        if (asset != null)
+        {
+            asset.EmployeeId = Assignment.ToEmployeeId;
+            asset.EmployeeName = Assignment.ToEmployeeName;
+            asset.DepartmentId = Assignment.ToDepartmentId;
+            asset.DepartmentName = Assignment.ToDepartmentName; // ← اضافه شد
             asset.Location = Assignment.ToLocation;
             asset.UpdatedAt = DateTime.Now;
         }
@@ -87,14 +119,12 @@ public class CreateModel : PageModel
                 .Select(a => new { a.Id, Name = a.Name + (a.PropertyTag != null ? " (" + a.PropertyTag + ")" : "") })
                 .ToListAsync(), "Id", "Name");
 
-        EmployeeList = new SelectList(
-            await _context.Employees.Where(e => e.IsActive)
-                .Include(e => e.Department)
-                .OrderBy(e => e.FullName)
-                .Select(e => new { e.Id, Name = e.FullName + " - " + e.Department!.Name })
-                .ToListAsync(), "Id", "Name");
+        EmployeeList = new SelectList(await _context.VwEmployees
+        .OrderBy(e => e.FullName)
+        .Select(e => new { e.Id, Name = e.FullName + " - " + e.DepartmentName })
+        .ToListAsync(), "Id", "Name");
 
-        DepartmentList = new SelectList(
-            await _context.Departments.Where(d => d.IsActive).OrderBy(d => d.Name).ToListAsync(), "Id", "Name");
+        DepartmentList = new SelectList(await _context.VwDepartments
+            .OrderBy(d => d.Name).ToListAsync(), "Id", "Name");
     }
 }

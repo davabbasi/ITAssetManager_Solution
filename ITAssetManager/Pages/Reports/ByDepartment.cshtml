@@ -26,7 +26,7 @@
                                 <td><a href="/Assets/Details/@asset.Id" class="text-decoration-none">@asset.Name</a></td>
                                 <td><small>@asset.Category?.Name</small></td>
                                 <td><small>@(asset.PropertyTag ?? "-")</small></td>
-                                <td><small>@(asset.Employee?.FullName ?? "-")</small></td>
+                                <td><small>@(asset.EmployeeName ?? "-")</small></td>
                                 <td>
                                     @{
                                         var (bc, lbl) = asset.Status switch

@@ -20,8 +20,6 @@ public class ScrappedModel : PageModel
     {
         var assets = await _context.Assets
             .Include(a => a.Category)
-            .Include(a => a.Department)
-            .Include(a => a.Employee)
             .Where(a => a.Status == AssetStatus.Scrapped ||
                         a.Status == AssetStatus.Faulty ||
                         a.Status == AssetStatus.UnderRepair)

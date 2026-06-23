@@ -23,9 +23,7 @@ public class IndexModel : PageModel
 
     public async Task OnGetAsync()
     {
-        var assets = _context.Assets.Include(a => a.Category)
-                                    .Include(a => a.Department)
-                                    .Include(a => a.Employee);
+        var assets = _context.Assets.Include(a => a.Category);
 
         TotalAssets = await assets.CountAsync();
         ActiveAssets = await assets.CountAsync(a => a.Status == AssetStatus.Active);

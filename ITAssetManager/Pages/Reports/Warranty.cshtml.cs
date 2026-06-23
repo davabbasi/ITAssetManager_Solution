@@ -26,8 +26,6 @@ public class WarrantyModel : PageModel
         var in30 = today.AddDays(30);
 
         var assets = await _context.Assets
-            .Include(a => a.Department)
-            .Include(a => a.Employee)
             .Where(a => a.WarrantyExpiry.HasValue && a.Status != AssetStatus.Scrapped)
             .ToListAsync();
 

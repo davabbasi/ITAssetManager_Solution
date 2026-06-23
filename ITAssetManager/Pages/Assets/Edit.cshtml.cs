@@ -53,12 +53,12 @@ public class EditModel : PageModel
         CategoryList = new SelectList(
             await _context.AssetCategories.OrderBy(c => c.Name).ToListAsync(), "Id", "Name");
         DepartmentList = new SelectList(
-            await _context.Departments.Where(d => d.IsActive).OrderBy(d => d.Name).ToListAsync(), "Id", "Name");
+            await _context.VwDepartments.OrderBy(d => d.Name).ToListAsync(), "Id", "Name");
         EmployeeList = new SelectList(
-            await _context.Employees.Where(e => e.IsActive)
-                .Include(e => e.Department)
+            await _context.VwEmployees
+                
                 .OrderBy(e => e.FullName)
-                .Select(e => new { e.Id, Name = e.FullName + " - " + e.Department!.Name })
+                .Select(e => new { e.Id, Name = e.FullName + " - " + e.DepartmentName })
                 .ToListAsync(), "Id", "Name");
     }
 }

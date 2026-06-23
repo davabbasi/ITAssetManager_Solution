@@ -22,17 +22,13 @@ public class IndexModel : PageModel
     {
         var query = _context.AssetAssignments
             .Include(a => a.Asset)
-            .Include(a => a.FromEmployee)
-            .Include(a => a.ToEmployee)
-            .Include(a => a.FromDepartment)
-            .Include(a => a.ToDepartment)
             .AsQueryable();
 
         if (!string.IsNullOrEmpty(Search))
             query = query.Where(a =>
                 (a.Asset != null && a.Asset.Name.Contains(Search)) ||
-                (a.ToEmployee != null && a.ToEmployee.FullName.Contains(Search)) ||
-                (a.FromEmployee != null && a.FromEmployee.FullName.Contains(Search)));
+                (a.ToEmployeeName != null && a.ToEmployeeName.Contains(Search)) ||
+                (a.FromEmployeeName != null && a.FromEmployeeName.Contains(Search)));
 
         if (FromDate.HasValue)
             query = query.Where(a => a.AssignedAt >= FromDate);

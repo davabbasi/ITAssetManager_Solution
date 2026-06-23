@@ -92,7 +92,7 @@
                                     }
                                 </td>
                                 <td><small>@asset.Category?.Name</small></td>
-                                <td><small>@(asset.Department?.Name ?? asset.Employee?.FullName ?? "-")</small></td>
+                                <td><small>@(asset.DepartmentName ?? asset.EmployeeName ?? "-")</small></td>
                                 <td>
                                     @{
                                         var (badgeClass, label) = asset.Status switch

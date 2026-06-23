@@ -36,9 +36,9 @@ public class Asset
 
     // مکان فعلی
     public int? DepartmentId { get; set; }
-    public Department? Department { get; set; }
+    public string? DepartmentName { get; set; }
     public int? EmployeeId { get; set; }
-    public Employee? Employee { get; set; }
+    public string? EmployeeName { get; set; }
     public string? Location { get; set; } // اتاق/طبقه
 
     // اطلاعات تکمیلی

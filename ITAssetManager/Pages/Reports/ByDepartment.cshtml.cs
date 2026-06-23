@@ -17,16 +17,14 @@ public class ByDepartmentModel : PageModel
     public async Task OnGetAsync()
     {
         var assets = await _context.Assets
-            .Include(a => a.Category)
-            .Include(a => a.Department)
-            .Include(a => a.Employee)
-            .Where(a => a.DepartmentId.HasValue)
-            .OrderBy(a => a.Department!.Name)
-            .ThenBy(a => a.Name)
-            .ToListAsync();
+         .Include(a => a.Category)
+         .Where(a => a.DepartmentId.HasValue)
+         .OrderBy(a => a.DepartmentName)
+         .ThenBy(a => a.Name)
+         .ToListAsync();
 
         DepartmentData = assets
-            .GroupBy(a => a.Department?.Name ?? "نامشخص")
+            .GroupBy(a => a.DepartmentName ?? "نامشخص")
             .Select(g => new DeptGroup { DepartmentName = g.Key, Assets = g.ToList() })
             .ToList();
     }

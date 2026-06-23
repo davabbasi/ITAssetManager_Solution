@@ -9,17 +9,18 @@ public class AssetAssignment
 
     // از کجا
     public int? FromEmployeeId { get; set; }
-    public Employee? FromEmployee { get; set; }
     public int? FromDepartmentId { get; set; }
-    public Department? FromDepartment { get; set; }
     public string? FromLocation { get; set; }
+    public string? FromEmployeeName { get; set; }
+    public string? FromDepartmentName { get; set; }
+
 
     // به کجا
     public int? ToEmployeeId { get; set; }
-    public Employee? ToEmployee { get; set; }
     public int? ToDepartmentId { get; set; }
-    public Department? ToDepartment { get; set; }
     public string? ToLocation { get; set; }
+    public string? ToEmployeeName { get; set; }
+    public string? ToDepartmentName { get; set; }
 
     public DateTime AssignedAt { get; set; } = DateTime.Now;
     public string? Reason { get; set; }

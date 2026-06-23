@@ -9,8 +9,6 @@ public class ApplicationDbContext : IdentityDbContext
     public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
         : base(options) { }
 
-    public DbSet<Department> Departments { get; set; }
-    public DbSet<Employee> Employees { get; set; }
     public DbSet<AssetCategory> AssetCategories { get; set; }
     public DbSet<Asset> Assets { get; set; }
     public DbSet<AssetAssignment> AssetAssignments { get; set; }
@@ -41,41 +39,7 @@ public class ApplicationDbContext : IdentityDbContext
         );
 
         // تنظیم رابطه‌ها - همه ON DELETE NO ACTION تا از cascade cycle جلوگیری بشه
-        builder.Entity<Asset>()
-            .HasOne(a => a.Department)
-            .WithMany(d => d.Assets)
-            .HasForeignKey(a => a.DepartmentId)
-            .OnDelete(DeleteBehavior.NoAction);
-
-        builder.Entity<Asset>()
-            .HasOne(a => a.Employee)
-            .WithMany()
-            .HasForeignKey(a => a.EmployeeId)
-            .OnDelete(DeleteBehavior.NoAction);
-
-        builder.Entity<AssetAssignment>()
-            .HasOne(a => a.FromEmployee)
-            .WithMany()
-            .HasForeignKey(a => a.FromEmployeeId)
-            .OnDelete(DeleteBehavior.NoAction);
-
-        builder.Entity<AssetAssignment>()
-            .HasOne(a => a.ToEmployee)
-            .WithMany(e => e.AssetAssignments)
-            .HasForeignKey(a => a.ToEmployeeId)
-            .OnDelete(DeleteBehavior.NoAction);
-
-        builder.Entity<AssetAssignment>()
-            .HasOne(a => a.FromDepartment)
-            .WithMany()
-            .HasForeignKey(a => a.FromDepartmentId)
-            .OnDelete(DeleteBehavior.NoAction);
-
-        builder.Entity<AssetAssignment>()
-            .HasOne(a => a.ToDepartment)
-            .WithMany()
-            .HasForeignKey(a => a.ToDepartmentId)
-            .OnDelete(DeleteBehavior.NoAction);
+        
 
         builder.Entity<SpecDefinition>()
             .HasOne(s => s.Category)
