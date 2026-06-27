@@ -18,6 +18,8 @@ public class ApplicationDbContext : IdentityDbContext
     public DbSet<AssetSpecValue> AssetSpecValues { get; set; }
     public DbSet<VwEmployee> VwEmployees { get; set; }
     public DbSet<VwDepartment> VwDepartments { get; set; }
+    public DbSet<Vendor> Vendors { get; set; }
+
     protected override void OnModelCreating(ModelBuilder builder)
     {
         base.OnModelCreating(builder);
@@ -39,7 +41,7 @@ public class ApplicationDbContext : IdentityDbContext
         );
 
         // تنظیم رابطه‌ها - همه ON DELETE NO ACTION تا از cascade cycle جلوگیری بشه
-        
+
 
         builder.Entity<SpecDefinition>()
             .HasOne(s => s.Category)
@@ -73,5 +75,10 @@ public class ApplicationDbContext : IdentityDbContext
 
         builder.Entity<VwEmployee>().ToView("vw_Employees").HasKey(e => e.Id);
         builder.Entity<VwDepartment>().ToView("vw_Departments").HasKey(d => d.Id);
+        builder.Entity<Asset>()
+            .HasOne(a => a.Vendor)
+            .WithMany(v => v.Assets)
+            .HasForeignKey(a => a.VendorId)
+            .OnDelete(DeleteBehavior.NoAction);
     }
 }

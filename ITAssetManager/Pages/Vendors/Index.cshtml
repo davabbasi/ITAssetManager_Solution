@@ -1,0 +1,99 @@
+﻿@page
+@model ITAssetManager.Pages.Vendors.IndexModel
+@{
+    ViewData["Title"] = "فروشندگان";
+}
+
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success alert-dismissible">
+        @TempData["Success"] <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h5 class="mb-0 fw-bold">فروشندگان</h5>
+    <a href="/Vendors/Create" class="btn btn-primary btn-sm">
+        <i class="bi bi-plus-lg me-1"></i>فروشنده جدید
+    </a>
+</div>
+
+<div class="card mb-3">
+    <div class="card-body py-2">
+        <form method="get" class="d-flex gap-2">
+            <input type="text" name="search" value="@Model.Search"
+                   class="form-control form-control-sm"
+                   placeholder="جستجو در نام، کد، مسئول فروش..." />
+            <button type="submit" class="btn btn-primary btn-sm">
+                <i class="bi bi-search"></i>
+            </button>
+            <a href="/Vendors" class="btn btn-outline-secondary btn-sm">
+                <i class="bi bi-x"></i>
+            </a>
+        </form>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-header"><i class="bi bi-shop me-2"></i>@Model.Vendors.Count فروشنده</div>
+    <div class="card-body p-0">
+        @if (!Model.Vendors.Any())
+        {
+            <div class="text-center text-muted py-5">
+                <i class="bi bi-inbox fs-2"></i>
+                <p class="mt-2">فروشنده‌ای یافت نشد</p>
+            </div>
+        }
+        else
+        {
+            <table class="table table-hover mb-0">
+                <thead>
+                    <tr>
+                        <th>کد</th>
+                        <th>نام فروشنده</th>
+                        <th>مسئول فروش</th>
+                        <th>تلفن</th>
+                        <th>موبایل</th>
+                        <th>وضعیت</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var v in Model.Vendors)
+                    {
+                        <tr>
+                            <td><small class="text-muted font-monospace">@v.Code</small></td>
+                            <td>
+                                <a href="/Vendors/Details/@v.Id" class="text-decoration-none fw-medium">
+                                    @v.Name
+                                </a>
+                            </td>
+                            <td><small>@(v.SalesPersonName ?? "-")</small></td>
+                            <td><small>@(v.Phone ?? "-")</small></td>
+                            <td><small>@(v.Mobile ?? "-")</small></td>
+                            <td>
+                                <span class="badge @(v.IsActive ? "badge-active" : "badge-scrapped")">
+                                    @(v.IsActive ? "فعال" : "غیرفعال")
+                                </span>
+                            </td>
+                            <td>
+                                <div class="d-flex gap-1">
+                                    <a href="/Vendors/Details/@v.Id"
+                                       class="btn btn-xs btn-outline-secondary" title="جزئیات">
+                                        <i class="bi bi-eye"></i>
+                                    </a>
+                                    <a href="/Vendors/Edit/@v.Id"
+                                       class="btn btn-xs btn-outline-primary" title="ویرایش">
+                                        <i class="bi bi-pencil"></i>
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+    </div>
+</div>
+
+<style>.btn-xs { padding: 0.15rem 0.4rem; font-size: 0.75rem; }</style>

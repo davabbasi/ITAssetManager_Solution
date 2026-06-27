@@ -86,6 +86,13 @@
 
                     <h6 class="text-muted mb-3 border-bottom pb-2">تخصیص</h6>
                     <div class="row g-3 mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label">فروشنده</label>
+                            <select asp-for="Asset.VendorId" asp-items="Model.VendorList"
+                                    id="vendorSelect" class="form-select">
+                                <option value="">بدون فروشنده</option>
+                            </select>
+                        </div>
                         <div class="col-md-4">
                             <label class="form-label">بخش</label>
                             <select asp-for="Asset.DepartmentId" asp-items="Model.DepartmentList" class="form-select">
@@ -124,3 +131,12 @@
         </div>
     </div>
 </div>
+
+@section Scripts {
+    <script>
+             new TomSelect('#vendorSelect', {
+            placeholder: 'جستجو در فروشندگان...',
+            allowEmptyOption: true
+        });
+    </script>
+}

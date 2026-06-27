@@ -1,0 +1,69 @@
+﻿@page
+@model ITAssetManager.Pages.Vendors.CreateModel
+@{
+    ViewData["Title"] = "فروشنده جدید";
+}
+
+<div class="row justify-content-center">
+    <div class="col-lg-7">
+        <div class="card">
+            <div class="card-header"><i class="bi bi-plus-circle me-2"></i>ثبت فروشنده جدید</div>
+            <div class="card-body">
+                <form method="post">
+                    <h6 class="text-muted mb-3 border-bottom pb-2">اطلاعات اصلی</h6>
+                    <div class="row g-3 mb-3">
+                        
+                        <div class="col-md-12">
+                            <label class="form-label">نام فروشنده <span class="text-danger">*</span></label>
+                            <input asp-for="Vendor.Name" class="form-control" />
+                            <span asp-validation-for="Vendor.Name" class="text-danger small"></span>
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label">آدرس</label>
+                            <textarea asp-for="Vendor.Address" class="form-control" rows="2"></textarea>
+                        </div>
+                    </div>
+
+                    <h6 class="text-muted mb-3 border-bottom pb-2">اطلاعات تماس</h6>
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-4">
+                            <label class="form-label">تلفن</label>
+                            <input asp-for="Vendor.Phone" class="form-control" placeholder="021-XXXXXXXX" />
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">فکس</label>
+                            <input asp-for="Vendor.Fax" class="form-control" />
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">موبایل</label>
+                            <input asp-for="Vendor.Mobile" class="form-control" placeholder="09XX-XXXXXXX" />
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">ایمیل</label>
+                            <input asp-for="Vendor.Email" type="email" class="form-control" />
+                        </div>
+                    </div>
+
+                    <h6 class="text-muted mb-3 border-bottom pb-2">اطلاعات پرسنل</h6>
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-6">
+                            <label class="form-label">نام مدیر</label>
+                            <input asp-for="Vendor.ManagerName" class="form-control" />
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">نام مسئول فروش</label>
+                            <input asp-for="Vendor.SalesPersonName" class="form-control" />
+                        </div>
+                    </div>
+
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-check-lg me-1"></i>ذخیره
+                        </button>
+                        <a href="/Vendors" class="btn btn-outline-secondary">انصراف</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

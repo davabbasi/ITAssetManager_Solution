@@ -20,6 +20,8 @@ public class CreateModel : PageModel
     public SelectList DepartmentList { get; set; } = null!;
     public SelectList EmployeeList { get; set; } = null!;
     public List<SpecDefinition> SpecDefinitions { get; set; } = new();
+    public SelectList VendorList { get; set; } = null!;
+
     [BindProperty] public Dictionary<int, int> SpecValues { get; set; } = new();
     public async Task OnGetAsync()
     {
@@ -96,6 +98,12 @@ public class CreateModel : PageModel
 
         if (Asset.CategoryId > 0)
             SpecDefinitions = await LoadSpecsAsync(Asset.CategoryId);
+
+        VendorList = new SelectList(
+            await _context.Vendors
+            .Where(v => v.IsActive)
+            .OrderBy(v => v.Name)
+            .ToListAsync(), "Id", "Name");
     }
 
     private async Task<List<SpecDefinition>> LoadSpecsAsync(int categoryId)
@@ -117,4 +125,5 @@ public class CreateModel : PageModel
 
         return Partial("_SpecsPartial", specs);
     }
+
 }

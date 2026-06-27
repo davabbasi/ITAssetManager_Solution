@@ -1,0 +1,131 @@
+﻿@page "{id:int}"
+@model ITAssetManager.Pages.Vendors.DetailsModel
+@{
+    ViewData["Title"] = Model.Vendor.Name;
+}
+
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success alert-dismissible">
+        @TempData["Success"] <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <div>
+        <a href="/Vendors" class="text-muted text-decoration-none small">
+            <i class="bi bi-arrow-right me-1"></i>فروشندگان
+        </a>
+        <h5 class="mb-0 mt-1 fw-bold">@Model.Vendor.Name</h5>
+        <small class="text-muted font-monospace">@Model.Vendor.Code</small>
+    </div>
+    <a href="/Vendors/Edit/@Model.Vendor.Id" class="btn btn-outline-primary btn-sm">
+        <i class="bi bi-pencil me-1"></i>ویرایش
+    </a>
+</div>
+
+<div class="row g-3">
+    <div class="col-md-6">
+        <div class="card h-100">
+            <div class="card-header">اطلاعات تماس</div>
+            <div class="card-body">
+                <div class="row g-2">
+                    <div class="col-6">
+                        <small class="text-muted d-block">تلفن</small>
+                        <span>@(Model.Vendor.Phone ?? "-")</span>
+                    </div>
+                    <div class="col-6">
+                        <small class="text-muted d-block">فکس</small>
+                        <span>@(Model.Vendor.Fax ?? "-")</span>
+                    </div>
+                    <div class="col-6">
+                        <small class="text-muted d-block">موبایل</small>
+                        <span>@(Model.Vendor.Mobile ?? "-")</span>
+                    </div>
+                    <div class="col-6">
+                        <small class="text-muted d-block">ایمیل</small>
+                        <span>@(Model.Vendor.Email ?? "-")</span>
+                    </div>
+                    <div class="col-12">
+                        <small class="text-muted d-block">آدرس</small>
+                        <span>@(Model.Vendor.Address ?? "-")</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card h-100">
+            <div class="card-header">اطلاعات پرسنل</div>
+            <div class="card-body">
+                <div class="row g-2">
+                    <div class="col-6">
+                        <small class="text-muted d-block">مدیر</small>
+                        <span>@(Model.Vendor.ManagerName ?? "-")</span>
+                    </div>
+                    <div class="col-6">
+                        <small class="text-muted d-block">مسئول فروش</small>
+                        <span>@(Model.Vendor.SalesPersonName ?? "-")</span>
+                    </div>
+                    <div class="col-6">
+                        <small class="text-muted d-block">وضعیت</small>
+                        <span class="badge @(Model.Vendor.IsActive ? "badge-active" : "badge-scrapped")">
+                            @(Model.Vendor.IsActive ? "فعال" : "غیرفعال")
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- تجهیزات این فروشنده -->
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <i class="bi bi-cpu me-2"></i>تجهیزات خریداری‌شده از این فروشنده
+                <span class="badge bg-secondary ms-1">@Model.Assets.Count</span>
+            </div>
+            <div class="card-body p-0">
+                @if (!Model.Assets.Any())
+                {
+                    <p class="text-muted text-center py-3">تجهیزی ثبت نشده</p>
+                }
+                else
+                {
+                    <table class="table table-sm mb-0">
+                        <thead>
+                            <tr><th>نام</th><th>برچسب اموال</th><th>دسته</th><th>وضعیت</th></tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var asset in Model.Assets)
+                            {
+                                <tr>
+                                    <td>
+                                        <a href="/Assets/Details/@asset.Id" class="text-decoration-none">
+                                            @asset.Name
+                                        </a>
+                                    </td>
+                                    <td><small>@(asset.PropertyTag ?? "-")</small></td>
+                                    <td><small>@asset.Category?.Name</small></td>
+                                    <td>
+                                        @{
+                                            var (bc, lbl) = asset.Status switch
+                                            {
+                                                AssetStatus.Active => ("badge-active", "فعال"),
+                                                AssetStatus.Faulty => ("badge-faulty", "معیوب"),
+                                                AssetStatus.UnderRepair => ("badge-repair", "در تعمیر"),
+                                                AssetStatus.Scrapped => ("badge-scrapped", "اسقاط"),
+                                                _ => ("badge-storage", "انبار")
+                                            };
+                                        }
+                                        <span class="badge @bc">@lbl</span>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                }
+            </div>
+        </div>
+    </div>
+</div>

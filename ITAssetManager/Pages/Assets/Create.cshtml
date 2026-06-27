@@ -15,7 +15,7 @@
                     <div asp-validation-summary="ModelOnly" class="alert alert-danger d-none"></div>
 
                     <!-- بخش اول: اطلاعات اصلی -->
-                    <h6 class="text-muted mb-3 border-bottom pb-2">اطلاعات اصلی</h6>
+                    <h6 class=" text-muted mb-3 border-bottom pb-2 ">اطلاعات اصلی</h6>
                     <div class="row g-3 mb-3">
                         <div class="col-md-6">
                             <label class="form-label">نام تجهیز <span class="text-danger">*</span></label>
@@ -89,6 +89,13 @@
                     <!-- بخش چهارم: تخصیص -->
                     <h6 class="text-muted mb-3 border-bottom pb-2">تخصیص</h6>
                     <div class="row g-3 mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label">فروشنده</label>
+                            <select asp-for="Asset.VendorId" asp-items="Model.VendorList"
+                                    id="vendorSelect" class="form-select">
+                                <option value="">بدون فروشنده</option>
+                            </select>
+                        </div>
                         <div class="col-md-4">
                             <label class="form-label">بخش</label>
                             <select asp-for="Asset.DepartmentId" asp-items="Model.DepartmentList" class="form-select">
@@ -177,10 +184,12 @@
 
             document.getElementById('specs-container').innerHTML = html;
         });
+        new TomSelect('#vendorSelect', {
+            placeholder: 'جستجو در فروشندگان...',
+            allowEmptyOption: true
+        });
     </script>
 }
-
-
 
 
 

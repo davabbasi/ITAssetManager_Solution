@@ -18,6 +18,7 @@ public class EditModel : PageModel
     public SelectList CategoryList { get; set; } = null!;
     public SelectList DepartmentList { get; set; } = null!;
     public SelectList EmployeeList { get; set; } = null!;
+    public SelectList VendorList { get; set; } = null!;
 
     public async Task<IActionResult> OnGetAsync(int id)
     {
@@ -60,5 +61,11 @@ public class EditModel : PageModel
                 .OrderBy(e => e.FullName)
                 .Select(e => new { e.Id, Name = e.FullName + " - " + e.DepartmentName })
                 .ToListAsync(), "Id", "Name");
+
+        VendorList = new SelectList(
+           await _context.Vendors
+           .Where(v => v.IsActive)
+           .OrderBy(v => v.Name)
+           .ToListAsync(), "Id", "Name");
     }
 }

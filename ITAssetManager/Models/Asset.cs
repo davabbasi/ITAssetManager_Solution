@@ -46,6 +46,10 @@ public class Asset
     public DateTime CreatedAt { get; set; } = DateTime.Now;
     public DateTime? UpdatedAt { get; set; }
 
+    //فروشنده
+    public int? VendorId { get; set; }
+    public Vendor? Vendor { get; set; }
+
     public ICollection<AssetSpecValue> SpecValues { get; set; } = new List<AssetSpecValue>();
     public ICollection<AssetAssignment> Assignments { get; set; } = new List<AssetAssignment>();
     public ICollection<MaintenanceLog> MaintenanceLogs { get; set; } = new List<MaintenanceLog>();
