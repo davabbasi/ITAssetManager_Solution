@@ -19,7 +19,7 @@ public class ApplicationDbContext : IdentityDbContext
     public DbSet<VwEmployee> VwEmployees { get; set; }
     public DbSet<VwDepartment> VwDepartments { get; set; }
     public DbSet<Vendor> Vendors { get; set; }
-
+    public DbSet<VwPurchaseRequest> VwPurchaseRequests { get; set; }
     protected override void OnModelCreating(ModelBuilder builder)
     {
         base.OnModelCreating(builder);
@@ -80,5 +80,8 @@ public class ApplicationDbContext : IdentityDbContext
             .WithMany(v => v.Assets)
             .HasForeignKey(a => a.VendorId)
             .OnDelete(DeleteBehavior.NoAction);
+        builder.Entity<VwPurchaseRequest>()
+            .ToView("vw_PurchaseRequests")
+            .HasNoKey();
     }
 }

@@ -1,0 +1,53 @@
+﻿using ITAssetManager.Data;
+using ITAssetManager.Models;
+using ITAssetManager.Paging;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.EntityFrameworkCore;
+
+namespace ITAssetManager.Pages.PurchaseRequests;
+
+[Authorize]
+public class IndexModel : PageModel
+{
+    private readonly ApplicationDbContext _context;
+    public IndexModel(ApplicationDbContext context) => _context = context;
+    public PagedResult<VwPurchaseRequest> Result { get; set; } = default!;
+    public List<VwPurchaseRequest> Items { get; set; } = new();
+    public int TotalCount { get; set; }
+    public int TotalPages { get; set; }
+    public int PageSize { get; set; } = 20;
+    public string? OrderNo { get; set; }
+    public string? Serial { get; set; }
+    public string? Description { get; set; }
+    public int Page { get; set; } = 1;
+
+    public async Task OnGetAsync(int page = 1, string? orderNo = null,
+    string? serial = null, string? description = null)
+    {
+        Page = page < 1 ? 1 : page;
+        OrderNo = orderNo;
+        Serial = serial;
+        Description = description;
+
+        var query = _context.VwPurchaseRequests.AsQueryable();
+
+        if (!string.IsNullOrEmpty(OrderNo))
+            query = query.Where(x => x.OrderNo != null && x.OrderNo.Contains(OrderNo));
+
+        if (!string.IsNullOrEmpty(Serial))
+            query = query.Where(x => x.Serial != null && x.Serial.Contains(Serial));
+
+        if (!string.IsNullOrEmpty(Description))
+            query = query.Where(x => x.FarsiDesc != null && x.FarsiDesc.Contains(Description));
+
+        TotalCount = await query.CountAsync();
+        TotalPages = (int)Math.Ceiling((double)TotalCount / PageSize);
+        Result = await query
+            .OrderByDescending(x => x.RequestDate)
+            .ToPagedResultAsync(Page, PageSize);
+
+        Items = await query.OrderByDescending(x => x.RequestDate).ToListAsync();
+    }
+}

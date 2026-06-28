@@ -47,6 +47,7 @@ builder.Services.AddRazorPages(options =>
     options.Conventions.AuthorizeFolder("/Admin", "RequireAdminRole");
     options.Conventions.AllowAnonymousToPage("/Account/Login");
     options.Conventions.AllowAnonymousToPage("/Account/Logout");
+    options.Conventions.AuthorizeFolder("/PurchaseRequests");
 });
 
 builder.Services.AddAuthorization(options =>

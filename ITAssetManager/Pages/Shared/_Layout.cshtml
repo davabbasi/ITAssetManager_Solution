@@ -219,6 +219,11 @@
             <a href="/Vendors" class="nav-link-item @(Context.Request.Path.StartsWithSegments("/Vendors") ? "active" : "")">
                 <i class="bi bi-shop"></i> فروشندگان
             </a>
+                <div class="sidebar-section">خرید</div>
+                <a href="/PurchaseRequests"
+                   class="nav-link-item @(Context.Request.Path.StartsWithSegments("/PurchaseRequests") ? "active" : "")">
+                    <i class="bi bi-cart3"></i> درخواست‌های خرید
+                </a>
             <div class="sidebar-section">تجهیزات</div>
             <a href="/Assets" class="nav-link-item @(Context.Request.Path.StartsWithSegments("/Assets") ? "active" : "")">
                 <i class="bi bi-cpu"></i> لیست تجهیزات
