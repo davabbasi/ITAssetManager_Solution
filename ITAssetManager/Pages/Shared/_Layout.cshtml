@@ -43,7 +43,9 @@
             top: 0;
             z-index: 1000;
             transition: all 0.3s;
-            overflow-y: auto;
+            overflow-y: auto; /* ← این خط باید باشه */
+            overflow-x: hidden; /* ← این رو اضافه کن */
+            height: 100vh; /* ← این رو اضافه کن */
         }
 
         .sidebar-brand {
