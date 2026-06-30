@@ -36,43 +36,91 @@
         /* Sidebar */
         #sidebar {
             width: var(--sidebar-width);
-            min-height: 100vh;
+            height: 100vh;
             background: var(--sidebar-bg);
             position: fixed;
             right: 0;
             top: 0;
             z-index: 1000;
             transition: all 0.3s;
-            overflow-y: auto; /* ← این خط باید باشه */
-            overflow-x: hidden; /* ← این رو اضافه کن */
-            height: 100vh; /* ← این رو اضافه کن */
+            overflow-y: auto;
+            overflow-x: hidden;
         }
+
+            /* scrollbar ظریف */
+            #sidebar::-webkit-scrollbar {
+                width: 4px;
+            }
+
+            #sidebar::-webkit-scrollbar-track {
+                background: transparent;
+            }
+
+            #sidebar::-webkit-scrollbar-thumb {
+                background: #334155;
+                border-radius: 2px;
+            }
 
         .sidebar-brand {
             padding: 1.25rem 1.5rem;
             border-bottom: 1px solid #1e293b;
         }
 
-        .sidebar-brand h5 {
-            color: #fff;
-            font-weight: 700;
-            margin: 0;
-            font-size: 0.95rem;
+            .sidebar-brand h5 {
+                color: #fff;
+                font-weight: 700;
+                margin: 0;
+                font-size: 0.95rem;
+            }
+
+            .sidebar-brand small {
+                color: #64748b;
+                font-size: 0.75rem;
+            }
+
+        /* گروه جمع‌شونده */
+        .sidebar-group {
         }
 
-        .sidebar-brand small {
+        .sidebar-group-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0.5rem 1.25rem;
+            margin: 0.1rem 0.5rem;
+            border-radius: 0.5rem;
+            cursor: pointer;
             color: #64748b;
-            font-size: 0.75rem;
-        }
-
-        .sidebar-section {
-            padding: 1rem 0.75rem 0.25rem;
-            font-size: 0.68rem;
+            font-size: 0.72rem;
+            font-weight: 600;
             text-transform: uppercase;
             letter-spacing: 0.05em;
-            color: #475569;
-            font-weight: 600;
+            user-select: none;
+            transition: all 0.2s;
         }
+
+            .sidebar-group-header:hover {
+                color: #94a3b8;
+                background: #1e293b;
+            }
+
+            .sidebar-group-header .chevron {
+                font-size: 0.65rem;
+                transition: transform 0.2s;
+            }
+
+            .sidebar-group-header.collapsed .chevron {
+                transform: rotate(-90deg);
+            }
+
+        .sidebar-group-items {
+            overflow: hidden;
+            transition: max-height 0.25s ease;
+        }
+
+            .sidebar-group-items.collapsed {
+                max-height: 0 !important;
+            }
 
         .nav-link-item {
             display: flex;
@@ -87,21 +135,21 @@
             transition: all 0.2s;
         }
 
-        .nav-link-item:hover {
-            background: #1e293b;
-            color: #fff;
-        }
+            .nav-link-item:hover {
+                background: #1e293b;
+                color: #fff;
+            }
 
-        .nav-link-item.active {
-            background: var(--sidebar-active);
-            color: #fff;
-        }
+            .nav-link-item.active {
+                background: var(--sidebar-active);
+                color: #fff;
+            }
 
-        .nav-link-item i {
-            font-size: 1rem;
-            width: 20px;
-            text-align: center;
-        }
+            .nav-link-item i {
+                font-size: 1rem;
+                width: 20px;
+                text-align: center;
+            }
 
         /* Main content */
         #main-content {
@@ -200,6 +248,49 @@
         .warranty-warning { background: #fef3c7; border-right: 4px solid #f59e0b; }
         .warranty-expired { background: #fee2e2; border-right: 4px solid #ef4444; }
     </style>
+    <script>
+        function toggleGroup(header) {
+            const items = header.nextElementSibling;
+            const isCollapsed = header.classList.contains('collapsed');
+
+            if (isCollapsed) {
+                header.classList.remove('collapsed');
+                items.style.maxHeight = items.scrollHeight + 'px';
+                items.classList.remove('collapsed');
+                // ذخیره وضعیت
+                localStorage.setItem('sidebar_' + header.innerText.trim(), 'open');
+            } else {
+                header.classList.add('collapsed');
+                items.style.maxHeight = '0';
+                items.classList.add('collapsed');
+                localStorage.setItem('sidebar_' + header.innerText.trim(), 'closed');
+            }
+        }
+
+        // بازیابی وضعیت ذخیره‌شده + باز کردن گروه فعال
+        document.addEventListener('DOMContentLoaded', function() {
+            const currentPath = window.location.pathname;
+
+            document.querySelectorAll('.sidebar-group').forEach(function(group) {
+                const header = group.querySelector('.sidebar-group-header');
+                const items = group.querySelector('.sidebar-group-items');
+                const groupName = header.innerText.trim();
+                const savedState = localStorage.getItem('sidebar_' + groupName);
+
+                // اگه لینک فعال داخل این گروهه، باز بمونه
+                const hasActive = group.querySelector('.nav-link-item.active');
+
+                if (hasActive || savedState === 'open' || savedState === null) {
+                    // باز
+                    items.style.maxHeight = items.scrollHeight + 'px';
+                } else {
+                    // بسته
+                    header.classList.add('collapsed');
+                    items.style.maxHeight = '0';
+                }
+            });
+        });
+    </script>
 </head>
 <body>
 
@@ -212,70 +303,31 @@
             <small>مدیریت تجهیزات</small>
         </div>
           
-        <nav class="py-2">
-            <div class="sidebar-section">داشبورد</div>
-            <a href="/" class="nav-link-item @(Context.Request.Path == "/" ? "active" : "")">
-                <i class="bi bi-speedometer2"></i> داشبورد
-            </a>
-            <div class="sidebar-section">فروشندگان</div>
-            <a href="/Vendors" class="nav-link-item @(Context.Request.Path.StartsWithSegments("/Vendors") ? "active" : "")">
-                <i class="bi bi-shop"></i> فروشندگان
-            </a>
-                <div class="sidebar-section">خرید</div>
-                <a href="/PurchaseRequests"
-                   class="nav-link-item @(Context.Request.Path.StartsWithSegments("/PurchaseRequests") ? "active" : "")">
-                    <i class="bi bi-cart3"></i> درخواست‌های خرید
-                </a>
-            <div class="sidebar-section">تجهیزات</div>
-            <a href="/Assets" class="nav-link-item @(Context.Request.Path.StartsWithSegments("/Assets") ? "active" : "")">
-                <i class="bi bi-cpu"></i> لیست تجهیزات
-            </a>
-            <a href="/Assets/Create" class="nav-link-item">
-                <i class="bi bi-plus-circle"></i> ثبت تجهیز جدید
-            </a>
+            <nav class="py-2">
 
-            <div class="sidebar-section">ردیابی</div>
-            <a href="/Assignments" class="nav-link-item @(Context.Request.Path.StartsWithSegments("/Assignments") ? "active" : "")">
-                <i class="bi bi-arrow-left-right"></i> جابجایی‌ها
-            </a>
-            <a href="/Maintenance" class="nav-link-item @(Context.Request.Path.StartsWithSegments("/Maintenance") ? "active" : "")">
-                <i class="bi bi-tools"></i> تعمیرات
-            </a>
-
-            <div class="sidebar-section">گزارش‌ها</div>
-            <a href="/Reports/ByDepartment" class="nav-link-item">
-                <i class="bi bi-building"></i> گزارش بخش‌ها
-            </a>
-            <a href="/Reports/Warranty" class="nav-link-item">
-                <i class="bi bi-shield"></i> گارانتی
-            </a>
-            <a href="/Reports/Scrapped" class="nav-link-item">
-                <i class="bi bi-trash3"></i> اسقاطی‌ها
-            </a>
-                <a href="/Reports/ComponentTracking" class="nav-link-item">
-                    <i class="bi bi-diagram-3"></i> ردیابی قطعات
-                </a>
-
-            @if (User.IsInRole("Admin"))
-            {
-                    <div class="sidebar-section">مدیریت</div>
-                    <a href="/Admin/Users" class="nav-link-item">
-                        <i class="bi bi-people"></i> کاربران
+                <!-- داشبورد -->
+              
+                <div class="sidebar-group-items">
+                    <a href="/" class="nav-link-item @(Context.Request.Path == "/" ? "active" : "")">
+                        <i class="bi bi-speedometer2"></i> داشبورد
                     </a>
-                    <a href="/Admin/ViewEmployees" class="nav-link-item">
-                        <i class="bi bi-people"></i> پرسنل
-                    </a>
-                    <a href="/Admin/ViewDepartments" class="nav-link-item">
-                        <i class="bi bi-building"></i> واحدها
-                    </a>
-                    <a href="/Admin/Specs" class="nav-link-item @(Context.Request.Path.StartsWithSegments("/Admin/Spec") ? "active" : "")">
-                        <i class="bi bi-sliders"></i> مشخصات فنی
-                    </a>
-                    <a href="/Admin/Categories" class="nav-link-item">
-                        <i class="bi bi-tags"></i> دسته‌بندی‌ها
-                    </a>
-            }
-
+                </div>
+                <!-- تجهیزات -->
+                <div class="sidebar-group">
+                    <div class="sidebar-group-header" onclick="toggleGroup(this)">
+                        <span><i class="bi bi-cpu me-1"></i>تجهیزات</span>
+                        <i class="bi bi-chevron-down chevron"></i>
+                    </div>
+                    <div class="sidebar-group-items">
+                        <a href="/Assets" class="nav-link-item @(Context.Request.Path.StartsWithSegments("/Assets") ? "active" : "")">
+                            <i class="bi bi-cpu"></i> لیست تجهیزات
+                        </a>
+                        <a href="/Assets/Create" class="nav-link-item">
+                            <i class="bi bi-plus-circle"></i> ثبت تجهیز جدید
+                        </a>
+                    </div>
+                    <!-- اسمبل سیستم -->
+                </div>
                 <div class="sidebar-group">
                     <div class="sidebar-group-header" onclick="toggleGroup(this)">
                         <span><i class="bi bi-pc-display me-1"></i>اسمبل سیستم</span>
@@ -290,7 +342,97 @@
                         </a>
                     </div>
                 </div>
-        </nav>
+
+                <!-- ردیابی -->
+                <div class="sidebar-group">
+                    <div class="sidebar-group-header" onclick="toggleGroup(this)">
+                        <span><i class="bi bi-arrow-left-right me-1"></i>ردیابی</span>
+                        <i class="bi bi-chevron-down chevron"></i>
+                    </div>
+                    <div class="sidebar-group-items">
+                        <a href="/Assignments" class="nav-link-item @(Context.Request.Path.StartsWithSegments("/Assignments") ? "active" : "")">
+                            <i class="bi bi-arrow-left-right"></i> جابجایی‌ها
+                        </a>
+                        <a href="/Maintenance" class="nav-link-item @(Context.Request.Path.StartsWithSegments("/Maintenance") ? "active" : "")">
+                            <i class="bi bi-tools"></i> تعمیرات
+                        </a>
+                    </div>
+                </div>
+
+                <!-- فروشندگان -->
+                <div class="sidebar-group">
+                    <div class="sidebar-group-header" onclick="toggleGroup(this)">
+                        <span><i class="bi bi-shop me-1"></i>فروشندگان</span>
+                        <i class="bi bi-chevron-down chevron"></i>
+                    </div>
+                    <div class="sidebar-group-items">
+                        <a href="/Vendors" class="nav-link-item @(Context.Request.Path.StartsWithSegments("/Vendors") ? "active" : "")">
+                            <i class="bi bi-shop"></i> فروشندگان
+                        </a>
+                    </div>
+                </div>
+
+                <!-- خرید -->
+                <div class="sidebar-group">
+                    <div class="sidebar-group-header" onclick="toggleGroup(this)">
+                        <span><i class="bi bi-cart3 me-1"></i>خرید</span>
+                        <i class="bi bi-chevron-down chevron"></i>
+                    </div>
+                    <div class="sidebar-group-items">
+                        <a href="/PurchaseRequests" class="nav-link-item @(Context.Request.Path.StartsWithSegments("/PurchaseRequests") ? "active" : "")">
+                            <i class="bi bi-cart3"></i> درخواست‌های خرید
+                        </a>
+                    </div>
+                </div>
+
+                <!-- گزارش‌ها -->
+                <div class="sidebar-group">
+                    <div class="sidebar-group-header" onclick="toggleGroup(this)">
+                        <span><i class="bi bi-bar-chart me-1"></i>گزارش‌ها</span>
+                        <i class="bi bi-chevron-down chevron"></i>
+                    </div>
+                    <div class="sidebar-group-items">
+                        <a href="/Reports/ByDepartment" class="nav-link-item">
+                            <i class="bi bi-building"></i> گزارش بخش‌ها
+                        </a>
+                        <a href="/Reports/Warranty" class="nav-link-item">
+                            <i class="bi bi-shield"></i> گارانتی
+                        </a>
+                        <a href="/Reports/Scrapped" class="nav-link-item">
+                            <i class="bi bi-trash3"></i> اسقاطی‌ها
+                        </a>
+                    </div>
+                </div>
+
+                <!-- مدیریت -->
+                @if (User.IsInRole("Admin"))
+                {
+                    <div class="sidebar-group">
+                        <div class="sidebar-group-header" onclick="toggleGroup(this)">
+                            <span><i class="bi bi-gear me-1"></i>مدیریت</span>
+                            <i class="bi bi-chevron-down chevron"></i>
+                        </div>
+                        <div class="sidebar-group-items">
+                            <a href="/Admin/Users" class="nav-link-item">
+                                <i class="bi bi-people"></i> کاربران
+                            </a>
+                            <a href="/Admin/ViewEmployees" class="nav-link-item">
+                                <i class="bi bi-person-badge"></i> پرسنل
+                            </a>
+                            <a href="/Admin/ViewDepartments" class="nav-link-item">
+                                <i class="bi bi-building-gear"></i> واحدها
+                            </a>
+                            <a href="/Admin/Specs" class="nav-link-item @(Context.Request.Path.StartsWithSegments("/Admin/Spec") ? "active" : "")">
+                                <i class="bi bi-sliders"></i> مشخصات فنی
+                            </a>
+                            <a href="/Admin/Categories" class="nav-link-item">
+                                <i class="bi bi-tags"></i> دسته‌بندی‌ها
+                            </a>
+                        </div>
+                    </div>
+                }
+
+            </nav>
     </div>
 
     <!-- Main Content -->
