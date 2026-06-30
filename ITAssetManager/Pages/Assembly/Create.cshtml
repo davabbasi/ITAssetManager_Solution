@@ -1,0 +1,215 @@
+﻿@page
+@model ITAssetManager.Pages.Assembly.CreateModel
+@{
+    ViewData["Title"] = "اسمبل سیستم جدید";
+}
+
+<div class="card mb-3">
+    <div class="card-header">
+        <i class="bi bi-pc-display me-2"></i>اسمبل سیستم جدید
+        <span class="badge bg-primary ms-2">شماره: #@Model.NextAssemblyNumber</span>
+    </div>
+    <div class="card-body">
+        <form method="post">
+            <input type="hidden" asp-for="NextAssemblyNumber" />
+
+            <div class="row g-3 mb-4">
+                <div class="col-md-3">
+                    <label class="form-label">تاریخ اسمبل</label>
+                    <input asp-for="AssembleDate" type="date" class="form-control" />
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">شماره اموال <span class="text-danger">*</span></label>
+                    <input asp-for="PropertyTag" class="form-control" placeholder="AM-2024-XXX" />
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">مدل دستگاه</label>
+                    <input asp-for="DeviceModel" class="form-control" placeholder="مثلاً: PC اداری مدل A" />
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">نام سیستم</label>
+                    <input asp-for="AssetName" class="form-control" placeholder="مثلاً: کامپیوتر اداری ۱" />
+                </div>
+                <div class="col-12">
+                    <label class="form-label">توضیحات</label>
+                    <textarea asp-for="Description" class="form-control" rows="2"></textarea>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">واحد تحویل‌گیرنده</label>
+                    <select asp-for="DepartmentId" asp-items="Model.DepartmentList"
+                            id="departmentSelect" class="form-select">
+                        <option value="">بدون واحد</option>
+                    </select>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">تحویل‌گیرنده (کارمند)</label>
+                    <select asp-for="EmployeeId" asp-items="Model.EmployeeList"
+                            id="employeeSelect" class="form-select">
+                        <option value="">بدون کارمند</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- جستجوی قطعات -->
+            <h6 class="text-muted mb-3 border-bottom pb-2">
+                <i class="bi bi-search me-1"></i>افزودن قطعه به سیستم
+            </h6>
+            <div class="row g-2 mb-3 align-items-end">
+                <div class="col-md-4">
+                    <label class="form-label small">دسته‌بندی قطعه</label>
+                    <select id="componentCategorySelect" class="form-select form-select-sm">
+                        <option value="">انتخاب دسته‌بندی...</option>
+                        @foreach (var cat in Model.InstalledCategories)
+                        {
+                            <option value="@cat.Id">@cat.Name</option>
+                        }
+                    </select>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label small">قطعه آزاد (اسمبل‌نشده)</label>
+                    <select id="freeComponentSelect" class="form-select form-select-sm" disabled>
+                        <option value="">ابتدا دسته‌بندی را انتخاب کنید</option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <button type="button" id="addComponentBtn" class="btn btn-success btn-sm w-100" disabled>
+                        <i class="bi bi-plus-lg me-1"></i>افزودن
+                    </button>
+                </div>
+            </div>
+
+            <!-- جدول قطعات انتخاب‌شده -->
+            <h6 class="text-muted mb-3 border-bottom pb-2">قطعات انتخاب‌شده</h6>
+            <div class="card mb-4">
+                <div class="card-body p-0">
+                    <table class="table table-sm mb-0" id="selectedComponentsTable">
+                        <thead>
+                            <tr>
+                                <th>دسته‌بندی</th>
+                                <th>نام قطعه</th>
+                                <th>برچسب اموال</th>
+                                <th>سریال</th>
+                                <th style="width:60px;"></th>
+                            </tr>
+                        </thead>
+                        <tbody id="selectedComponentsBody">
+                            <tr id="emptyRow">
+                                <td colspan="5" class="text-center text-muted py-3">
+                                    هنوز قطعه‌ای انتخاب نشده
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- این input های مخفی با جاوااسکریپت پر میشن -->
+            <div id="hiddenInputsContainer"></div>
+
+            <div class="d-flex gap-2">
+                <button type="submit" class="btn btn-primary" id="submitBtn" disabled>
+                    <i class="bi bi-check-lg me-1"></i>ثبت سیستم اسمبل‌شده
+                </button>
+                <a href="/Assembly" class="btn btn-outline-secondary">انصراف</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        const categorySelect = document.getElementById('componentCategorySelect');
+        const componentSelect = document.getElementById('freeComponentSelect');
+        const addBtn = document.getElementById('addComponentBtn');
+        const tbody = document.getElementById('selectedComponentsBody');
+        const emptyRow = document.getElementById('emptyRow');
+        const hiddenContainer = document.getElementById('hiddenInputsContainer');
+        const submitBtn = document.getElementById('submitBtn');
+
+        const selectedIds = new Set();
+
+        categorySelect.addEventListener('change', function () {
+            const categoryId = this.value;
+            componentSelect.innerHTML = '<option value="">در حال بارگذاری...</option>';
+            componentSelect.disabled = true;
+            addBtn.disabled = true;
+
+            if (!categoryId) {
+                componentSelect.innerHTML = '<option value="">ابتدا دسته‌بندی را انتخاب کنید</option>';
+                return;
+            }
+
+            fetch('/Api/FreeComponents?categoryId=' + categoryId)
+                .then(r => r.json())
+                .then(items => {
+                    if (!items || items.length === 0) {
+                        componentSelect.innerHTML = '<option value="">قطعه آزادی موجود نیست</option>';
+                        return;
+                    }
+                    componentSelect.innerHTML = '<option value="">انتخاب قطعه...</option>' +
+                        items.map(i => `<option value="${i.id}" data-name="${i.name}" data-tag="${i.propertyTag || ''}" data-serial="${i.serialNumber || ''}" data-cat="${i.categoryName}">${i.name} ${i.propertyTag ? '(' + i.propertyTag + ')' : ''}</option>`).join('');
+                    componentSelect.disabled = false;
+                });
+        });
+
+        componentSelect.addEventListener('change', function () {
+            addBtn.disabled = !this.value;
+        });
+
+        addBtn.addEventListener('click', function () {
+            const opt = componentSelect.selectedOptions[0];
+            if (!opt || !opt.value) return;
+
+            const id = opt.value;
+            if (selectedIds.has(id)) {
+                alert('این قطعه قبلاً اضافه شده');
+                return;
+            }
+            selectedIds.add(id);
+
+            if (!emptyRow.classList.contains('d-none')) emptyRow.classList.add('d-none');
+
+            const row = document.createElement('tr');
+            row.id = 'row-' + id;
+            row.innerHTML = `
+                <td><small>${opt.dataset.cat}</small></td>
+                <td><small class="fw-medium">${opt.dataset.name}</small></td>
+                <td><small>${opt.dataset.tag || '-'}</small></td>
+                <td><small>${opt.dataset.serial || '-'}</small></td>
+                <td>
+                    <button type="button" class="btn btn-xs btn-outline-danger" onclick="removeComponent('${id}')">
+                        <i class="bi bi-x-lg"></i>
+                    </button>
+                </td>`;
+            tbody.appendChild(row);
+
+            const hidden = document.createElement('input');
+            hidden.type = 'hidden';
+            hidden.name = 'ComponentIds';
+            hidden.value = id;
+            hidden.id = 'hidden-' + id;
+            hiddenContainer.appendChild(hidden);
+
+            submitBtn.disabled = selectedIds.size === 0;
+
+            // ریست انتخاب
+            componentSelect.value = '';
+            addBtn.disabled = true;
+        });
+
+        function removeComponent(id) {
+            selectedIds.delete(id);
+            document.getElementById('row-' + id)?.remove();
+            document.getElementById('hidden-' + id)?.remove();
+            if (selectedIds.size === 0) emptyRow.classList.remove('d-none');
+            submitBtn.disabled = selectedIds.size === 0;
+        };
+        new TomSelect('#departmentSelect', { placeholder: 'جستجو در واحدها...' });
+        new TomSelect('#employeeSelect', { placeholder: 'جستجو در کارمندان...' });
+    </script>
+    <style>
+        .btn-xs {
+            padding: 0.15rem 0.4rem;
+            font-size: 0.75rem;
+        }</style>
+}

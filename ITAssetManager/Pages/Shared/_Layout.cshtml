@@ -252,6 +252,9 @@
             <a href="/Reports/Scrapped" class="nav-link-item">
                 <i class="bi bi-trash3"></i> اسقاطی‌ها
             </a>
+                <a href="/Reports/ComponentTracking" class="nav-link-item">
+                    <i class="bi bi-diagram-3"></i> ردیابی قطعات
+                </a>
 
             @if (User.IsInRole("Admin"))
             {
@@ -272,6 +275,21 @@
                         <i class="bi bi-tags"></i> دسته‌بندی‌ها
                     </a>
             }
+
+                <div class="sidebar-group">
+                    <div class="sidebar-group-header" onclick="toggleGroup(this)">
+                        <span><i class="bi bi-pc-display me-1"></i>اسمبل سیستم</span>
+                        <i class="bi bi-chevron-down chevron"></i>
+                    </div>
+                    <div class="sidebar-group-items">
+                        <a href="/Assembly" class="nav-link-item @(Context.Request.Path.StartsWithSegments("/Assembly") ? "active" : "")">
+                            <i class="bi bi-pc-display"></i> سیستم‌های اسمبل‌شده
+                        </a>
+                        <a href="/Assembly/Create" class="nav-link-item">
+                            <i class="bi bi-plus-circle"></i> اسمبل جدید
+                        </a>
+                    </div>
+                </div>
         </nav>
     </div>
 

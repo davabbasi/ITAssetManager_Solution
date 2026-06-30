@@ -1,0 +1,119 @@
+﻿@page
+@model ITAssetManager.Pages.Reports.ComponentTrackingModel
+@{
+    ViewData["Title"] = "ردیابی قطعات";
+}
+
+<h5 class="mb-3 fw-bold"><i class="bi bi-diagram-3 me-2"></i>ردیابی قطعات نصبی</h5>
+
+<div class="card mb-3">
+    <div class="card-body py-2">
+        <form method="get" class="row g-2 align-items-end">
+            <div class="col-md-4">
+                <input type="text" name="search" value="@Model.Search"
+                       class="form-control form-control-sm"
+                       placeholder="جستجو در نام، سریال، برچسب اموال..." />
+            </div>
+            <div class="col-md-3">
+                <select name="categoryId" class="form-select form-select-sm">
+                    <option value="">همه دسته‌های نصبی</option>
+                    @foreach (var cat in Model.InstalledCategories)
+                    {
+                        <option value="@cat.Id" selected="@(Model.CategoryId == cat.Id)">@cat.Name</option>
+                    }
+                </select>
+            </div>
+            <div class="col-md-3">
+                <select name="status" class="form-select form-select-sm">
+                    <option value="">همه وضعیت‌ها</option>
+                    <option value="installed" selected="@(Model.StatusFilter == "installed")">نصب‌شده در PC</option>
+                    <option value="free" selected="@(Model.StatusFilter == "free")">آزاد (بدون استفاده)</option>
+                </select>
+            </div>
+            <div class="col-md-2">
+                <button type="submit" class="btn btn-primary btn-sm w-100">جستجو</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-header">@Model.Items.Count قطعه</div>
+    <div class="card-body p-0">
+        <table class="table table-hover mb-0">
+            <thead>
+                <tr>
+                    <th>دسته‌بندی</th>
+                    <th>نام قطعه</th>
+                    <th>برچسب اموال</th>
+                    <th>سریال</th>
+                    <th>وضعیت فعلی</th>
+                    <th>در کدام سیستم</th>
+                    <th>تحویل‌گیرنده فعلی</th>
+                    <th>تاریخ نصب</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model.Items)
+                {
+                    <tr>
+                        <td><small>@item.Asset.Category?.Name</small></td>
+                        <td>
+                            <a href="/Assets/Details/@item.Asset.Id" class="text-decoration-none fw-medium">
+                                @item.Asset.Name
+                            </a>
+                        </td>
+                        <td><small>@(item.Asset.PropertyTag ?? "-")</small></td>
+                        <td><small class="font-monospace">@(item.Asset.SerialNumber ?? "-")</small></td>
+                        <td>
+                            @if (item.ActiveAssembly != null)
+                            {
+                                <span class="badge badge-active">نصب‌شده</span>
+                            }
+                            else
+                            {
+                                <span class="badge badge-storage">آزاد</span>
+                            }
+                        </td>
+                        <td>
+                            @if (item.ActiveAssembly != null)
+                            {
+                                <a href="/Assembly/Details/@item.ActiveAssembly.PcAssetId" class="text-decoration-none">
+                                    <span class="badge bg-primary">#@item.ActiveAssembly.PcAsset?.AssemblyNumber</span>
+                                    @item.ActiveAssembly.PcAsset?.Name
+                                </a>
+                            }
+                            else
+                            {
+                                <small class="text-muted">-</small>
+                            }
+                        </td>
+                        <td>
+                            @if (item.ActiveAssembly?.PcAsset != null)
+                            {
+                                <small>@(item.ActiveAssembly.PcAsset.EmployeeName ?? item.ActiveAssembly.PcAsset.DepartmentName ?? "تخصیص‌نیافته")</small>
+                            }
+                            else
+                            {
+                                <small class="text-muted">-</small>
+                            }
+                        </td>
+                        <td><small>@(item.ActiveAssembly?.InstalledAt.ToString("yyyy/MM/dd") ?? "-")</small></td>
+                        <td>
+                            <a href="/Reports/ComponentHistory/@item.Asset.Id" class="btn btn-xs btn-outline-secondary">
+                                <i class="bi bi-clock-history"></i> تاریخچه
+                            </a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<style>
+    .btn-xs {
+        padding: 0.15rem 0.4rem;
+        font-size: 0.75rem;
+    }</style>

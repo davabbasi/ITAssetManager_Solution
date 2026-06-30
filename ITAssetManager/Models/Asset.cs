@@ -53,4 +53,11 @@ public class Asset
     public ICollection<AssetSpecValue> SpecValues { get; set; } = new List<AssetSpecValue>();
     public ICollection<AssetAssignment> Assignments { get; set; } = new List<AssetAssignment>();
     public ICollection<MaintenanceLog> MaintenanceLogs { get; set; } = new List<MaintenanceLog>();
+
+    // اضافه کن:
+    public int? AssemblyNumber { get; set; }   // شماره شناسایی PC (فقط برای PCهای اسمبل‌شده)
+    public bool IsAssembled { get; set; } = false; // آیا این Asset یک PC اسمبلیه؟
+
+    public ICollection<AssemblyComponent> AsComponentOf { get; set; } = new List<AssemblyComponent>(); // وقتی این قطعه توی یک PC استفاده شده
+    public ICollection<AssemblyComponent> Components { get; set; } = new List<AssemblyComponent>();     // وقتی این خودش PC هست و قطعات داره
 }

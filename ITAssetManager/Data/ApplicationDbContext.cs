@@ -20,6 +20,8 @@ public class ApplicationDbContext : IdentityDbContext
     public DbSet<VwDepartment> VwDepartments { get; set; }
     public DbSet<Vendor> Vendors { get; set; }
     public DbSet<VwPurchaseRequest> VwPurchaseRequests { get; set; }
+    public DbSet<AssemblyComponent> AssemblyComponents { get; set; }
+
     protected override void OnModelCreating(ModelBuilder builder)
     {
         base.OnModelCreating(builder);
@@ -83,5 +85,17 @@ public class ApplicationDbContext : IdentityDbContext
         builder.Entity<VwPurchaseRequest>()
             .ToView("vw_PurchaseRequests")
             .HasNoKey();
+
+        builder.Entity<AssemblyComponent>()
+            .HasOne(ac => ac.PcAsset)
+            .WithMany(a => a.Components)
+            .HasForeignKey(ac => ac.PcAssetId)
+            .OnDelete(DeleteBehavior.NoAction);
+
+        builder.Entity<AssemblyComponent>()
+            .HasOne(ac => ac.ComponentAsset)
+            .WithMany(a => a.AsComponentOf)
+            .HasForeignKey(ac => ac.ComponentAssetId)
+            .OnDelete(DeleteBehavior.NoAction);
     }
 }

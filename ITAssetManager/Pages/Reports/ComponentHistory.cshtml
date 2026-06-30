@@ -1,0 +1,68 @@
+﻿@page "{id:int}"
+@model ITAssetManager.Pages.Reports.ComponentHistoryModel
+@{
+    ViewData["Title"] = "تاریخچه قطعه: " + Model.Asset.Name;
+}
+
+<div class="mb-3">
+    <a href="/Reports/ComponentTracking" class="text-muted text-decoration-none small">
+        <i class="bi bi-arrow-right me-1"></i>ردیابی قطعات
+    </a>
+    <h5 class="mb-0 mt-1 fw-bold">@Model.Asset.Name</h5>
+    <small class="text-muted">@(Model.Asset.PropertyTag ?? "-") | @Model.Asset.Category?.Name</small>
+</div>
+
+<div class="card">
+    <div class="card-header"><i class="bi bi-clock-history me-2"></i>تاریخچه استفاده در سیستم‌ها</div>
+    <div class="card-body p-0">
+        @if (!Model.History.Any())
+        {
+            <p class="text-muted text-center py-4">این قطعه هنوز در هیچ سیستمی استفاده نشده</p>
+        }
+        else
+        {
+            <table class="table table-sm mb-0">
+                <thead>
+                    <tr>
+                        <th>سیستم (PC)</th>
+                        <th>تاریخ نصب</th>
+                        <th>تاریخ خروج</th>
+                        <th>مدت استفاده</th>
+                        <th>تحویل‌گیرنده در آن زمان</th>
+                        <th>نصب توسط</th>
+                        <th>وضعیت</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var h in Model.History)
+                    {
+                        var duration = (h.RemovedAt ?? DateTime.Now) - h.InstalledAt;
+                        <tr class="@(h.RemovedAt == null ? "table-success" : "")">
+                            <td>
+                                <a href="/Assembly/Details/@h.PcAssetId" class="text-decoration-none">
+                                    <span class="badge bg-primary">#@h.PcAsset?.AssemblyNumber</span>
+                                    @h.PcAsset?.Name
+                                </a>
+                            </td>
+                            <td><small>@h.InstalledAt.ToString("yyyy/MM/dd")</small></td>
+                            <td><small>@(h.RemovedAt?.ToString("yyyy/MM/dd") ?? "-")</small></td>
+                            <td><small>@duration.Days روز</small></td>
+                            <td><small>@(h.PcAsset?.EmployeeName ?? h.PcAsset?.DepartmentName ?? "-")</small></td>
+                            <td><small class="text-muted">@h.InstalledBy</small></td>
+                            <td>
+                                @if (h.RemovedAt == null)
+                                {
+                                    <span class="badge badge-active">در حال استفاده</span>
+                                }
+                                else
+                                {
+                                    <span class="badge badge-scrapped">خارج‌شده</span>
+                                }
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+    </div>
+</div>

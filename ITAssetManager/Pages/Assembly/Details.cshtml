@@ -1,0 +1,133 @@
+﻿@page "{id:int}"
+@model ITAssetManager.Pages.Assembly.DetailsModel
+@{
+    ViewData["Title"] = "سیستم #" + Model.PcAsset.AssemblyNumber;
+}
+
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success alert-dismissible">
+        @TempData["Success"] <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <div>
+        <a href="/Assembly" class="text-muted text-decoration-none small">
+            <i class="bi bi-arrow-right me-1"></i>سیستم‌های اسمبل‌شده
+        </a>
+        <h5 class="mb-0 mt-1 fw-bold">
+            <span class="badge bg-primary">#@Model.PcAsset.AssemblyNumber</span>
+            @Model.PcAsset.Name
+        </h5>
+    </div>
+    <a href="/Assets/Details/@Model.PcAsset.Id" class="btn btn-outline-secondary btn-sm">
+        <i class="bi bi-cpu me-1"></i>مشاهده به‌عنوان تجهیز
+    </a>
+</div>
+
+<div class="row g-3">
+    <div class="col-md-8">
+        <!-- قطعات فعال -->
+        <div class="card mb-3">
+            <div class="card-header d-flex justify-content-between">
+                <span><i class="bi bi-cpu-fill me-2"></i>قطعات نصب‌شده</span>
+                <a href="/Assembly/AddComponent?pcId=@Model.PcAsset.Id" class="btn btn-sm btn-outline-primary">
+                    <i class="bi bi-plus"></i> افزودن قطعه
+                </a>
+            </div>
+            <div class="card-body p-0">
+                @if (!Model.ActiveComponents.Any())
+                {
+                    <p class="text-muted text-center py-3">قطعه‌ای نصب نیست</p>
+                }
+                else
+                {
+                    <table class="table table-sm mb-0">
+                        <thead>
+                            <tr><th>دسته‌بندی</th><th>نام قطعه</th><th>برچسب اموال</th><th>تاریخ نصب</th><th></th></tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var c in Model.ActiveComponents)
+                            {
+                                <tr>
+                                    <td><small>@c.ComponentAsset?.Category?.Name</small></td>
+                                    <td>
+                                        <a href="/Assets/Details/@c.ComponentAssetId" class="text-decoration-none">
+                                            @c.ComponentAsset?.Name
+                                        </a>
+                                    </td>
+                                    <td><small>@(c.ComponentAsset?.PropertyTag ?? "-")</small></td>
+                                    <td><small>@c.InstalledAt.ToString("yyyy/MM/dd")</small></td>
+                                    <td>
+                                        <form method="post" asp-page-handler="RemoveComponent"
+                                              onsubmit="return confirm('این قطعه از سیستم خارج شود؟')">
+                                            <input type="hidden" name="componentId" value="@c.Id" />
+                                            <button type="submit" class="btn btn-xs btn-outline-danger">
+                                                <i class="bi bi-box-arrow-up me-1"></i>خارج‌کردن
+                                            </button>
+                                        </form>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                }
+            </div>
+        </div>
+
+        <!-- تاریخچه قطعات (شامل خارج‌شده‌ها) -->
+        @if (Model.RemovedComponents.Any())
+        {
+            <div class="card">
+                <div class="card-header"><i class="bi bi-clock-history me-2"></i>تاریخچه قطعات خارج‌شده</div>
+                <div class="card-body p-0">
+                    <table class="table table-sm mb-0">
+                        <thead>
+                            <tr><th>قطعه</th><th>تاریخ نصب</th><th>تاریخ خروج</th><th>توسط</th></tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var c in Model.RemovedComponents)
+                            {
+                                <tr class="text-muted">
+                                    <td><small>@c.ComponentAsset?.Name</small></td>
+                                    <td><small>@c.InstalledAt.ToString("yyyy/MM/dd")</small></td>
+                                    <td><small>@c.RemovedAt?.ToString("yyyy/MM/dd")</small></td>
+                                    <td><small>@c.RemovedBy</small></td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        }
+    </div>
+
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header">اطلاعات سیستم</div>
+            <div class="card-body">
+                <small class="text-muted d-block">شماره اموال</small>
+                <span class="fw-medium d-block mb-2">@(Model.PcAsset.PropertyTag ?? "-")</span>
+
+                <small class="text-muted d-block">مدل</small>
+                <span class="d-block mb-2">@(Model.PcAsset.Model ?? "-")</span>
+
+                <small class="text-muted d-block">تاریخ اسمبل</small>
+                <span class="d-block mb-2">@Model.PcAsset.CreatedAt.ToString("yyyy/MM/dd")</span>
+
+                @if (!string.IsNullOrEmpty(Model.PcAsset.Notes))
+                {
+                    <small class="text-muted d-block">توضیحات</small>
+                    <span class="d-block">@Model.PcAsset.Notes</span>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .btn-xs {
+        padding: 0.15rem 0.4rem;
+        font-size: 0.75rem;
+    }</style>
