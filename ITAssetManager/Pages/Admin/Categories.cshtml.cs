@@ -1,5 +1,6 @@
 using ITAssetManager.Data;
 using ITAssetManager.Models;
+using ITAssetManager.Models.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -14,13 +15,12 @@ public class CategoriesModel : PageModel
     public CategoriesModel(ApplicationDbContext context) => _context = context;
 
     public List<AssetCategory> Categories { get; set; } = new();
-    [BindProperty(SupportsGet = true)] public int? EditId { get; set; }
 
+    
+
+    [BindProperty(SupportsGet = true)]
+    public CategoryEditViewModel Input { get; set; } =new();
    
-    public int EditType { get; set; } = 1;
-    public string? EditName { get; set; }
-    public string? EditIcon { get; set; }
-    public string? EditDescription { get; set; }
 
     public async Task OnGetAsync()
     {
@@ -30,43 +30,49 @@ public class CategoriesModel : PageModel
             .ToListAsync();
 
 
-        if (EditId.HasValue)
+        if (Input.Id>0)
         {
-            var cat = await _context.AssetCategories.FindAsync(EditId);
+            var cat = await _context.AssetCategories.FindAsync(Input.Id);
             if (cat != null)
             {
-                EditName = cat.Name;
-                EditIcon = cat.Icon;
-                EditDescription = cat.Description;
-                EditType = (int)cat.Type;
+                Input.Name = cat.Name;
+                Input.Icon = cat.Icon;
+                Input.Description = cat.Description;
+                Input.Type = (int)cat.Type;
 
             }
         }
     }
 
-    public async Task<IActionResult> OnPostAsync(int? editId, string name, string? icon, string? description, int type = 1)
+    public async Task<IActionResult> OnPostAsync()
     {
-        if (string.IsNullOrWhiteSpace(name)) return RedirectToPage();
+        if (!ModelState.IsValid)
+            return Page();
 
-        if (editId.HasValue)
+        if (Input.Id>0)
         {
-            var cat = await _context.AssetCategories.FindAsync(editId);
+            var cat = await _context.AssetCategories.FindAsync(Input.Id);
             if (cat != null) 
             { 
-                cat.Name = name; 
-                cat.Icon = icon ?? "bi-box";
-                cat.Description = description;
-                cat.Type = (AssetCategoryType)type;
+                cat.Name = Input.Name; 
+                cat.Icon = Input.Icon ?? "bi-box";
+                cat.Description = Input.Description;
+                cat.Type = (AssetCategoryType)Input.Type;
+            }
+            else
+            {
+                return NotFound();
+
             }
         }
         else
         {
             _context.AssetCategories.Add(new AssetCategory
             {
-                Name = name,
-                Icon = icon ?? "bi-box",
-                Description = description,
-                Type = (AssetCategoryType)type
+                Name = Input.Name,
+                Icon = Input.Icon ?? "bi-box",
+                Description = Input.Description,
+                Type = (AssetCategoryType)Input.Type,
             });
 
         }
