@@ -14,7 +14,7 @@ public class CategoriesModel : PageModel
     private readonly ApplicationDbContext _context;
     public CategoriesModel(ApplicationDbContext context) => _context = context;
 
-    public List<AssetCategory> Categories { get; set; } = new();
+    public List<Category> Categories { get; set; } = new();
 
     
 
@@ -24,7 +24,7 @@ public class CategoriesModel : PageModel
 
     public async Task OnGetAsync()
     {
-        Categories = await _context.AssetCategories
+        Categories = await _context.Categories
             .Include(c => c.Assets)
             .OrderBy(c => c.Name)
             .ToListAsync();
@@ -32,11 +32,10 @@ public class CategoriesModel : PageModel
 
         if (Input.Id>0)
         {
-            var cat = await _context.AssetCategories.FindAsync(Input.Id);
+            var cat = await _context.Categories.FindAsync(Input.Id);
             if (cat != null)
             {
                 Input.Name = cat.Name;
-                Input.Icon = cat.Icon;
                 Input.Description = cat.Description;
                 Input.Type = (int)cat.Type;
 
@@ -51,11 +50,10 @@ public class CategoriesModel : PageModel
 
         if (Input.Id>0)
         {
-            var cat = await _context.AssetCategories.FindAsync(Input.Id);
+            var cat = await _context.Categories.FindAsync(Input.Id);
             if (cat != null) 
             { 
                 cat.Name = Input.Name; 
-                cat.Icon = Input.Icon ?? "bi-box";
                 cat.Description = Input.Description;
                 cat.Type = (AssetCategoryType)Input.Type;
             }
@@ -67,10 +65,9 @@ public class CategoriesModel : PageModel
         }
         else
         {
-            _context.AssetCategories.Add(new AssetCategory
+            _context.Categories.Add(new Category
             {
                 Name = Input.Name,
-                Icon = Input.Icon ?? "bi-box",
                 Description = Input.Description,
                 Type = (AssetCategoryType)Input.Type,
             });

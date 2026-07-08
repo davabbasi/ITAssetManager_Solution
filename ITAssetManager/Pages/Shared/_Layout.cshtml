@@ -423,8 +423,12 @@
                             <a href="/Admin/ViewDepartments" class="nav-link-item">
                                 <i class="bi bi-building-gear"></i> واحدها
                             </a>
-                            <a href="/Admin/Specs" class="nav-link-item @(Context.Request.Path.StartsWithSegments("/Admin/Spec") ? "active" : "")">
+                            <a href="/Admin/SpecificationIndex" class="nav-link-item @(Context.Request.Path.StartsWithSegments("/Admin/SpecificationIndex") ? "active" : "")">
                                 <i class="bi bi-sliders"></i> مشخصات فنی
+                            </a>
+                          
+                            <a href="/Admin/SpecificationAssignToCategory" class="nav-link-item @(Context.Request.Path.StartsWithSegments("/Admin/SpecificationAssignToCategory") ? "active" : "")">
+                                <i class="bi bi-sliders"></i>انتساب مشخصات فنی به دسته بندی
                             </a>
                             <a href="/Admin/Categories" class="nav-link-item">
                                 <i class="bi bi-tags"></i> دسته‌بندی‌ها

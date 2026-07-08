@@ -14,7 +14,7 @@ public class AddComponentModel : PageModel
     public AddComponentModel(ApplicationDbContext context) => _context = context;
 
     public Asset PcAsset { get; set; } = null!;
-    public List<AssetCategory> InstalledCategories { get; set; } = new();
+    public List<Category> InstalledCategories { get; set; } = new();
 
     public async Task<IActionResult> OnGetAsync(int pcId)
     {
@@ -22,7 +22,7 @@ public class AddComponentModel : PageModel
         if (pc == null) return NotFound();
         PcAsset = pc;
 
-        InstalledCategories = await _context.AssetCategories
+        InstalledCategories = await _context.Categories
             .Where(c => c.Type == AssetCategoryType.Installed)
             .OrderBy(c => c.Name)
             .ToListAsync();

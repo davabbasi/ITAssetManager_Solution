@@ -13,29 +13,27 @@ public class SpecValueCreateModel : PageModel
     public SpecValueCreateModel(ApplicationDbContext context) => _context = context;
 
     public int SpecId { get; set; }
-    public int CategoryId { get; set; }
     public string SpecName { get; set; } = string.Empty;
 
-    public async Task<IActionResult> OnGetAsync(int specId, int categoryId)
+    public async Task<IActionResult> OnGetAsync(int specId)
     {
-        var spec = await _context.SpecDefinitions.FindAsync(specId);
+        var spec = await _context.Specifications.FindAsync(specId);
         if (spec == null) return NotFound();
 
         SpecId = specId;
-        CategoryId = categoryId;
         SpecName = spec.Name;
         return Page();
     }
 
-    public async Task<IActionResult> OnPostAsync(int specId, int categoryId,
+    public async Task<IActionResult> OnPostAsync(int specId,
         string value, int sortOrder = 0, string action = "save")
     {
         if (!string.IsNullOrWhiteSpace(value))
         {
-            _context.SpecValues.Add(new SpecValue
+            _context.SpecValues.Add(new SpecificationValue
             {
                 Value = value.Trim(),
-                SpecDefinitionId = specId,
+                SpecificationId = specId,
                 SortOrder = sortOrder
             });
             await _context.SaveChangesAsync();
@@ -44,8 +42,8 @@ public class SpecValueCreateModel : PageModel
 
         // اگر "ذخیره و جدید" زده شد، دوباره همین صفحه
         if (action == "saveAndNew")
-            return RedirectToPage(new { specId, categoryId });
+            return RedirectToPage(new { specId });
 
-        return RedirectToPage("/Admin/Specs", new { categoryId, selectedSpecId = specId });
+        return RedirectToPage("/Admin/SpecificationIndex", new { selectedSpecId = specId });
     }
 }

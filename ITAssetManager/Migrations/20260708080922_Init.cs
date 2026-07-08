@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace ITAssetManager.Migrations
 {
     /// <inheritdoc />
-    public partial class init : Migration
+    public partial class Init : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -53,33 +53,55 @@ namespace ITAssetManager.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "AssetCategories",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Icon = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Description = table.Column<string>(type: "nvarchar(max)", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_AssetCategories", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "Departments",
+                name: "Categories",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    IsActive = table.Column<bool>(type: "bit", nullable: false)
+                    Type = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Departments", x => x.Id);
+                    table.PrimaryKey("PK_Categories", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Specifications",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    SortOrder = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Specifications", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Vendors",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Code = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Address = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Phone = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Fax = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Mobile = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Email = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ManagerName = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    SalesPersonName = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    IsActive = table.Column<bool>(type: "bit", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Vendors", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -189,26 +211,50 @@ namespace ITAssetManager.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Employees",
+                name: "CategorySpecifications",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    FullName = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    EmployeeCode = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Position = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    DepartmentId = table.Column<int>(type: "int", nullable: false),
-                    IsActive = table.Column<bool>(type: "bit", nullable: false)
+                    CategoryId = table.Column<int>(type: "int", nullable: false),
+                    SpecificationId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Employees", x => x.Id);
+                    table.PrimaryKey("PK_CategorySpecifications", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Employees_Departments_DepartmentId",
-                        column: x => x.DepartmentId,
-                        principalTable: "Departments",
+                        name: "FK_CategorySpecifications_Categories_CategoryId",
+                        column: x => x.CategoryId,
+                        principalTable: "Categories",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_CategorySpecifications_Specifications_SpecificationId",
+                        column: x => x.SpecificationId,
+                        principalTable: "Specifications",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "SpecValues",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Value = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    SpecificationId = table.Column<int>(type: "int", nullable: false),
+                    SortOrder = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_SpecValues", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_SpecValues_Specifications_SpecificationId",
+                        column: x => x.SpecificationId,
+                        principalTable: "Specifications",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
@@ -218,7 +264,6 @@ namespace ITAssetManager.Migrations
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Brand = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Model = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     SerialNumber = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Barcode = table.Column<string>(type: "nvarchar(max)", nullable: true),
@@ -230,31 +275,59 @@ namespace ITAssetManager.Migrations
                     WarrantyExpiry = table.Column<DateTime>(type: "datetime2", nullable: true),
                     PurchasePrice = table.Column<decimal>(type: "decimal(18,2)", nullable: true),
                     DepartmentId = table.Column<int>(type: "int", nullable: true),
+                    DepartmentName = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     EmployeeId = table.Column<int>(type: "int", nullable: true),
+                    EmployeeName = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Location = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Specs = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Notes = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: true)
+                    UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    VendorId = table.Column<int>(type: "int", nullable: true),
+                    AssemblyNumber = table.Column<int>(type: "int", nullable: true),
+                    IsAssembled = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Assets", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Assets_AssetCategories_CategoryId",
+                        name: "FK_Assets_Categories_CategoryId",
                         column: x => x.CategoryId,
-                        principalTable: "AssetCategories",
+                        principalTable: "Categories",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
-                        name: "FK_Assets_Departments_DepartmentId",
-                        column: x => x.DepartmentId,
-                        principalTable: "Departments",
+                        name: "FK_Assets_Vendors_VendorId",
+                        column: x => x.VendorId,
+                        principalTable: "Vendors",
+                        principalColumn: "Id");
+                });
+
+            migrationBuilder.CreateTable(
+                name: "AssemblyComponents",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    PcAssetId = table.Column<int>(type: "int", nullable: false),
+                    ComponentAssetId = table.Column<int>(type: "int", nullable: false),
+                    InstalledAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    RemovedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    InstalledBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    RemovedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Notes = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_AssemblyComponents", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_AssemblyComponents_Assets_ComponentAssetId",
+                        column: x => x.ComponentAssetId,
+                        principalTable: "Assets",
                         principalColumn: "Id");
                     table.ForeignKey(
-                        name: "FK_Assets_Employees_EmployeeId",
-                        column: x => x.EmployeeId,
-                        principalTable: "Employees",
+                        name: "FK_AssemblyComponents_Assets_PcAssetId",
+                        column: x => x.PcAssetId,
+                        principalTable: "Assets",
                         principalColumn: "Id");
                 });
 
@@ -268,9 +341,13 @@ namespace ITAssetManager.Migrations
                     FromEmployeeId = table.Column<int>(type: "int", nullable: true),
                     FromDepartmentId = table.Column<int>(type: "int", nullable: true),
                     FromLocation = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    FromEmployeeName = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    FromDepartmentName = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     ToEmployeeId = table.Column<int>(type: "int", nullable: true),
                     ToDepartmentId = table.Column<int>(type: "int", nullable: true),
                     ToLocation = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ToEmployeeName = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ToDepartmentName = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     AssignedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
                     Reason = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     AssignedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
@@ -285,25 +362,36 @@ namespace ITAssetManager.Migrations
                         principalTable: "Assets",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "AssetSpecValues",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    AssetId = table.Column<int>(type: "int", nullable: false),
+                    SpecDefinitionId = table.Column<int>(type: "int", nullable: false),
+                    SpecValueId = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_AssetSpecValues", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_AssetAssignments_Departments_FromDepartmentId",
-                        column: x => x.FromDepartmentId,
-                        principalTable: "Departments",
+                        name: "FK_AssetSpecValues_Assets_AssetId",
+                        column: x => x.AssetId,
+                        principalTable: "Assets",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_AssetSpecValues_SpecValues_SpecValueId",
+                        column: x => x.SpecValueId,
+                        principalTable: "SpecValues",
                         principalColumn: "Id");
                     table.ForeignKey(
-                        name: "FK_AssetAssignments_Departments_ToDepartmentId",
-                        column: x => x.ToDepartmentId,
-                        principalTable: "Departments",
-                        principalColumn: "Id");
-                    table.ForeignKey(
-                        name: "FK_AssetAssignments_Employees_FromEmployeeId",
-                        column: x => x.FromEmployeeId,
-                        principalTable: "Employees",
-                        principalColumn: "Id");
-                    table.ForeignKey(
-                        name: "FK_AssetAssignments_Employees_ToEmployeeId",
-                        column: x => x.ToEmployeeId,
-                        principalTable: "Employees",
+                        name: "FK_AssetSpecValues_Specifications_SpecDefinitionId",
+                        column: x => x.SpecDefinitionId,
+                        principalTable: "Specifications",
                         principalColumn: "Id");
                 });
 
@@ -337,22 +425,22 @@ namespace ITAssetManager.Migrations
                 });
 
             migrationBuilder.InsertData(
-                table: "AssetCategories",
-                columns: new[] { "Id", "Description", "Icon", "Name" },
+                table: "Categories",
+                columns: new[] { "Id", "Description", "Name", "Type" },
                 values: new object[,]
                 {
-                    { 1, null, "bi-laptop", "لپ‌تاپ" },
-                    { 2, null, "bi-pc-display", "کامپیوتر رومیزی" },
-                    { 3, null, "bi-display", "مانیتور" },
-                    { 4, null, "bi-printer", "پرینتر" },
-                    { 5, null, "bi-mouse", "ماوس" },
-                    { 6, null, "bi-keyboard", "کیبورد" },
-                    { 7, null, "bi-hdd-network", "سوئیچ شبکه" },
-                    { 8, null, "bi-router", "روتر" },
-                    { 9, null, "bi-server", "سرور" },
-                    { 10, null, "bi-battery-charging", "UPS" },
-                    { 11, null, "bi-headset", "هدست" },
-                    { 12, null, "bi-box", "سایر" }
+                    { 1, null, "لپ‌تاپ", 1 },
+                    { 2, null, "کامپیوتر رومیزی", 1 },
+                    { 3, null, "مانیتور", 1 },
+                    { 4, null, "پرینتر", 1 },
+                    { 5, null, "ماوس", 1 },
+                    { 6, null, "کیبورد", 1 },
+                    { 7, null, "سوئیچ شبکه", 1 },
+                    { 8, null, "روتر", 1 },
+                    { 9, null, "سرور", 1 },
+                    { 10, null, "UPS", 1 },
+                    { 11, null, "هدست", 1 },
+                    { 12, null, "سایر", 1 }
                 });
 
             migrationBuilder.CreateIndex(
@@ -395,29 +483,19 @@ namespace ITAssetManager.Migrations
                 filter: "[NormalizedUserName] IS NOT NULL");
 
             migrationBuilder.CreateIndex(
+                name: "IX_AssemblyComponents_ComponentAssetId",
+                table: "AssemblyComponents",
+                column: "ComponentAssetId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_AssemblyComponents_PcAssetId",
+                table: "AssemblyComponents",
+                column: "PcAssetId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_AssetAssignments_AssetId",
                 table: "AssetAssignments",
                 column: "AssetId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_AssetAssignments_FromDepartmentId",
-                table: "AssetAssignments",
-                column: "FromDepartmentId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_AssetAssignments_FromEmployeeId",
-                table: "AssetAssignments",
-                column: "FromEmployeeId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_AssetAssignments_ToDepartmentId",
-                table: "AssetAssignments",
-                column: "ToDepartmentId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_AssetAssignments_ToEmployeeId",
-                table: "AssetAssignments",
-                column: "ToEmployeeId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Assets_CategoryId",
@@ -425,24 +503,44 @@ namespace ITAssetManager.Migrations
                 column: "CategoryId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Assets_DepartmentId",
+                name: "IX_Assets_VendorId",
                 table: "Assets",
-                column: "DepartmentId");
+                column: "VendorId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Assets_EmployeeId",
-                table: "Assets",
-                column: "EmployeeId");
+                name: "IX_AssetSpecValues_AssetId",
+                table: "AssetSpecValues",
+                column: "AssetId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Employees_DepartmentId",
-                table: "Employees",
-                column: "DepartmentId");
+                name: "IX_AssetSpecValues_SpecDefinitionId",
+                table: "AssetSpecValues",
+                column: "SpecDefinitionId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_AssetSpecValues_SpecValueId",
+                table: "AssetSpecValues",
+                column: "SpecValueId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_CategorySpecifications_CategoryId",
+                table: "CategorySpecifications",
+                column: "CategoryId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_CategorySpecifications_SpecificationId",
+                table: "CategorySpecifications",
+                column: "SpecificationId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_MaintenanceLogs_AssetId",
                 table: "MaintenanceLogs",
                 column: "AssetId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_SpecValues_SpecificationId",
+                table: "SpecValues",
+                column: "SpecificationId");
         }
 
         /// <inheritdoc />
@@ -464,7 +562,16 @@ namespace ITAssetManager.Migrations
                 name: "AspNetUserTokens");
 
             migrationBuilder.DropTable(
+                name: "AssemblyComponents");
+
+            migrationBuilder.DropTable(
                 name: "AssetAssignments");
+
+            migrationBuilder.DropTable(
+                name: "AssetSpecValues");
+
+            migrationBuilder.DropTable(
+                name: "CategorySpecifications");
 
             migrationBuilder.DropTable(
                 name: "MaintenanceLogs");
@@ -476,16 +583,19 @@ namespace ITAssetManager.Migrations
                 name: "AspNetUsers");
 
             migrationBuilder.DropTable(
+                name: "SpecValues");
+
+            migrationBuilder.DropTable(
                 name: "Assets");
 
             migrationBuilder.DropTable(
-                name: "AssetCategories");
+                name: "Specifications");
 
             migrationBuilder.DropTable(
-                name: "Employees");
+                name: "Categories");
 
             migrationBuilder.DropTable(
-                name: "Departments");
+                name: "Vendors");
         }
     }
 }

@@ -19,14 +19,14 @@ public class CreateModel : PageModel
     public SelectList CategoryList { get; set; } = null!;
     public SelectList DepartmentList { get; set; } = null!;
     public SelectList EmployeeList { get; set; } = null!;
-    public List<SpecDefinition> SpecDefinitions { get; set; } = new();
+    public List<CategorySpecification> CategorySpecifications { get; set; } = new();
     public SelectList VendorList { get; set; } = null!;
 
     [BindProperty] public Dictionary<int, int> SpecValues { get; set; } = new();
     public async Task OnGetAsync()
     {
         if (Asset.CategoryId > 0)
-            SpecDefinitions = await LoadSpecsAsync(Asset.CategoryId);
+            CategorySpecifications = await LoadSpecsAsync(Asset.CategoryId);
         await LoadSelectListsAsync();
     }
 
@@ -67,7 +67,7 @@ public class CreateModel : PageModel
         {
             if (specValId > 0)
             {
-                _context.AssetSpecValues.Add(new AssetSpecValue
+                _context.AssetSpecValues.Add(new AssetSpecificationValue
                 {
                     AssetId = Asset.Id,
                     SpecDefinitionId = specDefId,
@@ -85,7 +85,7 @@ public class CreateModel : PageModel
     private async Task LoadSelectListsAsync()
     {
         CategoryList = new SelectList(
-            await _context.AssetCategories.OrderBy(c => c.Name).ToListAsync(), "Id", "Name");
+            await _context.Categories.OrderBy(c => c.Name).ToListAsync(), "Id", "Name");
 
 
         DepartmentList = new SelectList(await _context.VwDepartments.OrderBy(d => d.Name).ToListAsync(), "Id", "Name");
@@ -97,7 +97,7 @@ public class CreateModel : PageModel
                 .ToListAsync(), "Id", "Name");
 
         if (Asset.CategoryId > 0)
-            SpecDefinitions = await LoadSpecsAsync(Asset.CategoryId);
+            CategorySpecifications = await LoadSpecsAsync(Asset.CategoryId);
 
         VendorList = new SelectList(
             await _context.Vendors
@@ -106,20 +106,20 @@ public class CreateModel : PageModel
             .ToListAsync(), "Id", "Name");
     }
 
-    private async Task<List<SpecDefinition>> LoadSpecsAsync(int categoryId)
+    private async Task<List<CategorySpecification>> LoadSpecsAsync(int categoryId)
     {
-        return await _context.SpecDefinitions
-            .Include(s => s.SpecValues)
+        return await _context.CategorySpecifications
+            .Include(s => s.Specification)
             .Where(s => s.CategoryId == categoryId)
-            .OrderBy(s => s.SortOrder)
+            .OrderBy(s => s.Specification.SortOrder)
             .ToListAsync();
     }
 
 
     public async Task<IActionResult> OnGetSpecsAsync(int categoryId)
     {
-        var specs = await _context.SpecDefinitions
-            .Include(x => x.SpecValues)
+        var specs = await _context.CategorySpecifications
+            .Include(x => x.Specification)
             .Where(x => x.CategoryId == categoryId)
             .ToListAsync();
 

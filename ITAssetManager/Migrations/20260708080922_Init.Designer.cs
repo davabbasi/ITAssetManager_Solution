@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace ITAssetManager.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20260630085107_AssemblyPageAdded")]
-    partial class AssemblyPageAdded
+    [Migration("20260708080922_Init")]
+    partial class Init
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -75,9 +75,6 @@ namespace ITAssetManager.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("Barcode")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Brand")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("CategoryId")
@@ -210,119 +207,7 @@ namespace ITAssetManager.Migrations
                     b.ToTable("AssetAssignments");
                 });
 
-            modelBuilder.Entity("ITAssetManager.Models.AssetCategory", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Description")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Icon")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int?>("Type")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("AssetCategories");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            Icon = "bi-laptop",
-                            Name = "لپ‌تاپ",
-                            Type = 1
-                        },
-                        new
-                        {
-                            Id = 2,
-                            Icon = "bi-pc-display",
-                            Name = "کامپیوتر رومیزی",
-                            Type = 1
-                        },
-                        new
-                        {
-                            Id = 3,
-                            Icon = "bi-display",
-                            Name = "مانیتور",
-                            Type = 1
-                        },
-                        new
-                        {
-                            Id = 4,
-                            Icon = "bi-printer",
-                            Name = "پرینتر",
-                            Type = 1
-                        },
-                        new
-                        {
-                            Id = 5,
-                            Icon = "bi-mouse",
-                            Name = "ماوس",
-                            Type = 1
-                        },
-                        new
-                        {
-                            Id = 6,
-                            Icon = "bi-keyboard",
-                            Name = "کیبورد",
-                            Type = 1
-                        },
-                        new
-                        {
-                            Id = 7,
-                            Icon = "bi-hdd-network",
-                            Name = "سوئیچ شبکه",
-                            Type = 1
-                        },
-                        new
-                        {
-                            Id = 8,
-                            Icon = "bi-router",
-                            Name = "روتر",
-                            Type = 1
-                        },
-                        new
-                        {
-                            Id = 9,
-                            Icon = "bi-server",
-                            Name = "سرور",
-                            Type = 1
-                        },
-                        new
-                        {
-                            Id = 10,
-                            Icon = "bi-battery-charging",
-                            Name = "UPS",
-                            Type = 1
-                        },
-                        new
-                        {
-                            Id = 11,
-                            Icon = "bi-headset",
-                            Name = "هدست",
-                            Type = 1
-                        },
-                        new
-                        {
-                            Id = 12,
-                            Icon = "bi-box",
-                            Name = "سایر",
-                            Type = 1
-                        });
-                });
-
-            modelBuilder.Entity("ITAssetManager.Models.AssetSpecValue", b =>
+            modelBuilder.Entity("ITAssetManager.Models.AssetSpecificationValue", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -348,6 +233,126 @@ namespace ITAssetManager.Migrations
                     b.HasIndex("SpecValueId");
 
                     b.ToTable("AssetSpecValues");
+                });
+
+            modelBuilder.Entity("ITAssetManager.Models.Category", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Description")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("Type")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Categories");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            Name = "لپ‌تاپ",
+                            Type = 1
+                        },
+                        new
+                        {
+                            Id = 2,
+                            Name = "کامپیوتر رومیزی",
+                            Type = 1
+                        },
+                        new
+                        {
+                            Id = 3,
+                            Name = "مانیتور",
+                            Type = 1
+                        },
+                        new
+                        {
+                            Id = 4,
+                            Name = "پرینتر",
+                            Type = 1
+                        },
+                        new
+                        {
+                            Id = 5,
+                            Name = "ماوس",
+                            Type = 1
+                        },
+                        new
+                        {
+                            Id = 6,
+                            Name = "کیبورد",
+                            Type = 1
+                        },
+                        new
+                        {
+                            Id = 7,
+                            Name = "سوئیچ شبکه",
+                            Type = 1
+                        },
+                        new
+                        {
+                            Id = 8,
+                            Name = "روتر",
+                            Type = 1
+                        },
+                        new
+                        {
+                            Id = 9,
+                            Name = "سرور",
+                            Type = 1
+                        },
+                        new
+                        {
+                            Id = 10,
+                            Name = "UPS",
+                            Type = 1
+                        },
+                        new
+                        {
+                            Id = 11,
+                            Name = "هدست",
+                            Type = 1
+                        },
+                        new
+                        {
+                            Id = 12,
+                            Name = "سایر",
+                            Type = 1
+                        });
+                });
+
+            modelBuilder.Entity("ITAssetManager.Models.CategorySpecification", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("CategoryId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("SpecificationId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CategoryId");
+
+                    b.HasIndex("SpecificationId");
+
+                    b.ToTable("CategorySpecifications");
                 });
 
             modelBuilder.Entity("ITAssetManager.Models.MaintenanceLog", b =>
@@ -399,16 +404,13 @@ namespace ITAssetManager.Migrations
                     b.ToTable("MaintenanceLogs");
                 });
 
-            modelBuilder.Entity("ITAssetManager.Models.SpecDefinition", b =>
+            modelBuilder.Entity("ITAssetManager.Models.Specification", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("CategoryId")
-                        .HasColumnType("int");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -419,12 +421,10 @@ namespace ITAssetManager.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("CategoryId");
-
-                    b.ToTable("SpecDefinitions");
+                    b.ToTable("Specifications");
                 });
 
-            modelBuilder.Entity("ITAssetManager.Models.SpecValue", b =>
+            modelBuilder.Entity("ITAssetManager.Models.SpecificationValue", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -435,7 +435,7 @@ namespace ITAssetManager.Migrations
                     b.Property<int>("SortOrder")
                         .HasColumnType("int");
 
-                    b.Property<int>("SpecDefinitionId")
+                    b.Property<int>("SpecificationId")
                         .HasColumnType("int");
 
                     b.Property<string>("Value")
@@ -444,7 +444,7 @@ namespace ITAssetManager.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("SpecDefinitionId");
+                    b.HasIndex("SpecificationId");
 
                     b.ToTable("SpecValues");
                 });
@@ -806,10 +806,10 @@ namespace ITAssetManager.Migrations
 
             modelBuilder.Entity("ITAssetManager.Models.Asset", b =>
                 {
-                    b.HasOne("ITAssetManager.Models.AssetCategory", "Category")
+                    b.HasOne("ITAssetManager.Models.Category", "Category")
                         .WithMany("Assets")
                         .HasForeignKey("CategoryId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("ITAssetManager.Models.Vendor", "Vendor")
@@ -833,7 +833,7 @@ namespace ITAssetManager.Migrations
                     b.Navigation("Asset");
                 });
 
-            modelBuilder.Entity("ITAssetManager.Models.AssetSpecValue", b =>
+            modelBuilder.Entity("ITAssetManager.Models.AssetSpecificationValue", b =>
                 {
                     b.HasOne("ITAssetManager.Models.Asset", "Asset")
                         .WithMany("SpecValues")
@@ -841,23 +841,42 @@ namespace ITAssetManager.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("ITAssetManager.Models.SpecDefinition", "SpecDefinition")
+                    b.HasOne("ITAssetManager.Models.Specification", "Specification")
                         .WithMany("AssetSpecValues")
                         .HasForeignKey("SpecDefinitionId")
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
-                    b.HasOne("ITAssetManager.Models.SpecValue", "SpecValue")
-                        .WithMany()
+                    b.HasOne("ITAssetManager.Models.SpecificationValue", "SpecValue")
+                        .WithMany("AssetSpecificationValues")
                         .HasForeignKey("SpecValueId")
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.Navigation("Asset");
 
-                    b.Navigation("SpecDefinition");
-
                     b.Navigation("SpecValue");
+
+                    b.Navigation("Specification");
+                });
+
+            modelBuilder.Entity("ITAssetManager.Models.CategorySpecification", b =>
+                {
+                    b.HasOne("ITAssetManager.Models.Category", "Category")
+                        .WithMany("CategorySpecifications")
+                        .HasForeignKey("CategoryId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("ITAssetManager.Models.Specification", "Specification")
+                        .WithMany("CategorySpecifications")
+                        .HasForeignKey("SpecificationId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Category");
+
+                    b.Navigation("Specification");
                 });
 
             modelBuilder.Entity("ITAssetManager.Models.MaintenanceLog", b =>
@@ -871,26 +890,15 @@ namespace ITAssetManager.Migrations
                     b.Navigation("Asset");
                 });
 
-            modelBuilder.Entity("ITAssetManager.Models.SpecDefinition", b =>
+            modelBuilder.Entity("ITAssetManager.Models.SpecificationValue", b =>
                 {
-                    b.HasOne("ITAssetManager.Models.AssetCategory", "Category")
-                        .WithMany()
-                        .HasForeignKey("CategoryId")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
-
-                    b.Navigation("Category");
-                });
-
-            modelBuilder.Entity("ITAssetManager.Models.SpecValue", b =>
-                {
-                    b.HasOne("ITAssetManager.Models.SpecDefinition", "SpecDefinition")
+                    b.HasOne("ITAssetManager.Models.Specification", "Specification")
                         .WithMany("SpecValues")
-                        .HasForeignKey("SpecDefinitionId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .HasForeignKey("SpecificationId")
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.Navigation("SpecDefinition");
+                    b.Navigation("Specification");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -957,16 +965,25 @@ namespace ITAssetManager.Migrations
                     b.Navigation("SpecValues");
                 });
 
-            modelBuilder.Entity("ITAssetManager.Models.AssetCategory", b =>
+            modelBuilder.Entity("ITAssetManager.Models.Category", b =>
                 {
                     b.Navigation("Assets");
+
+                    b.Navigation("CategorySpecifications");
                 });
 
-            modelBuilder.Entity("ITAssetManager.Models.SpecDefinition", b =>
+            modelBuilder.Entity("ITAssetManager.Models.Specification", b =>
                 {
                     b.Navigation("AssetSpecValues");
 
+                    b.Navigation("CategorySpecifications");
+
                     b.Navigation("SpecValues");
+                });
+
+            modelBuilder.Entity("ITAssetManager.Models.SpecificationValue", b =>
+                {
+                    b.Navigation("AssetSpecificationValues");
                 });
 
             modelBuilder.Entity("ITAssetManager.Models.Vendor", b =>

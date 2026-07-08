@@ -14,7 +14,7 @@ public class ComponentTrackingModel : PageModel
     public ComponentTrackingModel(ApplicationDbContext context) => _context = context;
 
     public List<ComponentTrackingItem> Items { get; set; } = new();
-    public List<AssetCategory> InstalledCategories { get; set; } = new();
+    public List<Category> InstalledCategories { get; set; } = new();
 
     [BindProperty(SupportsGet = true)] public string? Search { get; set; }
     [BindProperty(SupportsGet = true)] public int? CategoryId { get; set; }
@@ -22,7 +22,7 @@ public class ComponentTrackingModel : PageModel
 
     public async Task OnGetAsync()
     {
-        InstalledCategories = await _context.AssetCategories
+        InstalledCategories = await _context.Categories
             .Where(c => c.Type == AssetCategoryType.Installed)
             .OrderBy(c => c.Name)
             .ToListAsync();

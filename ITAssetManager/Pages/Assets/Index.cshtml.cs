@@ -14,7 +14,7 @@ public class IndexModel : PageModel
     public IndexModel(ApplicationDbContext context) => _context = context;
 
     public List<Asset> Assets { get; set; } = new();
-    public List<AssetCategory> Categories { get; set; } = new();
+    public List<Category> Categories { get; set; } = new();
     public List<VwDepartment> Departments { get; set; } = new();
     public int TotalCount { get; set; }
 
@@ -25,7 +25,7 @@ public class IndexModel : PageModel
 
     public async Task OnGetAsync()
     {
-        Categories = await _context.AssetCategories.OrderBy(c => c.Name).ToListAsync();
+        Categories = await _context.Categories.OrderBy(c => c.Name).ToListAsync();
         Departments = await _context.VwDepartments.OrderBy(d => d.Name).ToListAsync();
 
         var query = _context.Assets
@@ -38,7 +38,6 @@ public class IndexModel : PageModel
                 (a.SerialNumber != null && a.SerialNumber.Contains(Search)) ||
                 (a.Barcode != null && a.Barcode.Contains(Search)) ||
                 (a.PropertyTag != null && a.PropertyTag.Contains(Search)) ||
-                (a.Brand != null && a.Brand.Contains(Search)) ||
                 (a.Model != null && a.Model.Contains(Search)));
 
         if (CategoryId.HasValue)

@@ -1,0 +1,147 @@
+﻿@page
+@model ITAssetManager.Pages.Admin.SpecificationIndex
+@{
+    ViewData["Title"] = "مشخصات فنی";
+}
+
+
+@if (Model.SpecificationList!=null && Model.SpecificationList.Count>0)
+{
+    <!-- جدول مشخصات فنی -->
+    <div class="card mb-3">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <span><i class="bi bi-tag me-2"></i>مشخصات فنی</span>
+            <a asp-page="/Admin/SpecDefinitionCreate"  class="btn btn-primary btn-sm">
+                <i class="bi bi-plus-lg me-1"></i>ایجاد مشخصه جدید
+            </a>          
+        </div>
+        <div class="card-body p-0">
+            <table class="table table-hover mb-0">
+                    <thead>
+                        <tr>
+                            <th>نام مشخصه</th>
+                            <th>ترتیب</th>
+                            <th>تعداد مقادیر</th>
+                            <th style="width:120px;"></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var spec in Model.SpecificationList)
+                        {
+                            var selected = Model.SelectedSpecId == spec.Id;
+                            <tr class="@(selected ? "table-primary" : "")">
+                                <td class="fw-medium">@spec.Name</td>
+                                <td><small class="text-muted">@spec.SortOrder</small></td>
+                                <td>
+                                    <a href="?SelectedCategoryId=selectedSpecId=@spec.Id"
+                                       class="badge @(selected ? "bg-primary" : "bg-light text-dark") text-decoration-none">
+                                        @spec.SpecValues.Count مقدار
+                                    </a>
+                                </td>
+                                <td>
+                                    <div class="d-flex gap-1">
+                                    <a href="/Admin/SpecificationValueCreate?specId=@spec.Id"
+                                        class="btn btn-xs btn-outline-success" title="افزودن مقدار">
+                                        <i class="bi bi-plus"></i>
+
+                                        </a>
+                                    <a href="/Admin/SpecificationEdit?specId=@spec.Id"
+                                           class="btn btn-xs btn-outline-primary" title="ویرایش">
+                                            <i class="bi bi-pencil"></i>
+                                        </a>
+                                        <form method="post" asp-page-handler="DeleteSpec"
+                                              onsubmit="return confirm('این مشخصه و تمام مقادیرش حذف شود؟')">
+                                            <input type="hidden" name="specId" value="@spec.Id" />
+                                            <input type="hidden" name="categoryId" value="@Model.SelectedSpecId" />
+                                            <button type="submit" class="btn btn-xs btn-outline-danger" title="حذف">
+                                                <i class="bi bi-trash"></i>
+                                            </button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+
+        </div>
+    </div>
+
+    <!-- جدول مقادیر -->
+    @* @if (Model.SelectedSpecId.HasValue)
+    {
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <span>
+                    <i class="bi bi-list-ul me-2"></i>مقادیر مشخصه:
+                    <strong>@Model.SelectedSpecName</strong>
+                </span>
+                <a href="/Admin/SpecValueCreate?specId=@Model.SelectedSpecId&categoryId=@Model.SelectedCategoryId"
+                   class="btn btn-success btn-sm">
+                    <i class="bi bi-plus-lg me-1"></i>ایجاد مقدار جدید
+                </a>
+            </div>
+            <div class="card-body p-0">
+                @if (!Model.SpecValues.Any())
+                {
+                    <div class="text-center text-muted py-4">
+                        <i class="bi bi-inbox fs-3"></i>
+                        <p class="mt-2 mb-0">مقداری تعریف نشده</p>
+                    </div>
+                }
+                else
+                {
+                    <table class="table table-hover mb-0">
+                        <thead>
+                            <tr>
+                                <th>مقدار</th>
+                                <th>ترتیب</th>
+                                <th style="width:120px;"></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var val in Model.SpecValues)
+                            {
+                                <tr>
+                                    <td class="fw-medium">@val.Value</td>
+                                    <td><small class="text-muted">@val.SortOrder</small></td>
+                                    <td>
+                                        <div class="d-flex gap-1">
+                                            <a href="/Admin/SpecValueEdit?id=@val.Id&specId=@Model.SelectedSpecId&categoryId=@Model.SelectedCategoryId"
+                                               class="btn btn-xs btn-outline-primary" title="ویرایش">
+                                                <i class="bi bi-pencil"></i>
+                                            </a>
+                                            <form method="post" asp-page-handler="DeleteValue"
+                                                  onsubmit="return confirm('این مقدار حذف شود؟')">
+                                                <input type="hidden" name="valueId" value="@val.Id" />
+                                                <input type="hidden" name="categoryId" value="@Model.SelectedCategoryId" />
+                                                <input type="hidden" name="specId" value="@Model.SelectedSpecId" />
+                                                <button type="submit" class="btn btn-xs btn-outline-danger" title="حذف">
+                                                    <i class="bi bi-trash"></i>
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                }
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="alert alert-light text-muted">
+            <i class="bi bi-hand-index me-1"></i>
+            روی تعداد مقادیر هر مشخصه کلیک کنید تا مقادیر آن نمایش داده شود
+        </div>
+    } *@
+}
+
+<style>    
+    .btn-xs {
+        padding: 0.15rem 0.4rem;
+        font-size: 0.75rem;
+    }
+</style>

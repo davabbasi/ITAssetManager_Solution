@@ -1,5 +1,5 @@
 ﻿@page
-@model ITAssetManager.Pages.Admin.SpecsModel
+@model ITAssetManager.Pages.Admin.SpecificationAssignToCategory
 @{
     ViewData["Title"] = "مشخصات فنی";
 }
@@ -16,21 +16,15 @@
     <div class="card-body py-2">
         <form method="get" class="d-flex align-items-center gap-3">
             <label class="form-label mb-0 fw-medium text-nowrap">دسته‌بندی:</label>
-            <select name="categoryId" class="form-select" style="max-width:280px;" onchange="this.form.submit()">
+            <select asp-for="SelectedCategoryId" class="form-select" style="max-width:280px;" onchange="this.form.submit()">
                 <option value="">انتخاب دسته‌بندی...</option>
                 @foreach (var cat in Model.Categories)
                 {
-                    <option value="@cat.Id" selected="@(Model.SelectedCategoryId == cat.Id)">
+                    <option value="@cat.Id">
                         @cat.Name
                     </option>
                 }
-            </select>
-            @if (Model.SelectedCategoryId.HasValue)
-            {
-                <span class="text-muted small">
-                    @Model.Categories.FirstOrDefault(c => c.Id == Model.SelectedCategoryId)?.Name
-                </span>
-            }
+            </select>         
         </form>
     </div>
 </div>
@@ -41,13 +35,13 @@
     <div class="card mb-3">
         <div class="card-header d-flex justify-content-between align-items-center">
             <span><i class="bi bi-tag me-2"></i>مشخصات فنی</span>
-            <a href="/Admin/SpecDefinitionCreate?categoryId=@Model.SelectedCategoryId"
-               class="btn btn-primary btn-sm">
+            <a asp-page="/Admin/SpecDefinitionCreate" asp-route-categoryId="@Model.SelectedCategoryId" class="btn btn-primary btn-sm">
                 <i class="bi bi-plus-lg me-1"></i>ایجاد مشخصه جدید
             </a>
+           
         </div>
         <div class="card-body p-0">
-            @if (!Model.SpecDefinitions.Any())
+            @if (!Model.CategorySpecifications.Any())
             {
                 <div class="text-center text-muted py-4">
                     <i class="bi bi-inbox fs-3"></i>
@@ -66,15 +60,16 @@
                         </tr>
                     </thead>
                     <tbody>
-                        @foreach (var spec in Model.SpecDefinitions)
+                        @foreach (var spec in Model.CategorySpecifications)
                         {
-                            <tr class="@(Model.SelectedSpecId == spec.Id ? "table-primary" : "")">
-                                <td class="fw-medium">@spec.Name</td>
-                                <td><small class="text-muted">@spec.SortOrder</small></td>
+                            var selected = Model.SelectedSpecId == spec.Id;
+                            <tr class="@(selected ? "table-primary" : "")">
+                                <td class="fw-medium">@spec.Specification.Name</td>
+                                <td><small class="text-muted">@spec.Specification.SortOrder</small></td>
                                 <td>
-                                    <a href="?categoryId=@Model.SelectedCategoryId&selectedSpecId=@spec.Id"
-                                       class="badge @(Model.SelectedSpecId == spec.Id ? "bg-primary" : "bg-light text-dark") text-decoration-none">
-                                        @spec.SpecValues.Count مقدار
+                                    <a href="?SelectedCategoryId=@Model.SelectedCategoryId&selectedSpecId=@spec.Id"
+                                       class="badge @(selected ? "bg-primary" : "bg-light text-dark") text-decoration-none">
+                                        @spec.Specification.SpecValues.Count مقدار
                                     </a>
                                 </td>
                                 <td>

@@ -15,7 +15,7 @@ public class CreateModel : PageModel
     public CreateModel(ApplicationDbContext context) => _context = context;
 
     public int NextAssemblyNumber { get; set; }
-    public List<AssetCategory> InstalledCategories { get; set; } = new();
+    public List<Category> InstalledCategories { get; set; } = new();
 
     [BindProperty] public DateTime AssembleDate { get; set; } = DateTime.Today;
     [BindProperty] public string PropertyTag { get; set; } = string.Empty;
@@ -43,7 +43,7 @@ public class CreateModel : PageModel
         }
 
         // دسته‌بندی "کامپیوتر رومیزی"
-        var pcCategory = await _context.AssetCategories
+        var pcCategory = await _context.Categories
             .FirstOrDefaultAsync(c => c.Name == "کامپیوتر رومیزی");
         if (pcCategory == null)
         {
@@ -130,7 +130,7 @@ public class CreateModel : PageModel
         NextAssemblyNumber = lastNumber + 1;
 
         // دسته‌بندی‌های نصبی
-        InstalledCategories = await _context.AssetCategories
+        InstalledCategories = await _context.Categories
             .Where(c => c.Type == AssetCategoryType.Installed)
             .OrderBy(c => c.Name)
             .ToListAsync();

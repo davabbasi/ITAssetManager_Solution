@@ -15,7 +15,6 @@ public class Asset
 
     // اطلاعات اصلی
     public string Name { get; set; } = string.Empty;
-    public string? Brand { get; set; }
     public string? Model { get; set; }
     public string? SerialNumber { get; set; }
     public string? Barcode { get; set; }
@@ -23,7 +22,7 @@ public class Asset
 
     // دسته‌بندی
     public int CategoryId { get; set; }
-    public AssetCategory? Category { get; set; }
+    public Category? Category { get; set; }
 
     // وضعیت
     public AssetStatus Status { get; set; } = AssetStatus.Active;
@@ -50,11 +49,11 @@ public class Asset
     public int? VendorId { get; set; }
     public Vendor? Vendor { get; set; }
 
-    public ICollection<AssetSpecValue> SpecValues { get; set; } = new List<AssetSpecValue>();
+    public ICollection<AssetSpecificationValue> SpecValues { get; set; } = new List<AssetSpecificationValue>();
     public ICollection<AssetAssignment> Assignments { get; set; } = new List<AssetAssignment>();
     public ICollection<MaintenanceLog> MaintenanceLogs { get; set; } = new List<MaintenanceLog>();
 
-    // اضافه کن:
+    //فقط برای اسمبل
     public int? AssemblyNumber { get; set; }   // شماره شناسایی PC (فقط برای PCهای اسمبل‌شده)
     public bool IsAssembled { get; set; } = false; // آیا این Asset یک PC اسمبلیه؟
 

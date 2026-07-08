@@ -52,7 +52,7 @@ public class EditModel : PageModel
     private async Task LoadSelectListsAsync()
     {
         CategoryList = new SelectList(
-            await _context.AssetCategories.OrderBy(c => c.Name).ToListAsync(), "Id", "Name");
+            await _context.Categories.OrderBy(c => c.Name).ToListAsync(), "Id", "Name");
         DepartmentList = new SelectList(
             await _context.VwDepartments.OrderBy(d => d.Name).ToListAsync(), "Id", "Name");
         EmployeeList = new SelectList(

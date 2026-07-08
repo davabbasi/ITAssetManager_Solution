@@ -19,7 +19,7 @@ public class SpecDefinitionCreateModel : PageModel
     public async Task<IActionResult> OnGetAsync(int categoryId)
     {
         CategoryId = categoryId;
-        var cat = await _context.AssetCategories.FindAsync(categoryId);
+        var cat = await _context.Categories.FindAsync(categoryId);
         if (cat == null) return NotFound();
         CategoryName = cat.Name;
         return Page();
@@ -30,10 +30,9 @@ public class SpecDefinitionCreateModel : PageModel
         if (string.IsNullOrWhiteSpace(name))
             return RedirectToPage(new { categoryId });
 
-        _context.SpecDefinitions.Add(new SpecDefinition
+        _context.Specifications.Add(new Specification
         {
             Name = name.Trim(),
-            CategoryId = categoryId,
             SortOrder = sortOrder
         });
         await _context.SaveChangesAsync();

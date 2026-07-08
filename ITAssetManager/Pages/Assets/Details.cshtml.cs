@@ -20,10 +20,9 @@ public class DetailsModel : PageModel
     public async Task<IActionResult> OnGetAsync(int id)
     {
         var asset = await _context.Assets
-            .Include(a => a.Category)
-           
+            .Include(a => a.Category)          
             .Include(a => a.SpecValues)
-            .ThenInclude(sv => sv.SpecDefinition)
+            .ThenInclude(sv => sv.Specification)
             .Include(a => a.SpecValues)
             .ThenInclude(sv => sv.SpecValue)
             .FirstOrDefaultAsync(a => a.Id == id);

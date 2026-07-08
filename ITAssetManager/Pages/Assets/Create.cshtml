@@ -28,10 +28,7 @@
                                 <option value="">انتخاب کنید...</option>
                             </select>
                         </div>
-                        <div class="col-md-4">
-                            <label class="form-label">برند</label>
-                            <input asp-for="Asset.Brand" class="form-control" placeholder="Dell, HP, Cisco..." />
-                        </div>
+                      
                         <div class="col-md-4">
                             <label class="form-label">مدل</label>
                             <input asp-for="Asset.Model" class="form-control" placeholder="مدل دستگاه" />
@@ -117,16 +114,16 @@
                     <!-- بخش پنجم: مشخصات و توضیحات -->
                     <h6 class="text-muted mb-3 border-bottom pb-2">مشخصات فنی</h6>
                     <div id="specs-container">
-                        @if (Model.SpecDefinitions.Any())
+                        @if (Model.CategorySpecifications.Any())
                         {
                             <div class="row g-3 mb-3">
-                                @foreach (var spec in Model.SpecDefinitions)
+                                @foreach (var spec in Model.CategorySpecifications)
                                 {
                                     <div class="col-md-4">
-                                        <label class="form-label">@spec.Name</label>
+                                        <label class="form-label">@spec.Specification.Name</label>
                                         <select id="categorySelect" name="SpecValues[@spec.Id]" class="form-select">
                                             <option value="">انتخاب کنید...</option>
-                                            @foreach (var val in spec.SpecValues.OrderBy(v => v.SortOrder))
+                                            @foreach (var val in spec.Specification.SpecValues.OrderBy(v => v.SortOrder))
                                             {
                                                 <option value="@val.Id">@val.Value</option>
                                             }

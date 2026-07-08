@@ -23,7 +23,7 @@ public class SpecValueEditModel : PageModel
         var val = await _context.SpecValues.FindAsync(id);
         if (val == null) return NotFound();
 
-        var spec = await _context.SpecDefinitions.FindAsync(specId);
+        var spec = await _context.Specifications.FindAsync(specId);
         if (spec == null) return NotFound();
 
         ValueId = val.Id;

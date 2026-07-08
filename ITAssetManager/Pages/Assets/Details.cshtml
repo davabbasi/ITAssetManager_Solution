@@ -43,14 +43,8 @@
 
 
 
-                    <div class="col-sm-6">
-                        <label class="text-muted small d-block">برند / مدل</label>
-                        <span>@(Model.Asset.Brand + " " + Model.Asset.Model)</span>
-                    </div>
-                    <div class="col-sm-6">
-                        <label class="text-muted small d-block">دسته‌بندی</label>
-                        <span><i class="bi @(Model.Asset.Category?.Icon) me-1"></i>@Model.Asset.Category?.Name</span>
-                    </div>
+                   
+                  
                     <div class="col-sm-6">
                         <label class="text-muted small d-block">سریال نامبر</label>
                         <span class="font-monospace">@(Model.Asset.SerialNumber ?? "-")</span>
@@ -91,10 +85,10 @@
                             <label class="text-muted small d-block mb-2">مشخصات فنی</label>
                             <div class="d-flex flex-wrap gap-2">
                                 @foreach (var sv in Model.Asset.SpecValues
-                                .OrderBy(s => s.SpecDefinition?.SortOrder))
+                                .OrderBy(s => s.Specification?.SortOrder))
                                 {
                                     <div class="border rounded px-2 py-1" style="font-size:0.85rem;">
-                                        <span class="text-muted">@sv.SpecDefinition?.Name:</span>
+                                        <span class="text-muted">@sv.Specification?.Name:</span>
                                         <strong class="ms-1">@sv.SpecValue?.Value</strong>
                                     </div>
                                 }
