@@ -18,7 +18,7 @@ public class SpecValueEditModel : PageModel
     public string Value { get; set; } = string.Empty;
     public int SortOrder { get; set; }
 
-    public async Task<IActionResult> OnGetAsync(int id, int specId, int categoryId)
+    public async Task<IActionResult> OnGetAsync(int id, int specId)
     {
         var val = await _context.SpecValues.FindAsync(id);
         if (val == null) return NotFound();
@@ -28,18 +28,16 @@ public class SpecValueEditModel : PageModel
 
         ValueId = val.Id;
         SpecId = specId;
-        CategoryId = categoryId;
         SpecName = spec.Name;
         Value = val.Value;
         SortOrder = val.SortOrder;
         return Page();
     }
 
-    public async Task<IActionResult> OnPostAsync(int id, int specId, int categoryId,
-        string value, int sortOrder = 0)
+    public async Task<IActionResult> OnPostAsync(int id, int specId,string value, int sortOrder = 0)
     {
         if (string.IsNullOrWhiteSpace(value))
-            return RedirectToPage(new { id, specId, categoryId });
+            return RedirectToPage(new { id, specId });
 
         var val = await _context.SpecValues.FindAsync(id);
         if (val != null)
@@ -49,6 +47,6 @@ public class SpecValueEditModel : PageModel
             await _context.SaveChangesAsync();
         }
         TempData["Success"] = "مقدار با موفقیت ویرایش شد.";
-        return RedirectToPage("/Admin/Specs", new { categoryId, selectedSpecId = specId });
+        return RedirectToPage("/Admin/SpecificationValueCreate", new { SpecId = specId });
     }
 }

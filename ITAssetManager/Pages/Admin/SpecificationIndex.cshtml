@@ -4,7 +4,21 @@
     ViewData["Title"] = "مشخصات فنی";
 }
 
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        @TempData["Success"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+}
 
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        @TempData["Error"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+}
 @if (Model.SpecificationList!=null && Model.SpecificationList.Count>0)
 {
     <!-- جدول مشخصات فنی -->
@@ -19,17 +33,25 @@
             <table class="table table-hover mb-0">
                     <thead>
                         <tr>
+                        <th>ردیف</th>
+
                             <th>نام مشخصه</th>
                             <th>ترتیب</th>
                             <th>تعداد مقادیر</th>
                             <th style="width:120px;"></th>
                         </tr>
                     </thead>
+                @{
+                    int row = 1;
+                }
                     <tbody>
+
                         @foreach (var spec in Model.SpecificationList)
                         {
                             var selected = Model.SelectedSpecId == spec.Id;
                             <tr class="@(selected ? "table-primary" : "")">
+                            <td>@row</td>
+
                                 <td class="fw-medium">@spec.Name</td>
                                 <td><small class="text-muted">@spec.SortOrder</small></td>
                                 <td>
@@ -41,25 +63,29 @@
                                 <td>
                                     <div class="d-flex gap-1">
                                     <a href="/Admin/SpecificationValueCreate?specId=@spec.Id"
-                                        class="btn btn-xs btn-outline-success" title="افزودن مقدار">
+                                        class="btn btn-xs btn-outline-success" title="ایجاد و مشاهده مقادیر">
                                         <i class="bi bi-plus"></i>
 
                                         </a>
-                                    <a href="/Admin/SpecificationEdit?specId=@spec.Id"
+                                    <a asp-page="SpecificationEdit"
+                                       asp-route-id="@spec.Id"
+                                        
                                            class="btn btn-xs btn-outline-primary" title="ویرایش">
                                             <i class="bi bi-pencil"></i>
                                         </a>
-                                        <form method="post" asp-page-handler="DeleteSpec"
-                                              onsubmit="return confirm('این مشخصه و تمام مقادیرش حذف شود؟')">
-                                            <input type="hidden" name="specId" value="@spec.Id" />
-                                            <input type="hidden" name="categoryId" value="@Model.SelectedSpecId" />
-                                            <button type="submit" class="btn btn-xs btn-outline-danger" title="حذف">
-                                                <i class="bi bi-trash"></i>
-                                            </button>
-                                        </form>
+
+                                    <form method="post" asp-page-handler="Delete">
+                                        <input type="hidden" name="id" value="@spec.Id" />
+
+                                        <button type="submit" class="btn btn-xs btn-outline-danger" title="حذف"
+                                                onclick="return confirm('حذف شود؟')">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </form>
                                     </div>
                                 </td>
                             </tr>
+                        row++;
                         }
                     </tbody>
                 </table>

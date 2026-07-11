@@ -13,7 +13,7 @@
             </div>
             <div class="card-body">
                 <form method="post">
-                    <input type="hidden" name="specId" value="@Model.SpecId" />
+                    <input type="hidden" asp-for="SpecId" />
                     <div class="mb-3">
                         <label class="form-label">مقدار <span class="text-danger">*</span></label>
                         <input name="value" class="form-control" required
@@ -25,9 +25,7 @@
                             class="form-control" style="max-width:120px;" />
                     </div>
                     <div class="d-flex gap-2">
-                        <button type="submit" name="action" value="saveAndNew" class="btn btn-outline-primary">
-                            <i class="bi bi-plus-lg me-1"></i>ذخیره و جدید
-                        </button>
+
                         <button type="submit" name="action" value="save" class="btn btn-primary">
                             <i class="bi bi-check-lg me-1"></i>ذخیره
                         </button>
@@ -37,5 +35,92 @@
                 </form>
             </div>
         </div>
+    </div>
+</div>
+
+<!-- جدول مقادیر -->
+<div class="row justify-content-center">
+    <div class="col-lg-5">
+@if (Model.SpecId>0)
+    {
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <span>
+                    <i class="bi bi-list-ul me-2"></i>مقادیر مشخصه:
+                <strong>@Model.SpecName</strong>
+                </span>
+               
+            </div>
+            <div class="card-body p-0">
+                @if (!Model.SpecValues.Any())
+                {
+                    <div class="text-center text-muted py-4">
+                        <i class="bi bi-inbox fs-3"></i>
+                        <p class="mt-2 mb-0">مقداری تعریف نشده</p>
+                    </div>
+                }
+                else
+                {
+                    <table class="table table-hover mb-0">
+                        <thead>
+                            <tr>
+                                <th>ردیف</th>
+                                <th>مقدار</th>
+                                <th>ترتیب</th>
+                                <th style="width:120px;"></th>
+                            </tr>
+                        </thead>
+                            @{
+                                int row = 1;
+                            }
+                        <tbody>
+                            @foreach (var val in Model.SpecValues)
+                            {
+                                <tr>
+                                    <td>@row</td>
+                                    <td class="fw-medium">@val.Value</td>
+                                    <td><small class="text-muted">@val.SortOrder</small></td>
+                                    <td>
+                                        <div class="d-flex gap-1">
+
+                                             @*    <a href="/Admin/SpecificationValueEdit?id=@val.Id=@Model.SpecId"
+                                               class="btn btn-xs btn-outline-primary" title="ویرایش">
+                                                <i class="bi bi-pencil"></i>
+                                            </a> *@
+
+                                                <a asp-page="/Admin/SpecificationValueEdit"
+                                                   asp-route-id="@val.Id"
+                                                   asp-route-specId="@Model.SpecId" class="btn btn-xs btn-outline-primary" title="ویرایش">
+                                                    <i class="bi bi-pencil"></i>
+                                                </a>
+
+                                            <form method="post" asp-page-handler="DeleteValue"
+                                                  onsubmit="return confirm('این مقدار حذف شود؟')">
+                                                <input type="hidden" name="valueId" value="@val.Id" />
+                                                <input type="hidden" name="specId" value="@Model.SpecId" />
+                                                <button type="submit" class="btn btn-xs btn-outline-danger" title="حذف">
+                                                    <i class="bi bi-trash"></i>
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </td>
+                                </tr>
+                                    row++;
+
+                            }
+                        </tbody>
+                    </table>
+                }
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="alert alert-light text-muted">
+            <i class="bi bi-hand-index me-1"></i>
+            روی تعداد مقادیر هر مشخصه کلیک کنید تا مقادیر آن نمایش داده شود
+        </div>
+        }
+
     </div>
 </div>

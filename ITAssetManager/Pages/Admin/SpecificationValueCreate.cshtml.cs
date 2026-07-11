@@ -3,6 +3,7 @@ using ITAssetManager.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.EntityFrameworkCore;
 
 namespace ITAssetManager.Pages.Admin;
 
@@ -12,9 +13,10 @@ public class SpecValueCreateModel : PageModel
     private readonly ApplicationDbContext _context;
     public SpecValueCreateModel(ApplicationDbContext context) => _context = context;
 
+    [BindProperty]
     public int SpecId { get; set; }
     public string SpecName { get; set; } = string.Empty;
-
+    public List<SpecificationValue> SpecValues { get; set; }
     public async Task<IActionResult> OnGetAsync(int specId)
     {
         var spec = await _context.Specifications.FindAsync(specId);
@@ -22,6 +24,7 @@ public class SpecValueCreateModel : PageModel
 
         SpecId = specId;
         SpecName = spec.Name;
+        SpecValues = await _context.SpecValues.Include(v=>v.Specification).Where(v => v.SpecificationId == specId).ToListAsync();
         return Page();
     }
 
@@ -38,11 +41,9 @@ public class SpecValueCreateModel : PageModel
             });
             await _context.SaveChangesAsync();
             TempData["Success"] = $"مقدار «{value}» با موفقیت ایجاد شد.";
-        }
-
-        // اگر "ذخیره و جدید" زده شد، دوباره همین صفحه
-        if (action == "saveAndNew")
             return RedirectToPage(new { specId });
+
+        }
 
         return RedirectToPage("/Admin/SpecificationIndex", new { selectedSpecId = specId });
     }
