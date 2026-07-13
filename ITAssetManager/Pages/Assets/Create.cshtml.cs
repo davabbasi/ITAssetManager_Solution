@@ -25,8 +25,7 @@ public class CreateModel : PageModel
     [BindProperty] public Dictionary<int, int> SpecValues { get; set; } = new();
     public async Task OnGetAsync()
     {
-        if (Asset.CategoryId > 0)
-            CategorySpecifications = await LoadSpecsAsync(Asset.CategoryId);
+        
         await LoadSelectListsAsync();
     }
 
@@ -96,8 +95,7 @@ public class CreateModel : PageModel
                 .Select(e => new { e.Id, Name = e.FullName + " - " + e.DepartmentName })
                 .ToListAsync(), "Id", "Name");
 
-        if (Asset.CategoryId > 0)
-            CategorySpecifications = await LoadSpecsAsync(Asset.CategoryId);
+        
 
         VendorList = new SelectList(
             await _context.Vendors
@@ -106,23 +104,21 @@ public class CreateModel : PageModel
             .ToListAsync(), "Id", "Name");
     }
 
-    private async Task<List<CategorySpecification>> LoadSpecsAsync(int categoryId)
+    private async Task<List<Specification>> GetSpecificationsAsync(int categoryId)
     {
-        return await _context.CategorySpecifications
-            .Include(s => s.Specification)
-            .Where(s => s.CategoryId == categoryId)
-            .OrderBy(s => s.Specification.SortOrder)
+
+        return await _context.Specifications
+            .Include(s => s.SpecValues)
+            .Where(s => s.CategorySpecifications
+            .Any(cs => cs.CategoryId == categoryId))
+            .OrderBy(s => s.SortOrder)
             .ToListAsync();
     }
 
 
     public async Task<IActionResult> OnGetSpecsAsync(int categoryId)
     {
-        var specs = await _context.CategorySpecifications
-            .Include(x => x.Specification)
-            .Where(x => x.CategoryId == categoryId)
-            .ToListAsync();
-
+        var specs = await GetSpecificationsAsync(categoryId);
         return Partial("_SpecsPartial", specs);
     }
 
