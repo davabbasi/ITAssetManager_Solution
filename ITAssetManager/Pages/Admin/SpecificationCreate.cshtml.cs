@@ -13,22 +13,16 @@ public class SpecDefinitionCreateModel : PageModel
     private readonly ApplicationDbContext _context;
     public SpecDefinitionCreateModel(ApplicationDbContext context) => _context = context;
 
-    public int CategoryId { get; set; }
-    public string CategoryName { get; set; } = string.Empty;
-
-    public async Task<IActionResult> OnGetAsync(int categoryId)
+    public  IActionResult OnGetAsync()
     {
-        CategoryId = categoryId;
-        var cat = await _context.Categories.FindAsync(categoryId);
-        if (cat == null) return NotFound();
-        CategoryName = cat.Name;
+        
         return Page();
     }
 
-    public async Task<IActionResult> OnPostAsync(int categoryId, string name, int sortOrder = 0)
+    public async Task<IActionResult> OnPostAsync( string name, int sortOrder = 0)
     {
         if (string.IsNullOrWhiteSpace(name))
-            return RedirectToPage(new { categoryId });
+            return BadRequest();
 
         _context.Specifications.Add(new Specification
         {
@@ -37,6 +31,6 @@ public class SpecDefinitionCreateModel : PageModel
         });
         await _context.SaveChangesAsync();
         TempData["Success"] = $"مشخصه «{name}» با موفقیت ایجاد شد.";
-        return RedirectToPage("/Admin/Specs", new { categoryId });
+        return RedirectToPage("/Admin/SpecificationIndex");
     }
 }

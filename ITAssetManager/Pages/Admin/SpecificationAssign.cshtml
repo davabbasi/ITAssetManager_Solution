@@ -31,6 +31,66 @@
 
 @if (Model.SelectedCategoryId.HasValue)
 {
+    <form method="post" onsubmit="return confirm('آیا از ذخیره تغییرات اطمینان دارید؟')">
+
+        <input type="hidden" asp-for="SelectedCategoryId" />
+
+        <div class="card mt-3">
+
+            <div class="card-header">
+
+                مشخصات قابل استفاده
+
+            </div>
+
+            <div class="card-body">
+
+                @foreach (var item in Model.Specifications)
+                {
+                    <div class="col-md-4">
+
+                        <div class="form-check mb-2">
+
+                    <div class="form-check mb-2">
+
+                        <input class="form-check-input"
+                               type="checkbox"
+                               name="SelectedSpecifications"
+                               value="@item.Id"
+                               checked="@item.Selected" />
+
+                        <label class="form-check-label">
+
+                            @item.Name
+
+                        </label>
+
+                    </div>
+                        </div>
+
+                    </div>
+                
+                }
+
+            </div>
+
+            <div class="card-footer text-end">
+
+                <button class="btn btn-primary">
+
+                    ذخیره
+
+                </button>
+
+            </div>
+
+        </div>
+
+    </form>
+}
+
+@* @if (Model.SelectedCategoryId.HasValue)
+{
     <!-- جدول مشخصات فنی -->
     <div class="card mb-3">
         <div class="card-header d-flex justify-content-between align-items-center">
@@ -168,7 +228,12 @@
     }
 }
 
+ *@
+
+
 <style>    .btn-xs {
         padding: 0.15rem 0.4rem;
         font-size: 0.75rem;
-    }</style>
+    }
+    
+</style>

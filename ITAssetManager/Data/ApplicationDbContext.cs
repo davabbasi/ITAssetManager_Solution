@@ -63,18 +63,19 @@ public class ApplicationDbContext : IdentityDbContext
         .HasForeignKey(v => v.SpecificationId)
         .OnDelete(DeleteBehavior.Restrict);
 
+
+
         builder.Entity<CategorySpecification>()
-            .HasOne(cs=>cs.Specification)
-            .WithMany(c=>c.CategorySpecifications)
-            .HasForeignKey(cs=>cs.SpecificationId)
+            .HasOne(cs => cs.Category)
+            .WithMany(c => c.CategorySpecifications)
+            .HasForeignKey(cs => cs.CategoryId)
             .OnDelete(DeleteBehavior.Restrict);
 
-
         builder.Entity<CategorySpecification>()
-              .HasOne(cs => cs.Specification)
-              .WithMany(s => s.CategorySpecifications)
-              .HasForeignKey(cs => cs.SpecificationId)
-              .OnDelete(DeleteBehavior.Restrict);
+            .HasOne(cs => cs.Specification)
+            .WithMany(s => s.CategorySpecifications)
+            .HasForeignKey(cs => cs.SpecificationId)
+            .OnDelete(DeleteBehavior.Restrict);
 
 
         builder.Entity<AssetSpecificationValue>()

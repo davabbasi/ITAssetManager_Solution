@@ -47,4 +47,27 @@ public class SpecValueCreateModel : PageModel
 
         return RedirectToPage("/Admin/SpecificationIndex", new { selectedSpecId = specId });
     }
+
+    public async Task<IActionResult> OnPostDeleteAsync(int id, int specId)
+    {
+        var specValue = await _context.SpecValues
+            .Include(s => s.AssetSpecificationValues)
+            .FirstOrDefaultAsync(s => s.Id == id);
+
+        if (specValue == null)
+            return NotFound();
+
+        if (specValue.AssetSpecificationValues.Any())
+        {
+            TempData["Error"] = "این مقدار در برخی از تجهیزات مورد استفاده قرار گرفته است";
+            return RedirectToPage();
+        }
+
+        _context.SpecValues.Remove(specValue);
+        await _context.SaveChangesAsync();
+
+        TempData["Success"] = "مقدار  با موفقیت حذف شد.";
+
+        return RedirectToPage(new { specId });
+    }
 }

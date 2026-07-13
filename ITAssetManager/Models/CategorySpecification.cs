@@ -10,10 +10,10 @@ namespace ITAssetManager.Models
 
 
         [ForeignKey (nameof(CategoryId))]
-        public Category? Category { get; set; } = new Category();
+        public Category? Category { get; set; } 
 
         [ForeignKey (nameof(SpecificationId))]
-        public Specification? Specification { get; set; } = new Specification();
+        public Specification? Specification { get; set; }
 
     }
 }
