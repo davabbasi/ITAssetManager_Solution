@@ -35,7 +35,12 @@ builder.Services.AddAuthentication(options =>
     options.LogoutPath = "/Account/Logout";
     options.AccessDeniedPath = "/Account/Login";
     options.ExpireTimeSpan = TimeSpan.FromDays(14);
-    options.SlidingExpiration = true;
+    options.SlidingExpiration = false;
+});
+
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy("RequireAdminRole", policy => policy.RequireRole("Admin"));
 });
 
 builder.Services.AddRazorPages(options =>
@@ -51,10 +56,7 @@ builder.Services.AddRazorPages(options =>
     options.Conventions.AuthorizeFolder("/Assembly");
 });
 
-builder.Services.AddAuthorization(options =>
-{
-    options.AddPolicy("RequireAdminRole", policy => policy.RequireRole("Admin"));
-});
+
 
 var app = builder.Build();
 

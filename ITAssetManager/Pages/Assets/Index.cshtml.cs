@@ -1,4 +1,4 @@
-using ITAssetManager.Data;
+﻿using ITAssetManager.Data;
 using ITAssetManager.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -26,8 +26,13 @@ public class IndexModel : PageModel
     public async Task OnGetAsync()
     {
         Categories = await _context.Categories.OrderBy(c => c.Name).ToListAsync();
-        Departments = await _context.VwDepartments.OrderBy(d => d.Name).ToListAsync();
-
+        //Departments = await _context.VwDepartments.OrderBy(d => d.Name).ToListAsync();
+        VwDepartment vwDepartment = new()
+        {
+            Id = 1,
+            Name="انفورماتیک"
+        };
+        Departments.Add(vwDepartment);
         var query = _context.Assets
             .Include(a => a.Category)
             .AsQueryable();

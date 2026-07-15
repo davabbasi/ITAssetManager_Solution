@@ -19,13 +19,22 @@ public class EditModel : PageModel
     public SelectList DepartmentList { get; set; } = null!;
     public SelectList EmployeeList { get; set; } = null!;
     public SelectList VendorList { get; set; } = null!;
-
+    [BindProperty]
+    public Dictionary<int, int> SpecValues { get; set; } = new();
+    public List<Specification> CategorySpecifications { get; set; } = new();
     public async Task<IActionResult> OnGetAsync(int id)
     {
-        var asset = await _context.Assets.FindAsync(id);
-        if (asset == null) return NotFound();
-        Asset = asset;
+        Asset = await _context.Assets.FindAsync(id);
+        if (Asset == null)
+            return NotFound();
         await LoadSelectListsAsync();
+        CategorySpecifications =
+            await GetSpecificationsAsync(Asset.CategoryId);
+        SpecValues = await _context.AssetSpecValues
+            .Where(x => x.AssetId == Asset.Id)
+            .ToDictionaryAsync(
+                x => x.SpecDefinitionId,
+                x => x.SpecValueId);
         return Page();
     }
 
@@ -41,8 +50,25 @@ public class EditModel : PageModel
             return Page();
         }
 
-        Asset.UpdatedAt = DateTime.Now;
-        _context.Attach(Asset).State = EntityState.Modified;
+        var oldSpecs = await _context.AssetSpecValues
+            .Where(x => x.AssetId == Asset.Id)
+            .ToListAsync();
+
+        _context.AssetSpecValues.RemoveRange(oldSpecs);
+        foreach (var (specId, valueId) in SpecValues)
+        {
+            if (valueId > 0)
+            {
+                _context.AssetSpecValues.Add(new AssetSpecificationValue
+                {
+                    AssetId = Asset.Id,
+                    SpecDefinitionId = specId,
+                    SpecValueId = valueId
+                });
+            }
+        }
+
+
         await _context.SaveChangesAsync();
 
         TempData["Success"] = "تغییرات با موفقیت ذخیره شد.";
@@ -57,7 +83,7 @@ public class EditModel : PageModel
             await _context.VwDepartments.OrderBy(d => d.Name).ToListAsync(), "Id", "Name");
         EmployeeList = new SelectList(
             await _context.VwEmployees
-                
+
                 .OrderBy(e => e.FullName)
                 .Select(e => new { e.Id, Name = e.FullName + " - " + e.DepartmentName })
                 .ToListAsync(), "Id", "Name");
@@ -67,5 +93,16 @@ public class EditModel : PageModel
            .Where(v => v.IsActive)
            .OrderBy(v => v.Name)
            .ToListAsync(), "Id", "Name");
+        CategorySpecifications = await GetSpecificationsAsync(Asset.CategoryId);
     }
+    private async Task<List<Specification>> GetSpecificationsAsync(int categoryId)
+    {
+        return await _context.Specifications
+            .Include(s => s.SpecValues)
+            .Where(s => s.CategorySpecifications
+                .Any(cs => cs.CategoryId == categoryId))
+            .OrderBy(s => s.SortOrder)
+            .ToListAsync();
+    }
+
 }

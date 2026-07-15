@@ -109,6 +109,41 @@
                     </div>
 
                     <h6 class="text-muted mb-3 border-bottom pb-2">مشخصات فنی</h6>
+                    <div id="specs-container">
+                        @if (Model.CategorySpecifications.Any())
+                        {
+                            <div class="row g-3 mb-3">
+                                @foreach (var spec in Model.CategorySpecifications)
+                                {
+                                    <select name="SpecValues[@spec.Id]" class="form-select">
+
+                                        <option value="">انتخاب کنید...</option>
+
+                                        @foreach (var val in spec.SpecValues.OrderBy(v => v.SortOrder))
+                                        {
+                                            if (Model.SpecValues.TryGetValue(spec.Id, out var selectedValue)
+                                            && selectedValue == val.Id)
+                                            {
+                                                <option value="@val.Id" selected>
+                                                    @val.Value
+                                                </option>
+                                            }
+                                            else
+                                            {
+                                                <option value="@val.Id">
+                                                    @val.Value
+                                                </option>
+                                            }
+                                        }
+
+                                    </select>
+                                }
+                            </div>
+                        }
+
+                    </div>
+
+
                     <div class="row g-3 mb-4">
                        
                         <div class="col-md-6">
