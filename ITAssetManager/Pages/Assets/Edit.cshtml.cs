@@ -5,7 +5,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-
+using ITAssetManager.Convertor;
+using ITAssetManager.Models.DTOs;
 namespace ITAssetManager.Pages.Assets;
 
 [Authorize]
@@ -13,8 +14,13 @@ public class EditModel : PageModel
 {
     private readonly ApplicationDbContext _context;
     public EditModel(ApplicationDbContext context) => _context = context;
+    Asset Asset;
+    [BindProperty] public AssetEditModel AssetEditModel { get; set; } = null!;
+    [BindProperty] public string TextOldPurchaseDate { get; set; }
+    [BindProperty]  public string TextOldWarrantyExpiryDate { get; set; }
+    public string TextPurchaseDate { get; set; } 
+    public string TextWarrantyExpiryDate { get; set; } 
 
-    [BindProperty] public Asset Asset { get; set; } = null!;
     public SelectList CategoryList { get; set; } = null!;
     public SelectList DepartmentList { get; set; } = null!;
     public SelectList EmployeeList { get; set; } = null!;
@@ -27,9 +33,12 @@ public class EditModel : PageModel
         Asset = await _context.Assets.FindAsync(id);
         if (Asset == null)
             return NotFound();
+
+        AssetEditModel.PurchaseDate = Asset.PurchaseDate?.ToShamsi();
+        AssetEditModel.WarrantyExpiry = Asset.WarrantyExpiry?.ToShamsi();
+
         await LoadSelectListsAsync();
-        CategorySpecifications =
-            await GetSpecificationsAsync(Asset.CategoryId);
+        CategorySpecifications =await GetSpecificationsAsync(Asset.CategoryId);
         SpecValues = await _context.AssetSpecValues
             .Where(x => x.AssetId == Asset.Id)
             .ToDictionaryAsync(
@@ -51,7 +60,7 @@ public class EditModel : PageModel
         }
 
         var oldSpecs = await _context.AssetSpecValues
-            .Where(x => x.AssetId == Asset.Id)
+            .Where(x => x.AssetId == AssetEditModel.Id)
             .ToListAsync();
 
         _context.AssetSpecValues.RemoveRange(oldSpecs);
@@ -61,13 +70,14 @@ public class EditModel : PageModel
             {
                 _context.AssetSpecValues.Add(new AssetSpecificationValue
                 {
-                    AssetId = Asset.Id,
+                    AssetId = AssetEditModel.Id,
                     SpecDefinitionId = specId,
                     SpecValueId = valueId
                 });
             }
         }
-
+        Asset.PurchaseDate = AssetEditModel.PurchaseDate.ToMiladi();
+        Asset.WarrantyExpiry= AssetEditModel.WarrantyExpiry.ToMiladi() ;
 
         await _context.SaveChangesAsync();
 
@@ -77,22 +87,15 @@ public class EditModel : PageModel
 
     private async Task LoadSelectListsAsync()
     {
-        CategoryList = new SelectList(
-            await _context.Categories.OrderBy(c => c.Name).ToListAsync(), "Id", "Name");
-        DepartmentList = new SelectList(
-            await _context.VwDepartments.OrderBy(d => d.Name).ToListAsync(), "Id", "Name");
-        EmployeeList = new SelectList(
-            await _context.VwEmployees
-
-                .OrderBy(e => e.FullName)
-                .Select(e => new { e.Id, Name = e.FullName + " - " + e.DepartmentName })
-                .ToListAsync(), "Id", "Name");
-
-        VendorList = new SelectList(
-           await _context.Vendors
-           .Where(v => v.IsActive)
-           .OrderBy(v => v.Name)
-           .ToListAsync(), "Id", "Name");
+        CategoryList = new SelectList(await _context.Categories.OrderBy(c => c.Name).ToListAsync(), "Id", "Name");
+        DepartmentList = new SelectList( await _context.VwDepartments.OrderBy(d => d.Name).ToListAsync(), "Id", "Name");
+        EmployeeList = new SelectList(await _context.VwEmployees.OrderBy(e => e.FullName)
+            .Select(e => new { e.Id, Name = e.FullName + " - " + e.DepartmentName })
+            .ToListAsync(), "Id", "Name");
+        VendorList = new SelectList(await _context.Vendors
+            .Where(v => v.IsActive)
+            .OrderBy(v => v.Name)
+            .ToListAsync(), "Id", "Name");
         CategorySpecifications = await GetSpecificationsAsync(Asset.CategoryId);
     }
     private async Task<List<Specification>> GetSpecificationsAsync(int categoryId)

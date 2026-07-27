@@ -57,6 +57,36 @@
                             </select>
                         </div>
                     </div>
+                    <br />
+                    <!-- بخش پنجم: مشخصات و توضیحات -->
+                    <h6 class="text-muted mb-3 border-bottom pb-2">مشخصات فنی</h6>
+                    <div id="specs-container">
+                        @if (Model.CategorySpecifications.Any())
+                        {
+                            <div class="row g-3 mb-3">
+                                @foreach (var spec in Model.CategorySpecifications)
+                                {
+                                    <div class="col-md-4">
+                                        <label class="form-label">@spec.Specification.Name</label>
+                                        <select id="categorySelect" name="SpecValues[@spec.Id]" class="form-select">
+                                            <option value="">انتخاب کنید...</option>
+                                            @foreach (var val in spec.Specification.SpecValues.OrderBy(v => v.SortOrder))
+                                            {
+                                                <option value="@val.Id">@val.Value</option>
+                                            }
+                                        </select>
+                                    </div>
+                                    <div id="specs-container">
+                                        <div class="text-muted">
+                                            دسته‌بندی را انتخاب کنید
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+                        }
+
+                    </div>
+                    <br />
 
                     <!-- بخش دوم: شناسه‌ها -->
                     <h6 class="text-muted mb-3 border-bottom pb-2">شناسه‌ها</h6>
@@ -77,25 +107,38 @@
                             <input asp-for="Asset.Barcode" class="form-control" placeholder="بارکد" />
                         </div>
                     </div>
+                    <br />
 
                     <!-- بخش سوم: تاریخ‌ها -->
                     <h6 class="text-muted mb-3 border-bottom pb-2">تاریخ‌ها و مالی</h6>
                     <div class="row g-3 mb-3">
                         <div class="col-md-4">
                             <label class="form-label">تاریخ خرید</label>
-                            <input asp-for="Asset.PurchaseDate" type="date" class="form-control" />
-                            <input type="text" class="persian-date form-control" />
 
+                            <input asp-for="TextPurchaseDate" type="text"
+                                   id="purchaseDate"
+                                   class="persian-date form-control"
+                                   autocomplete="off"
+                                   placeholder="انتخاب تاریخ" />
+
+                          
                         </div>
                         <div class="col-md-4">
                             <label class="form-label">انقضا گارانتی</label>
-                            <input asp-for="Asset.WarrantyExpiry" type="date" class="form-control" />
+
+                            <input asp-for="TextWarrantyExpiryDate" type="text"
+                                   id="warrantyExpiry"
+                                   class="persian-date form-control"
+                                   autocomplete="off"
+                                   placeholder="انتخاب تاریخ" />
+
                         </div>
                         <div class="col-md-4">
                             <label class="form-label">قیمت خرید (تومان)</label>
                             <input asp-for="Asset.PurchasePrice" type="number" class="form-control" placeholder="0" />
                         </div>
                     </div>
+                    <br />
 
                     <!-- بخش چهارم: تخصیص -->
                     <h6 class="text-muted mb-3 border-bottom pb-2">تخصیص</h6>
@@ -125,34 +168,7 @@
                         </div>
                     </div>
 
-                    <!-- بخش پنجم: مشخصات و توضیحات -->
-                    <h6 class="text-muted mb-3 border-bottom pb-2">مشخصات فنی</h6>
-                    <div id="specs-container">
-                        @if (Model.CategorySpecifications.Any())
-                        {
-                            <div class="row g-3 mb-3">
-                                @foreach (var spec in Model.CategorySpecifications)
-                                {
-                                    <div class="col-md-4">
-                                        <label class="form-label">@spec.Specification.Name</label>
-                                        <select id="categorySelect" name="SpecValues[@spec.Id]" class="form-select">
-                                            <option value="">انتخاب کنید...</option>
-                                            @foreach (var val in spec.Specification.SpecValues.OrderBy(v => v.SortOrder))
-                                            {
-                                                <option value="@val.Id">@val.Value</option>
-                                            }
-                                        </select>
-                                    </div>
-                                    <div id="specs-container">
-                                        <div class="text-muted">
-                                            دسته‌بندی را انتخاب کنید
-                                        </div>
-                                    </div>
-                                }
-                            </div>
-                        }
-                        
-                    </div>
+                   
 
                     <div class="d-flex gap-2">
                         <button type="submit" class="btn btn-primary">
@@ -169,6 +185,54 @@
 
 @section Scripts {
     <script>
+        $(document).ready(function () {
+            $('#purchaseDate').persianDatepicker({
+                format: 'YYYY/MM/DD',
+                autoClose: true,
+                onSelect: function (unix) {
+                    var gregorianDate = new persianDate(unix)
+                        .toCalendar('gregorian')
+                        .format('YYYY-MM-DD');
+
+                    console.log("تاریخ میلادی:", gregorianDate);
+
+                    $('#purchaseDateGregorian').val(gregorianDate);
+
+                    console.log(
+                        "مقدار hidden:",
+                        $('#purchaseDateGregorian').val()
+                    );
+                }
+            });
+
+
+            $('#warrantyExpiry').persianDatepicker({
+                format: 'YYYY/MM/DD',
+                autoClose: true,
+
+                onSelect: function (unix) {
+
+                    var gregorianDate = new persianDate(unix)
+                        .toCalendar('gregorian')
+                        .format('YYYY-MM-DD');
+
+                    console.log("تاریخ میلادی:", gregorianDate);
+
+                    $('#warrantyExpiryGregorian').val(gregorianDate);
+
+                    console.log(
+                        "مقدار hidden:",
+                        $('#warrantyExpiryGregorian').val()
+                    );
+                }
+            });
+
+        });
+
+    
+
+
+
         document.getElementById('categorySelect')
         .addEventListener('change', async function () {
 
@@ -192,6 +256,12 @@
             placeholder: 'جستجو در فروشندگان...',
             allowEmptyOption: true
         });
+
+
+
+
+
+
     </script>
 }
 

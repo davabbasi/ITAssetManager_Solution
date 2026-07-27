@@ -1,4 +1,6 @@
 @page "{id:int}"
+@using ITAssetManager.Convertor
+
 @model ITAssetManager.Pages.Assets.DetailsModel
 @{
     ViewData["Title"] = Model.Asset.Name;
@@ -39,12 +41,6 @@
             <div class="card-header">اطلاعات تجهیز</div>
             <div class="card-body">
                 <div class="row g-3">
-
-
-
-
-                   
-                  
                     <div class="col-sm-6">
                         <label class="text-muted small d-block">سریال نامبر</label>
                         <span class="font-monospace">@(Model.Asset.SerialNumber ?? "-")</span>
@@ -55,7 +51,7 @@
                     </div>
                     <div class="col-sm-6">
                         <label class="text-muted small d-block">تاریخ خرید</label>
-                        <span>@(Model.Asset.PurchaseDate?.ToString("yyyy/MM/dd") ?? "-")</span>
+                        <span>@(Model.Asset.PurchaseDate?.ToShamsi() ?? "-")</span>
                     </div>
                     <div class="col-sm-6">
                         <label class="text-muted small d-block">انقضا گارانتی</label>
@@ -63,7 +59,7 @@
                         {
                             var days = (Model.Asset.WarrantyExpiry.Value - DateTime.Today).Days;
                             <span class="@(days < 0 ? "text-danger" : days <= 60 ? "text-warning" : "text-success") fw-medium">
-                                @Model.Asset.WarrantyExpiry.Value.ToString("yyyy/MM/dd")
+                                @Model.Asset.WarrantyExpiry.Value.ToShamsi()
                                 @if (days < 0) { <small>(منقضی)</small> }
                                 else if (days <= 60) { <small>(@days روز مانده)</small> }
                             </span>

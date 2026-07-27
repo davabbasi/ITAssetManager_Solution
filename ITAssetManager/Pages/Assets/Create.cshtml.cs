@@ -1,3 +1,4 @@
+using ITAssetManager.Convertor;
 using ITAssetManager.Data;
 using ITAssetManager.Models;
 using Microsoft.AspNetCore.Authorization;
@@ -15,6 +16,8 @@ public class CreateModel : PageModel
     public CreateModel(ApplicationDbContext context) => _context = context;
 
     [BindProperty] public Asset Asset { get; set; } = new();
+    [BindProperty] public string TextPurchaseDate { get; set; }
+    [BindProperty] public string TextWarrantyExpiryDate { get; set; }
 
     public SelectList CategoryList { get; set; } = null!;
     public SelectList DepartmentList { get; set; } = null!;
@@ -31,10 +34,10 @@ public class CreateModel : PageModel
 
     public async Task<IActionResult> OnPostAsync()
     {
-        ModelState.Remove("Asset.Category");
-        ModelState.Remove("Asset.Department");
-        ModelState.Remove("Asset.Employee");
+        var purchaseDate = Request.Form["Asset.PurchaseDate"];
+        var warrantyDate = Request.Form["Asset.WarrantyExpiry"];
 
+       
         if (!ModelState.IsValid)
         {
             await LoadSelectListsAsync();
@@ -42,6 +45,8 @@ public class CreateModel : PageModel
         }
 
         Asset.CreatedAt = DateTime.Now;
+        Asset.PurchaseDate = TextPurchaseDate.ToMiladi();
+        Asset.WarrantyExpiry = TextWarrantyExpiryDate.ToMiladi();
         _context.Assets.Add(Asset);
         await _context.SaveChangesAsync();
 

@@ -26,7 +26,7 @@ public class IndexModel : PageModel
     public async Task OnGetAsync()
     {
         Categories = await _context.Categories.OrderBy(c => c.Name).ToListAsync();
-        //Departments = await _context.VwDepartments.OrderBy(d => d.Name).ToListAsync();
+        Departments = await _context.VwDepartments.OrderBy(d => d.Name).ToListAsync();
         VwDepartment vwDepartment = new()
         {
             Id = 1,
