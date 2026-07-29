@@ -1,3 +1,4 @@
+using ITAssetManager.Convertor;
 using ITAssetManager.Data;
 using ITAssetManager.Models;
 using Microsoft.AspNetCore.Authorization;
@@ -17,6 +18,8 @@ public class CreateModel : PageModel
     [BindProperty] public MaintenanceLog Log { get; set; } = new();
     public Asset? Asset { get; set; }
     public SelectList AssetList { get; set; } = null!;
+    [BindProperty] public string TxtStartDate { get; set; }
+    [BindProperty] public string? TxtEndDate { get; set; }
 
     public async Task OnGetAsync(int? assetId)
     {
@@ -39,8 +42,9 @@ public class CreateModel : PageModel
             await LoadSelectListAsync();
             return Page();
         }
-
+        
         Log.LoggedBy = User.Identity?.Name;
+        Log.EndDate = string.IsNullOrWhiteSpace(TxtEndDate)?null : TxtEndDate.ToMiladi();
         _context.MaintenanceLogs.Add(Log);
 
         // اگر مشکل در جریان است، وضعیت تجهیز را به "در تعمیر" تغییر می‌دهیم

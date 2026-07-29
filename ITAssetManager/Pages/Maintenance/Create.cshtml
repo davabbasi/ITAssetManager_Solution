@@ -24,17 +24,37 @@
                 }
 
                 <form method="post">
-                    <input type="hidden" asp-for="Log.AssetId" />
+
 
                     @if (Model.Asset == null)
                     {
                         <div class="mb-3">
                             <label class="form-label">تجهیز</label>
-                            <select asp-for="Log.AssetId" asp-items="Model.AssetList" class="form-select">
+
+                            <select asp-for="Log.AssetId"
+                                    asp-items="Model.AssetList"
+                                    class="form-select">
                                 <option value="">انتخاب تجهیز...</option>
                             </select>
+                            <span asp-validation-for="Log.AssetId"
+                                  class="text-danger"></span>
                         </div>
                     }
+                    else
+                    {
+                        <input type="hidden" asp-for="Log.AssetId" />
+
+                        <div class="mb-3">
+                            <label class="form-label">تجهیز</label>
+                            <input type="text"
+                                   class="form-control"
+                                   value="@Model.Asset.Name"
+                                   readonly />
+                        </div>
+                    }
+
+
+                   
 
                     <div class="row g-3 mb-3">
                         <div class="col-md-6">
@@ -58,11 +78,19 @@
                         </div>
                         <div class="col-md-4">
                             <label class="form-label">تاریخ شروع</label>
-                            <input asp-for="Log.StartDate" type="date" class="form-control" />
+                            <input asp-for="TxtStartDate" type="text"
+                                   id="TxtStartDate"
+                                   class="persian-date form-control"
+                                   autocomplete="off"
+                                   placeholder="انتخاب تاریخ" />
                         </div>
                         <div class="col-md-4">
                             <label class="form-label">تاریخ پایان</label>
-                            <input asp-for="Log.EndDate" type="date" class="form-control" />
+                            <input asp-for="TxtEndDate" type="text"
+                                   id="TxtStartDate"
+                                   class="persian-date form-control"
+                                   autocomplete="off"
+                                   placeholder="انتخاب تاریخ" />
                         </div>
                         <div class="col-md-4">
                             <label class="form-label">هزینه (تومان)</label>

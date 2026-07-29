@@ -87,6 +87,7 @@
                             <th>بخش / کاربر</th>
                             <th>وضعیت</th>
                             <th>گارانتی</th>
+                            <th>محل نصب</th>
                             <th></th>
                         </tr>
                     </thead>
@@ -145,6 +146,25 @@
                                 </td>
                                 <td class="@warrantyStatus" style="font-size:0.8rem;">@warrantyLabel</td>
                                 <td>
+                                  @if (Model.ComponentLocations.TryGetValue(asset.Id, out var location))
+                                  {
+                                      <span class="badge bg-info">
+                                          <i class="bi bi-pc-display me-1"></i>
+                                          : @location
+                                          </span>
+                                  }
+                                  else if (asset.Category?.Type == AssetCategoryType.Installed)
+                                  {
+                                      <span class="text-muted small">
+                                          آزاد
+                                          </span>
+                                  }
+                                  else
+                                  {
+                                      <span class="text-muted small">-</span>
+                                  }
+                                </td>
+                              <td>
                                     <div class="d-flex gap-1">
                                         <a href="/Assets/Details/@asset.Id" class="btn btn-xs btn-outline-secondary" title="جزئیات">
                                             <i class="bi bi-eye"></i>
@@ -153,7 +173,8 @@
                                             <i class="bi bi-pencil"></i>
                                         </a>
                                     </div>
-                                </td>
+                               </td>
+                                
                             </tr>
                         }
                     </tbody>

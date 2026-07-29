@@ -12,10 +12,11 @@ public class DetailsModel : PageModel
 {
     private readonly ApplicationDbContext _context;
     public DetailsModel(ApplicationDbContext context) => _context = context;
-
+    public AssemblyComponent? InstalledIn { get; set; }
     public Asset Asset { get; set; } = null!;
     public List<AssetAssignment> Assignments { get; set; } = new();
     public List<MaintenanceLog> MaintenanceLogs { get; set; } = new();
+    public List<AssemblyComponent> InstalledList { get; set; }
 
     public async Task<IActionResult> OnGetAsync(int id)
     {
@@ -30,6 +31,18 @@ public class DetailsModel : PageModel
         if (asset == null) return NotFound();
         Asset = asset;
 
+        InstalledIn = await _context.AssemblyComponents
+            .Include(x => x.PcAsset).OrderByDescending(x=>x.InstalledAt)
+            .FirstOrDefaultAsync(x =>
+            x.ComponentAssetId == Asset.Id &&
+            x.RemovedAt == null);
+
+        InstalledList = await _context.AssemblyComponents
+            .Include(x => x.PcAsset)
+            .Where(x => x.ComponentAssetId == Asset.Id)
+           .ToListAsync();
+
+
         Assignments = await _context.AssetAssignments
             .Where(a => a.AssetId == id)
             .OrderByDescending(a => a.AssignedAt)
@@ -39,6 +52,7 @@ public class DetailsModel : PageModel
             .Where(m => m.AssetId == id)
             .OrderByDescending(m => m.StartDate)
             .ToListAsync();
+
 
         return Page();
     }

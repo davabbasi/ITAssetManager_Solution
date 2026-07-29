@@ -1,4 +1,6 @@
 @page
+@using ITAssetManager.Convertor
+
 @model ITAssetManager.Pages.Assignments.IndexModel
 @{
     ViewData["Title"] = "تاریخچه جابجایی‌ها";
@@ -20,12 +22,19 @@
                     placeholder="جستجو در تجهیزات، کارمندان..." />
             </div>
             <div class="col-md-2">
-                <input type="date" name="fromDate" value="@Model.FromDate?.ToString("yyyy-MM-dd")"
-                    class="form-control form-control-sm" placeholder="از تاریخ" />
+
+
+                <input asp-for="FromDate" type="text"
+                       class="persian-date form-control"
+                       autocomplete="off"
+                       placeholder="از تاریخ" />
             </div>
             <div class="col-md-2">
-                <input type="date" name="toDate" value="@Model.ToDate?.ToString("yyyy-MM-dd")"
-                    class="form-control form-control-sm" placeholder="تا تاریخ" />
+
+                <input asp-for="ToDate" type="text"
+                       class="persian-date form-control"
+                       autocomplete="off"
+                       placeholder="تا تاریخ" />
             </div>
             <div class="col-md-2">
                 <button type="submit" class="btn btn-primary btn-sm w-100">
@@ -60,7 +69,7 @@
                     @foreach (var a in Model.Assignments)
                     {
                         <tr>
-                            <td><small>@a.AssignedAt.ToString("yy/MM/dd HH:mm")</small></td>
+                            <td><small>@a.AssignedAt.ToShamsi()</small></td>
                             <td>
                                 <a href="/Assets/Details/@a.AssetId" class="text-decoration-none fw-medium">
                                     @a.Asset?.Name

@@ -1,4 +1,5 @@
 @page
+@using ITAssetManager.Convertor
 @model ITAssetManager.Pages.Maintenance.IndexModel
 @{
     ViewData["Title"] = "تعمیرات";
@@ -56,7 +57,7 @@
                     @foreach (var m in Model.Logs)
                     {
                         <tr>
-                            <td><small>@m.StartDate.ToString("yy/MM/dd")</small></td>
+                            <td><small>@m.StartDate.ToShamsi()</small></td>
                             <td>
                                 <a href="/Assets/Details/@m.AssetId" class="text-decoration-none fw-medium">
                                     @m.Asset?.Name

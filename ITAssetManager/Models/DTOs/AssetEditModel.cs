@@ -32,8 +32,7 @@
 
         // اطلاعات تکمیلی
         public string? Notes { get; set; }
-        public DateTime CreatedAt { get; set; } = DateTime.Now;
-        public DateTime? UpdatedAt { get; set; }
+     
 
         //فروشنده
         public int? VendorId { get; set; }

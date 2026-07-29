@@ -91,7 +91,77 @@
                                 </div>
                                 </div>
                     }
+                    <div class="col-md-4">
+    <label class="text-muted small">محل فعلی</label>
+
+    @if (Model.InstalledIn?.PcAsset != null)
+    {
+        <div>
+            <span class="badge bg-info">
+                <i class="bi bi-pc-display me-1"></i>
+                نصب‌شده در
+            </span>
+
+            <a href="/Assets/Details/@Model.InstalledIn.PcAsset.Id"
+               class="text-decoration-none fw-medium">
+                @Model.InstalledIn.PcAsset.Name
+            </a>
+        </div>
+    }
+    else if (Model.Asset.Category?.Type == AssetCategoryType.Installed)
+    {
+        <span class="text-muted">
+            آزاد / نصب‌نشده
+        </span>
+    }
+    else
+    {
+        <span class="text-muted">-</span>
+    }
+</div>
                 </div>
+            </div>
+        </div>
+
+          <!-- تاریخچه نصب ‌ها -->
+        <div class="card mb-3">
+            <div class="card-header d-flex justify-content-between">
+                <span><i class="bi bi-arrow-left-right me-2"></i>تاریخچه نصب ها</span>
+               
+            </div>
+            <div class="card-body p-0">
+                @if (!Model.InstalledList.Any())
+                {
+                    <p class="text-muted text-center py-3">نصبی ثبت نشده</p>
+                }
+                else
+                {
+                    <div class="table-responsive">
+                        <table class="table table-sm mb-0">
+                            <thead>
+                                <tr>
+                                    <th>تاریخ</th>
+                                    <th>از سیستم</th>
+                                    <th></th>
+                                    <th>به سیستم </th>
+                                    <th>ثبت‌کننده</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var a in Model.InstalledList)
+                                {
+                                    <tr>
+                                        <td><small>@a.InstalledAt.ToShamsi()</small></td> 
+                                        <td><small>@(a.FromAsset?.Name ?? "واحد انفورماتیک")</small></td>
+                                        <td><i class="bi bi-arrow-left text-muted"></i></td>
+                                        <td><small class="fw-medium">@(a.PcAsset?.Name ?? "بدون سیستم")</small></td>
+                                        <td><small class="text-muted">@a.InstalledBy</small></td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                }
             </div>
         </div>
 
@@ -126,7 +196,7 @@
                                 @foreach (var a in Model.Assignments)
                                 {
                                     <tr>
-                                        <td><small>@a.AssignedAt.ToString("yy/MM/dd")</small></td>
+                                        <td><small>@a.AssignedAt.ToShamsi()</small></td>
                                         <td><small>@(a.FromEmployeeName ?? a.FromDepartmentName ?? "-")</small></td>
                                         <td><i class="bi bi-arrow-left text-muted"></i></td>
                                         <td><small class="fw-medium">@(a.ToEmployeeName ?? a.ToDepartmentName ?? "-")</small></td>
@@ -170,7 +240,7 @@
                                 @foreach (var m in Model.MaintenanceLogs)
                                 {
                                     <tr>
-                                        <td><small>@m.StartDate.ToString("yy/MM/dd")</small></td>
+                                        <td><small>@m.StartDate.ToShamsi()</small></td>
                                         <td>
                                             <small>
                                                 @(m.Type switch {
@@ -234,7 +304,7 @@
                         </div>
                         <div>
                             <div class="fw-medium">@Model.Asset.EmployeeName</div>
-                            <small class="text-muted">@Model.Asset.DepartmentName?? "مشخص نشده است" </small>
+                            <small class="text-muted">@(Model.Asset.DepartmentName ?? "مشخص نشده است") </small>
                         </div>
                     </div>
                 }
@@ -264,5 +334,6 @@
                 </div>
             </div>
         }
+   
     </div>
 </div>

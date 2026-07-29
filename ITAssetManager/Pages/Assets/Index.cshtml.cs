@@ -17,7 +17,7 @@ public class IndexModel : PageModel
     public List<Category> Categories { get; set; } = new();
     public List<VwDepartment> Departments { get; set; } = new();
     public int TotalCount { get; set; }
-
+    public Dictionary<int, string> ComponentLocations { get; set; } = new();
     [BindProperty(SupportsGet = true)] public string? Search { get; set; }
     [BindProperty(SupportsGet = true)] public int? CategoryId { get; set; }
     [BindProperty(SupportsGet = true)] public int? Status { get; set; }
@@ -56,5 +56,19 @@ public class IndexModel : PageModel
 
         TotalCount = await query.CountAsync();
         Assets = await query.OrderByDescending(a => a.CreatedAt).ToListAsync();
+
+        var assemblyComponents = await _context.AssemblyComponents
+            .Include(x => x.PcAsset)
+            .Where(x => x.RemovedAt == null)
+            .ToListAsync();
+
+        ComponentLocations = assemblyComponents
+            .Where(x => x.PcAsset != null)
+            .ToDictionary(
+            x => x.ComponentAssetId,
+            x => x.PcAsset.EmployeeName != null
+            ? $"{x.PcAsset.Name} - {x.PcAsset.EmployeeName}"
+            : $"{x.PcAsset.Name} - {x.PcAsset.DepartmentName}"
+            );
     }
 }

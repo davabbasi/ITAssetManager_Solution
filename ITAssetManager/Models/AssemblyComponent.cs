@@ -4,6 +4,11 @@
     {
         public int Id { get; set; }
 
+        // مبدأ
+        public int? FromAssetId { get; set; }
+        public Asset? FromAsset { get; set; }
+
+        //مقصد
         public int PcAssetId { get; set; }       // PC ای که این قطعه توشه
         public Asset? PcAsset { get; set; }
 

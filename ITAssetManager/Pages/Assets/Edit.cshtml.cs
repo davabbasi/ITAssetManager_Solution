@@ -14,28 +14,24 @@ public class EditModel : PageModel
 {
     private readonly ApplicationDbContext _context;
     public EditModel(ApplicationDbContext context) => _context = context;
-    Asset Asset;
-    [BindProperty] public AssetEditModel AssetEditModel { get; set; } = null!;
-    [BindProperty] public string TextOldPurchaseDate { get; set; }
-    [BindProperty]  public string TextOldWarrantyExpiryDate { get; set; }
-    public string TextPurchaseDate { get; set; } 
-    public string TextWarrantyExpiryDate { get; set; } 
-
+    [BindProperty] public Asset Asset { get; set; } = new Asset();
     public SelectList CategoryList { get; set; } = null!;
     public SelectList DepartmentList { get; set; } = null!;
     public SelectList EmployeeList { get; set; } = null!;
     public SelectList VendorList { get; set; } = null!;
-    [BindProperty]
-    public Dictionary<int, int> SpecValues { get; set; } = new();
+    [BindProperty] public Dictionary<int, int> SpecValues { get; set; } = new();
     public List<Specification> CategorySpecifications { get; set; } = new();
+    [BindProperty] public string ShamsiPurchaseDate { get; set; }
+    [BindProperty] public string ShamsiWarrantyExpiry { get; set; }
+
     public async Task<IActionResult> OnGetAsync(int id)
     {
         Asset = await _context.Assets.FindAsync(id);
         if (Asset == null)
             return NotFound();
 
-        AssetEditModel.PurchaseDate = Asset.PurchaseDate?.ToShamsi();
-        AssetEditModel.WarrantyExpiry = Asset.WarrantyExpiry?.ToShamsi();
+        ShamsiPurchaseDate = Asset.PurchaseDate?.ToShamsi();
+        ShamsiWarrantyExpiry=Asset.WarrantyExpiry?.ToShamsi();
 
         await LoadSelectListsAsync();
         CategorySpecifications =await GetSpecificationsAsync(Asset.CategoryId);
@@ -46,7 +42,6 @@ public class EditModel : PageModel
                 x => x.SpecValueId);
         return Page();
     }
-
     public async Task<IActionResult> OnPostAsync()
     {
         ModelState.Remove("Asset.Category");
@@ -59,32 +54,68 @@ public class EditModel : PageModel
             return Page();
         }
 
+        var asset = await _context.Assets.FindAsync(Asset.Id);
+
+        if (asset == null)
+            return NotFound();
+
+        // اطلاعات اصلی
+        asset.Name = Asset.Name;
+        asset.Model = Asset.Model;
+        asset.SerialNumber = Asset.SerialNumber;
+        asset.Barcode = Asset.Barcode;
+        asset.PropertyTag = Asset.PropertyTag;
+        asset.CategoryId = Asset.CategoryId;
+        asset.Status = Asset.Status;
+        asset.StatusNote = Asset.StatusNote;
+        asset.PurchasePrice = Asset.PurchasePrice;
+        asset.DepartmentId = Asset.DepartmentId;
+        asset.EmployeeId = Asset.EmployeeId;
+        asset.Location = Asset.Location;
+        asset.Notes = Asset.Notes;
+        asset.VendorId = Asset.VendorId;
+        asset.AssemblyNumber = Asset.AssemblyNumber;
+        asset.IsAssembled = Asset.IsAssembled;
+
+        // تاریخ‌ها
+        asset.PurchaseDate = string.IsNullOrWhiteSpace(ShamsiPurchaseDate)
+            ? null
+            : ShamsiPurchaseDate.ToMiladi();
+
+        asset.WarrantyExpiry = string.IsNullOrWhiteSpace(ShamsiWarrantyExpiry)
+            ? null
+            : ShamsiWarrantyExpiry.ToMiladi();
+
+
+        // مشخصات فنی قبلی
         var oldSpecs = await _context.AssetSpecValues
-            .Where(x => x.AssetId == AssetEditModel.Id)
+            .Where(x => x.AssetId == Asset.Id)
             .ToListAsync();
 
         _context.AssetSpecValues.RemoveRange(oldSpecs);
+
+
+        // مشخصات فنی جدید
         foreach (var (specId, valueId) in SpecValues)
         {
             if (valueId > 0)
             {
                 _context.AssetSpecValues.Add(new AssetSpecificationValue
                 {
-                    AssetId = AssetEditModel.Id,
+                    AssetId = asset.Id,
                     SpecDefinitionId = specId,
                     SpecValueId = valueId
                 });
             }
         }
-        Asset.PurchaseDate = AssetEditModel.PurchaseDate.ToMiladi();
-        Asset.WarrantyExpiry= AssetEditModel.WarrantyExpiry.ToMiladi() ;
+
 
         await _context.SaveChangesAsync();
 
         TempData["Success"] = "تغییرات با موفقیت ذخیره شد.";
-        return RedirectToPage("/Assets/Details", new { id = Asset.Id });
-    }
 
+        return RedirectToPage("/Assets/Details", new { id = asset.Id });
+    }
     private async Task LoadSelectListsAsync()
     {
         CategoryList = new SelectList(await _context.Categories.OrderBy(c => c.Name).ToListAsync(), "Id", "Name");
