@@ -16,6 +16,10 @@ namespace ITAssetManager.Models.ViewModels
         [MaxLength(200, ErrorMessage = "{0} نمیتواند بیشتر از {1} باشد")]
         public  string Name { get; set; }= string.Empty;
 
+        [Display(Name = "قطعات داخلی ")]
+        [Required(ErrorMessage = "لطفا {0} را وارد نمایید")]
+        public Boolean HasInternalComponent { get; set; } 
+
         public string? Icon { get; set; }
 
         [Display(Name = "توضیحات")]

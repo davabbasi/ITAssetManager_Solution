@@ -22,7 +22,7 @@ public class IndexModel : PageModel
     public async Task OnGetAsync()
     {
         var query = _context.AssetAssignments
-            .Include(a => a.Asset)
+            .Include(a => a.Asset).Where(a=>a.Asset.Category.Type!=AssetCategoryType.Installed)
             .AsQueryable();
 
         if (!string.IsNullOrEmpty(Search))

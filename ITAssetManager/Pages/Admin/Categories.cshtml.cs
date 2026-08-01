@@ -1,4 +1,5 @@
 using ITAssetManager.Data;
+using ITAssetManager.Migrations;
 using ITAssetManager.Models;
 using ITAssetManager.Models.ViewModels;
 using Microsoft.AspNetCore.Authorization;
@@ -37,6 +38,7 @@ public class CategoriesModel : PageModel
             {
                 Input.Name = cat.Name;
                 Input.Description = cat.Description;
+                Input.HasInternalComponent = cat.HasInternalComponent;
                 Input.Type = (int)cat.Type;
 
             }
@@ -56,6 +58,7 @@ public class CategoriesModel : PageModel
                 cat.Name = Input.Name; 
                 cat.Description = Input.Description;
                 cat.Type = (AssetCategoryType)Input.Type;
+                cat.HasInternalComponent = Input.HasInternalComponent;
             }
             else
             {
@@ -70,6 +73,7 @@ public class CategoriesModel : PageModel
                 Name = Input.Name,
                 Description = Input.Description,
                 Type = (AssetCategoryType)Input.Type,
+                HasInternalComponent=Input.HasInternalComponent
             });
 
         }

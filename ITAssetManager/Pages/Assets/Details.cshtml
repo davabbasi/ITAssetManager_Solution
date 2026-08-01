@@ -28,9 +28,14 @@
         <a href="/Assets/Edit/@Model.Asset.Id" class="btn btn-outline-primary btn-sm">
             <i class="bi bi-pencil me-1"></i>ویرایش
         </a>
-        <a href="/Assignments/Create?assetId=@Model.Asset.Id" class="btn btn-primary btn-sm">
+
+          @if(Model.Asset.Category.Type!=AssetCategoryType.Installed)
+                {
+                    <a href="/Assignments/Create?assetId=@Model.Asset.Id" class="btn btn-primary btn-sm">
             <i class="bi bi-arrow-left-right me-1"></i>ثبت جابجایی
         </a>
+                }
+       
     </div>
 </div>
 
@@ -123,55 +128,17 @@
             </div>
         </div>
 
-          <!-- تاریخچه نصب ‌ها -->
-        <div class="card mb-3">
-            <div class="card-header d-flex justify-content-between">
-                <span><i class="bi bi-arrow-left-right me-2"></i>تاریخچه نصب ها</span>
-               
-            </div>
-            <div class="card-body p-0">
-                @if (!Model.InstalledList.Any())
-                {
-                    <p class="text-muted text-center py-3">نصبی ثبت نشده</p>
-                }
-                else
-                {
-                    <div class="table-responsive">
-                        <table class="table table-sm mb-0">
-                            <thead>
-                                <tr>
-                                    <th>تاریخ</th>
-                                    <th>از سیستم</th>
-                                    <th></th>
-                                    <th>به سیستم </th>
-                                    <th>ثبت‌کننده</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach (var a in Model.InstalledList)
-                                {
-                                    <tr>
-                                        <td><small>@a.InstalledAt.ToShamsi()</small></td> 
-                                        <td><small>@(a.FromAsset?.Name ?? "واحد انفورماتیک")</small></td>
-                                        <td><i class="bi bi-arrow-left text-muted"></i></td>
-                                        <td><small class="fw-medium">@(a.PcAsset?.Name ?? "بدون سیستم")</small></td>
-                                        <td><small class="text-muted">@a.InstalledBy</small></td>
-                                    </tr>
-                                }
-                            </tbody>
-                        </table>
-                    </div>
-                }
-            </div>
-        </div>
-
-        <!-- تاریخچه جابجایی‌ها -->
+           <!-- تاریخچه جابجایی‌ها -->
         <div class="card mb-3">
             <div class="card-header d-flex justify-content-between">
                 <span><i class="bi bi-arrow-left-right me-2"></i>تاریخچه جابجایی‌ها</span>
-                <a href="/Assignments/Create?assetId=@Model.Asset.Id" class="btn btn-sm btn-outline-primary">
+                @if(Model.Asset.Category.Type!=AssetCategoryType.Installed)
+                {
+                    <a href="/Assignments/Create?assetId=@Model.Asset.Id" class="btn btn-sm btn-outline-primary">
                     <i class="bi bi-plus"></i> جابجایی جدید
-                </a>
+                    </a>
+                }
+               
             </div>
             <div class="card-body p-0">
                 @if (!Model.Assignments.Any())
@@ -197,9 +164,9 @@
                                 {
                                     <tr>
                                         <td><small>@a.AssignedAt.ToShamsi()</small></td>
-                                        <td><small>@(a.FromEmployeeName ?? a.FromDepartmentName ?? "-")</small></td>
+                                        <td><small>@(a.FromEmployeeName ?? a.FromDepartmentName ??  "-")</small></td>
                                         <td><i class="bi bi-arrow-left text-muted"></i></td>
-                                        <td><small class="fw-medium">@(a.ToEmployeeName ?? a.ToDepartmentName ?? "-")</small></td>
+                                        <td><small class="fw-medium">@(a.ToEmployeeName ?? a.ToDepartmentName ?? "انفورماتیک")</small></td>
                                         <td><small class="text-muted">@(a.Reason ?? "-")</small></td>
                                         <td><small class="text-muted">@a.AssignedBy</small></td>
                                     </tr>
@@ -211,6 +178,49 @@
             </div>
         </div>
 
+
+          <!-- تاریخچه نصب ‌ها -->
+        <div class="card mb-3">
+            <div class="card-header d-flex justify-content-between">
+                <span><i class="bi bi-arrow-left-right me-2"></i>تاریخچه نصب ها</span>              
+            </div>
+            <div class="card-body p-0">
+                @if (!Model.InstalledList.Any())
+                {
+                    <p class="text-muted text-center py-3">نصبی ثبت نشده</p>
+                }
+                else
+                {
+                    <div class="table-responsive">
+                        <table class="table table-sm mb-0">
+                            <thead>
+                                <tr>
+                                    <th>تاریخ</th>
+                                    <th>از سیستم</th>
+                                    <th></th>
+                                    <th>به سیستم </th>
+                                    <th>ثبت‌کننده</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var a in Model.InstalledList)
+                                {
+                                    <tr>
+                                        <td><small>@a.InstalledAt.ToShamsi()</small></td> 
+                                        <td><small>@(a.FromAsset?.Name ?? "-")</small></td>
+                                        <td><i class="bi bi-arrow-left text-muted"></i></td>
+                                        <td><small class="fw-medium">@(a.PcAsset?.Name ?? "بدون سیستم")</small></td>
+                                        <td><small class="text-muted">@a.InstalledBy</small></td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                }
+            </div>
+        </div>
+
+     
         <!-- تاریخچه تعمیرات -->
         <div class="card">
             <div class="card-header d-flex justify-content-between">

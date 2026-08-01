@@ -321,7 +321,7 @@
                     </div>
                     <div class="sidebar-group-items">
                         <a href="/Assets" class="nav-link-item @(Context.Request.Path.StartsWithSegments("/Assets") ? "active" : "")">
-                            <i class="bi bi-cpu"></i> لیست تجهیزات
+                            <i class="bi bi-cpu"></i> لیست تجهیزات ثبت شده
                         </a>
                        
                     </div>
@@ -329,16 +329,19 @@
                 </div>
                 <div class="sidebar-group">
                     <div class="sidebar-group-header" onclick="toggleGroup(this)">
-                        <span><i class="bi bi-pc-display me-1"></i>اسمبل سیستم</span>
+                        <span><i class="bi bi-pc-display me-1"></i>مدیریت قطعات داخلی</span>
                         <i class="bi bi-chevron-down chevron"></i>
                     </div>
                     <div class="sidebar-group-items">
-                        <a href="/Assembly" class="nav-link-item @(Context.Request.Path.StartsWithSegments("/Assembly") ? "active" : "")">
-                            <i class="bi bi-pc-display"></i> سیستم‌های اسمبل‌شده
+                        <a href="/InternalComponents" class="nav-link-item @(Context.Request.Path.StartsWithSegments("/InternalComponents") ? "active" : "")">
+                            <i class="bi bi-pc-display"></i> لیست تجهیزات 
                         </a>
-                        <a href="/Assembly/Create" class="nav-link-item">
+
+                        @* <a href="/Assembly/Create" class="nav-link-item">
                             <i class="bi bi-plus-circle"></i> اسمبل جدید
-                        </a>
+                        </a> *@
+
+
                     </div>
                 </div>
 
@@ -415,22 +418,23 @@
                             <a href="/Admin/Users" class="nav-link-item">
                                 <i class="bi bi-people"></i> کاربران
                             </a>
-                            <a href="/Admin/ViewEmployees" class="nav-link-item">
-                                <i class="bi bi-person-badge"></i> پرسنل
-                            </a>
-                            <a href="/Admin/ViewDepartments" class="nav-link-item">
-                                <i class="bi bi-building-gear"></i> واحدها
+                            <a href="/Admin/Categories" class="nav-link-item">
+                                <i class="bi bi-tags"></i> دسته‌بندی‌ها
                             </a>
                             <a href="/Admin/SpecificationIndex" class="nav-link-item @(Context.Request.Path.StartsWithSegments("/Admin/SpecificationIndex") ? "active" : "")">
                                 <i class="bi bi-sliders"></i> مشخصات فنی
                             </a>
-
                             <a href="/Admin/SpecificationAssign" class="nav-link-item @(Context.Request.Path.StartsWithSegments("/Admin/SpecificationAssign") ? "active" : "")">
                                 <i class="bi bi-sliders"></i>انتساب مشخصات فنی به دسته بندی
                             </a>
-                            <a href="/Admin/Categories" class="nav-link-item">
-                                <i class="bi bi-tags"></i> دسته‌بندی‌ها
+
+                            @* <a href="/Admin/ViewEmployees" class="nav-link-item">
+                                <i class="bi bi-person-badge"></i> پرسنل
                             </a>
+                            <a href="/Admin/ViewDepartments" class="nav-link-item">
+                                <i class="bi bi-building-gear"></i> واحدها
+                            </a> *@
+                     
                         </div>
                     </div>
                 }

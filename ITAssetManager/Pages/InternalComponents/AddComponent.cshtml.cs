@@ -18,7 +18,7 @@ public class AddComponentModel : PageModel
 
     public async Task<IActionResult> OnGetAsync(int pcId)
     {
-        var pc = await _context.Assets.FirstOrDefaultAsync(a => a.Id == pcId && a.IsAssembled);
+        var pc = await _context.Assets.FirstOrDefaultAsync(a => a.Id == pcId && a.Category.HasInternalComponent==true);
         if (pc == null) return NotFound();
         PcAsset = pc;
 

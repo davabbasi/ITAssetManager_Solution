@@ -18,7 +18,17 @@
                     <label class="form-label">تاریخ اسمبل</label>
                     <input asp-for="AssembleDate" type="date" class="form-control" />
                 </div>
-                <div class="col-md-3">
+
+
+                <select id="componentCategorySelect" class="form-select form-select-sm">
+                    <option value="">انتخاب تجهیز...</option>
+                    @foreach (var cat in Model.InstalledCategories)
+                    {
+                        <option value="@cat.Id">@cat.Name</option>
+                    }
+                </select>
+
+                @* <div class="col-md-3">
                     <label class="form-label">شماره اموال <span class="text-danger">*</span></label>
                     <input asp-for="PropertyTag" class="form-control" placeholder="AM-2024-XXX" />
                 </div>
@@ -29,7 +39,9 @@
                 <div class="col-md-3">
                     <label class="form-label">نام سیستم</label>
                     <input asp-for="AssetName" class="form-control" placeholder="مثلاً: کامپیوتر اداری ۱" />
-                </div>
+                </div> *@
+
+
                 <div class="col-12">
                     <label class="form-label">توضیحات</label>
                     <textarea asp-for="Description" class="form-control" rows="2"></textarea>

@@ -1,4 +1,5 @@
 ﻿@page "{id:int}"
+@using ITAssetManager.Convertor
 @model ITAssetManager.Pages.Assembly.DetailsModel
 @{
     ViewData["Title"] = "سیستم #" + Model.PcAsset.AssemblyNumber;
@@ -13,8 +14,8 @@
 
 <div class="d-flex justify-content-between align-items-center mb-3">
     <div>
-        <a href="/Assembly" class="text-muted text-decoration-none small">
-            <i class="bi bi-arrow-right me-1"></i>سیستم‌های اسمبل‌شده
+        <a href="/InternalComponents" class="text-muted text-decoration-none small">
+            <i class="bi bi-arrow-right me-1"></i>لیست تجهیزات دارای قطعات داخلی
         </a>
         <h5 class="mb-0 mt-1 fw-bold">
             <span class="badge bg-primary">#@Model.PcAsset.AssemblyNumber</span>
@@ -32,7 +33,7 @@
         <div class="card mb-3">
             <div class="card-header d-flex justify-content-between">
                 <span><i class="bi bi-cpu-fill me-2"></i>قطعات نصب‌شده</span>
-                <a href="/Assembly/AddComponent?pcId=@Model.PcAsset.Id" class="btn btn-sm btn-outline-primary">
+                <a href="/InternalComponents/AddComponent?pcId=@Model.PcAsset.Id" class="btn btn-sm btn-outline-primary">
                     <i class="bi bi-plus"></i> افزودن قطعه
                 </a>
             </div>
@@ -58,7 +59,7 @@
                                         </a>
                                     </td>
                                     <td><small>@(c.ComponentAsset?.PropertyTag ?? "-")</small></td>
-                                    <td><small>@c.InstalledAt.ToString("yyyy/MM/dd")</small></td>
+                                    <td><small>@c.InstalledAt.ToShamsi()</small></td>
                                     <td>
                                         <form method="post" asp-page-handler="RemoveComponent"
                                               onsubmit="return confirm('این قطعه از سیستم خارج شود؟')">
@@ -91,8 +92,8 @@
                             {
                                 <tr class="text-muted">
                                     <td><small>@c.ComponentAsset?.Name</small></td>
-                                    <td><small>@c.InstalledAt.ToString("yyyy/MM/dd")</small></td>
-                                    <td><small>@c.RemovedAt?.ToString("yyyy/MM/dd")</small></td>
+                                    <td><small>@c.InstalledAt.ToShamsi()</small></td>
+                                    <td><small>@c.RemovedAt?.ToShamsi()</small></td>
                                     <td><small>@c.RemovedBy</small></td>
                                 </tr>
                             }
@@ -105,7 +106,7 @@
 
     <div class="col-md-4">
         <div class="card">
-            <div class="card-header">اطلاعات سیستم</div>
+            <div class="card-header">اطلاعات تجهیز</div>
             <div class="card-body">
                 <small class="text-muted d-block">شماره اموال</small>
                 <span class="fw-medium d-block mb-2">@(Model.PcAsset.PropertyTag ?? "-")</span>
@@ -113,8 +114,8 @@
                 <small class="text-muted d-block">مدل</small>
                 <span class="d-block mb-2">@(Model.PcAsset.Model ?? "-")</span>
 
-                <small class="text-muted d-block">تاریخ اسمبل</small>
-                <span class="d-block mb-2">@Model.PcAsset.CreatedAt.ToString("yyyy/MM/dd")</span>
+                <small class="text-muted d-block">تاریخ ایجاد</small>
+                <span class="d-block mb-2">@Model.PcAsset.CreatedAt.ToShamsi()</span>
 
                 @if (!string.IsNullOrEmpty(Model.PcAsset.Notes))
                 {

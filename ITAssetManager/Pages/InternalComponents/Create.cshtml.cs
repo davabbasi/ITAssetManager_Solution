@@ -58,33 +58,34 @@ public class CreateModel : PageModel
             .MaxAsync(a => (int?)a.AssemblyNumber) ?? 0;
 
         // ساخت Asset برای خود PC
-        var pcAsset = new Asset
-        {
-            Name = string.IsNullOrWhiteSpace(AssetName) ? $"PC اسمبل‌شده #{lastNumber + 1}" : AssetName,
-            Model = DeviceModel,
-            PropertyTag = PropertyTag,
-            CategoryId = pcCategory.Id,
-            Status = AssetStatus.Active,
-            Notes = Description,
-            IsAssembled = true,
-            AssemblyNumber = lastNumber + 1,
-            CreatedAt = AssembleDate,
-            DepartmentId = DepartmentId,
-            EmployeeId = EmployeeId
-        };
-        _context.Assets.Add(pcAsset);
-        await _context.SaveChangesAsync();
+        //var pcAsset = new Asset
+        //{
+        //    Name = string.IsNullOrWhiteSpace(AssetName) ? $"PC اسمبل‌شده #{lastNumber + 1}" : AssetName,
+        //    Model = DeviceModel,
+        //    PropertyTag = PropertyTag,
+        //    CategoryId = pcCategory.Id,
+        //    Status = AssetStatus.Active,
+        //    Notes = Description,
+        //    IsAssembled = true,
+        //    AssemblyNumber = lastNumber + 1,
+        //    CreatedAt = AssembleDate,
+        //    DepartmentId = DepartmentId,
+        //    EmployeeId = EmployeeId
+        //};
+        //_context.Assets.Add(pcAsset);
+
+        //await _context.SaveChangesAsync();
 
         // پر کردن نام‌های واحد و کارمند (چون از View می‌خونیم، FK نداریم)
         if (DepartmentId.HasValue)
         {
             var dept = await _context.VwDepartments.FindAsync(DepartmentId);
-            pcAsset.DepartmentName = dept?.Name;
+            //pcAsset.DepartmentName = dept?.Name;
         }
         if (EmployeeId.HasValue)
         {
             var emp = await _context.VwEmployees.FindAsync(EmployeeId);
-            pcAsset.EmployeeName = emp?.FullName;
+           // pcAsset.EmployeeName = emp?.FullName;
         }
         await _context.SaveChangesAsync();
 
@@ -93,7 +94,7 @@ public class CreateModel : PageModel
         {
             _context.AssemblyComponents.Add(new AssemblyComponent
             {
-                PcAssetId = pcAsset.Id,
+                //PcAssetId = pcAsset.Id,
                 ComponentAssetId = compId,
                 InstalledAt = DateTime.Now,
                 InstalledBy = User.Identity?.Name
@@ -106,11 +107,11 @@ public class CreateModel : PageModel
         {
             _context.AssetAssignments.Add(new AssetAssignment
             {
-                AssetId = pcAsset.Id,
+                //AssetId = pcAsset.Id,
                 ToEmployeeId = EmployeeId,
-                ToEmployeeName = pcAsset.EmployeeName,
+                //ToEmployeeName = pcAsset.EmployeeName,
                 ToDepartmentId = DepartmentId,
-                ToDepartmentName = pcAsset.DepartmentName,
+                //ToDepartmentName = pcAsset.DepartmentName,
                 AssignedAt = DateTime.Now,
                 Reason = "اسمبل اولیه سیستم",
                 AssignedBy = User.Identity?.Name
@@ -118,8 +119,10 @@ public class CreateModel : PageModel
             await _context.SaveChangesAsync();
         }
 
-        TempData["Success"] = $"سیستم #{pcAsset.AssemblyNumber} با موفقیت اسمبل شد.";
-        return RedirectToPage("/Assembly/Details", new { id = pcAsset.Id });
+        //TempData["Success"] = $"سیستم #{pcAsset.AssemblyNumber} با موفقیت اسمبل شد.";
+        //return RedirectToPage("/Assembly/Details", new { id = pcAsset.Id });
+        return RedirectToPage("/Assembly/Details");
+
     }
 
     private async Task LoadAsync()

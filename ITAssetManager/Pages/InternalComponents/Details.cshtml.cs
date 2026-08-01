@@ -19,7 +19,7 @@ public class DetailsModel : PageModel
 
     public async Task<IActionResult> OnGetAsync(int id)
     {
-        var pc = await _context.Assets.FirstOrDefaultAsync(a => a.Id == id && a.IsAssembled);
+        var pc = await _context.Assets.FirstOrDefaultAsync(a => a.Id == id );
         if (pc == null) return NotFound();
         PcAsset = pc;
 

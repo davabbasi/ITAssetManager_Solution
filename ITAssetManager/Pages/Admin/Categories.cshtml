@@ -30,6 +30,15 @@
                             <option value="3" selected="@(Model.Input.Type == 3)">مواد مصرفی</option>
                         </select>
                     </div>
+
+                    <div class="mb-3">
+                        <label asp-for="Input.HasInternalComponent" class="form-label">  <span class="text-danger">*</span> قطعات داخلی</label>
+                        <select asp-for="Input.HasInternalComponent" class="form-select">
+                            <option value="false" selected="@(Model.Input.HasInternalComponent == false)">فاقد قطعات داخلی </option>
+                            <option value="true" selected="@(Model.Input.HasInternalComponent == true)">دارای قطعات داخلی</option>
+                        </select>
+                    </div>
+
                  @*    <div class="mb-3">
                         <label class="form-label">آیکون Bootstrap</label>
                         <div class="input-group">
