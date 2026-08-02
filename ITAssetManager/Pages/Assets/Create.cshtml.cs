@@ -25,7 +25,12 @@ public class CreateModel : PageModel
     public List<CategorySpecification> CategorySpecifications { get; set; } = new();
     public SelectList VendorList { get; set; } = null!;
 
-    [BindProperty] public Dictionary<int, int> SpecValues { get; set; } = new();
+    [BindProperty] public Dictionary<string, string> SpecValues { 
+        get; 
+        set;
+    } 
+        = new();
+
     public async Task OnGetAsync()
     {
         
@@ -66,21 +71,26 @@ public class CreateModel : PageModel
             _context.AssetAssignments.Add(assignment);
             await _context.SaveChangesAsync();
         }
-
-        foreach (var (specDefId, specValId) in SpecValues)
+        if (SpecValues.Any())
         {
-            if (specValId > 0)
+            foreach (var (specDefId, specValId) in SpecValues)
             {
-                _context.AssetSpecValues.Add(new AssetSpecificationValue
+                if (!string.IsNullOrEmpty(specValId) &&
+                    specValId != "انتخاب کنید..." &&
+                    int.TryParse(specDefId, out int definitionId) &&
+                    int.TryParse(specValId, out int valueId))
                 {
-                    AssetId = Asset.Id,
-                    SpecDefinitionId = specDefId,
-                    SpecValueId = specValId
-                });
+                    _context.AssetSpecValues.Add(new AssetSpecificationValue
+                    {
+                        AssetId = Asset.Id,
+                        SpecDefinitionId = definitionId,
+                        SpecValueId = valueId
+                    });
+                }
             }
-        }
-        await _context.SaveChangesAsync();
 
+            await _context.SaveChangesAsync();
+        }
 
         TempData["Success"] = "تجهیز با موفقیت ثبت شد.";
         return RedirectToPage("/Assets/Details", new { id = Asset.Id });

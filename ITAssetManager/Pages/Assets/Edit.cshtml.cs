@@ -19,7 +19,7 @@ public class EditModel : PageModel
     public SelectList DepartmentList { get; set; } = null!;
     public SelectList EmployeeList { get; set; } = null!;
     public SelectList VendorList { get; set; } = null!;
-    [BindProperty] public Dictionary<int, int> SpecValues { get; set; } = new();
+    [BindProperty] public Dictionary<string, string> SpecValues { get; set; } = new();
     public List<Specification> CategorySpecifications { get; set; } = new();
     [BindProperty] public string ShamsiPurchaseDate { get; set; }
     [BindProperty] public string ShamsiWarrantyExpiry { get; set; }
@@ -38,8 +38,8 @@ public class EditModel : PageModel
         SpecValues = await _context.AssetSpecValues
             .Where(x => x.AssetId == Asset.Id)
             .ToDictionaryAsync(
-                x => x.SpecDefinitionId,
-                x => x.SpecValueId);
+                x => x.SpecDefinitionId.ToString(),
+                x => x.SpecValueId.ToString());
         return Page();
     }
     public async Task<IActionResult> OnPostAsync()
@@ -96,21 +96,42 @@ public class EditModel : PageModel
 
 
         // مشخصات فنی جدید
-        foreach (var (specId, valueId) in SpecValues)
+        //foreach (var (specId, valueId) in SpecValues)
+        //{
+        //    if (valueId > 0)
+        //    {
+        //        _context.AssetSpecValues.Add(new AssetSpecificationValue
+        //        {
+        //            AssetId = asset.Id,
+        //            SpecDefinitionId = specId,
+        //            SpecValueId = valueId
+        //        });
+        //    }
+        //}
+
+
+        //await _context.SaveChangesAsync();
+
+        if (SpecValues.Any())
         {
-            if (valueId > 0)
+            foreach (var (specDefId, specValId) in SpecValues)
             {
-                _context.AssetSpecValues.Add(new AssetSpecificationValue
+                if (!string.IsNullOrEmpty(specValId) &&
+                    specValId != "انتخاب کنید..." &&
+                    int.TryParse(specDefId, out int definitionId) &&
+                    int.TryParse(specValId, out int valueId))
                 {
-                    AssetId = asset.Id,
-                    SpecDefinitionId = specId,
-                    SpecValueId = valueId
-                });
+                    _context.AssetSpecValues.Add(new AssetSpecificationValue
+                    {
+                        AssetId = Asset.Id,
+                        SpecDefinitionId = definitionId,
+                        SpecValueId = valueId
+                    });
+                }
             }
+
+            await _context.SaveChangesAsync();
         }
-
-
-        await _context.SaveChangesAsync();
 
         TempData["Success"] = "تغییرات با موفقیت ذخیره شد.";
 

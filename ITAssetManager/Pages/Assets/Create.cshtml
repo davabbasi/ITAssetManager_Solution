@@ -36,6 +36,8 @@
                             <input asp-for="Asset.Name" class="form-control" placeholder="مثلاً: لپ‌تاپ دل اداری" />
                             <span asp-validation-for="Asset.Name" class="text-danger small"></span>
                         </div>
+
+                        <!-- انتخاب دسته بندی -->
                         <div class="col-md-6">
                             <label class="form-label">دسته‌بندی <span class="text-danger">*</span></label>
                             <select id="categorySelect" asp-for="Asset.CategoryId" asp-items="Model.CategoryList" class="form-select">
@@ -61,29 +63,8 @@
                     <!-- بخش پنجم: مشخصات و توضیحات -->
                     <h6 class="text-muted mb-3 border-bottom pb-2">مشخصات فنی</h6>
                     <div id="specs-container">
-                        @if (Model.CategorySpecifications.Any())
-                        {
-                            <div class="row g-3 mb-3">
-                                @foreach (var spec in Model.CategorySpecifications)
-                                {
-                                    <div class="col-md-4">
-                                        <label class="form-label">@spec.Specification.Name</label>
-                                        <select id="categorySelect" name="SpecValues[@spec.Id]" class="form-select">
-                                            <option value="">انتخاب کنید...</option>
-                                            @foreach (var val in spec.Specification.SpecValues.OrderBy(v => v.SortOrder))
-                                            {
-                                                <option value="@val.Id">@val.Value</option>
-                                            }
-                                        </select>
-                                    </div>
-                                    <div id="specs-container">
-                                        <div class="text-muted">
-                                            دسته‌بندی را انتخاب کنید
-                                        </div>
-                                    </div>
-                                }
-                            </div>
-                        }
+
+                        <!-- محل نمایش مشخصات فنی  -->
 
                     </div>
                     <br />
@@ -185,120 +166,24 @@
 
 @section Scripts {
     <script>
-        $(document).ready(function () {
-            $('#purchaseDate').persianDatepicker({
-                format: 'YYYY/MM/DD',
-                autoClose: true,
-                onSelect: function (unix) {
-                    var gregorianDate = new persianDate(unix)
-                        .toCalendar('gregorian')
-                        .format('YYYY-MM-DD');
-
-                    console.log("تاریخ میلادی:", gregorianDate);
-
-                    $('#purchaseDateGregorian').val(gregorianDate);
-
-                    console.log(
-                        "مقدار hidden:",
-                        $('#purchaseDateGregorian').val()
-                    );
-                }
-            });
-
-
-            $('#warrantyExpiry').persianDatepicker({
-                format: 'YYYY/MM/DD',
-                autoClose: true,
-
-                onSelect: function (unix) {
-
-                    var gregorianDate = new persianDate(unix)
-                        .toCalendar('gregorian')
-                        .format('YYYY-MM-DD');
-
-                    console.log("تاریخ میلادی:", gregorianDate);
-
-                    $('#warrantyExpiryGregorian').val(gregorianDate);
-
-                    console.log(
-                        "مقدار hidden:",
-                        $('#warrantyExpiryGregorian').val()
-                    );
-                }
-            });
-
-        });
-
-    
-
-
-
         document.getElementById('categorySelect')
         .addEventListener('change', async function () {
-
             const categoryId = this.value;
-
             if (!categoryId) {
                 document.getElementById('specs-container').innerHTML =
                     '<div class="text-muted">دسته‌بندی را انتخاب کنید</div>';
                 return;
             }
-
             const response = await fetch(
                 `/Assets/Create?handler=Specs&categoryId=${categoryId}`
             );
-
             const html = await response.text();
-
             document.getElementById('specs-container').innerHTML = html;
         });
+
         new TomSelect('#vendorSelect', {
             placeholder: 'جستجو در فروشندگان...',
             allowEmptyOption: true
         });
-
-
-
-
-
-
     </script>
 }
-
-
-
-
-
-
-@* @section Scripts {
-    <script>
-        document.getElementById('categorySelect').addEventListener('change', function() {
-            const categoryId = this.value;
-            if (!categoryId) {
-                document.getElementById('specs-container').innerHTML =
-                    '<div class="alert alert-light text-muted">ابتدا دسته‌بندی را انتخاب کنید</div>';
-                return;
-            }
-            fetch('/api/specs?categoryId=' + categoryId)
-                .then(r => r.json())
-                .then(specs => {
-                    if (specs.length === 0) {
-                        document.getElementById('specs-container').innerHTML =
-                            '<div class="alert alert-light text-muted">مشخصات فنی برای این دسته تعریف نشده</div>';
-                        return;
-                    }
-                    let html = '<div class="row g-3 mb-3">';
-                    specs.forEach(spec => {
-                        html += `<div class="col-md-4">
-                            <label class="form-label">${spec.name}</label>
-                            <select name="SpecValues[${spec.id}]" class="form-select">
-                                <option value="">انتخاب کنید...</option>
-                                ${spec.values.map(v => `<option value="${v.id}">${v.value}</option>`).join('')}
-                            </select></div>`;
-                    });
-                    html += '</div>';
-                    document.getElementById('specs-container').innerHTML = html;
-                });
-        });
-    </script>
-} *@

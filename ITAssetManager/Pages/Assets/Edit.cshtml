@@ -77,8 +77,8 @@
 
                                         @foreach (var val in spec.SpecValues.OrderBy(v => v.SortOrder))
                                         {
-                                            if (Model.SpecValues.TryGetValue(spec.Id, out var selectedValue)
-                                            && selectedValue == val.Id)
+                                            if (Model.SpecValues.TryGetValue(spec.Id.ToString(), out var selectedValue)
+                                            && selectedValue == val.Id.ToString())
                                             {
                                                 <option value="@val.Id" selected>
                                                     @val.Value

@@ -42,6 +42,6 @@ public class AddComponentModel : PageModel
         await _context.SaveChangesAsync();
 
         TempData["Success"] = "قطعه با موفقیت اضافه شد.";
-        return RedirectToPage("/Assembly/Details", new { id = pcId });
+        return RedirectToPage("/InternalComponents/Details", new { id = pcId });
     }
 }

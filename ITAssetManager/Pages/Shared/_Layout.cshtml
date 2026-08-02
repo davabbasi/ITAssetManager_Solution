@@ -321,29 +321,14 @@
                     </div>
                     <div class="sidebar-group-items">
                         <a href="/Assets" class="nav-link-item @(Context.Request.Path.StartsWithSegments("/Assets") ? "active" : "")">
-                            <i class="bi bi-cpu"></i> لیست تجهیزات ثبت شده
+                            <i class="bi bi-cpu"></i> لیست کلیه تجهیزات 
+                        </a>
+                        <a href="/InternalComponents" class="nav-link-item @(Context.Request.Path.StartsWithSegments("/InternalComponents") ? "active" : "")">
+                            <i class="bi bi-pc-display"></i> مدیریت قطعات داخلی تجهیزات
                         </a>
                        
                     </div>
-                    <!-- اسمبل سیستم -->
-                </div>
-                <div class="sidebar-group">
-                    <div class="sidebar-group-header" onclick="toggleGroup(this)">
-                        <span><i class="bi bi-pc-display me-1"></i>مدیریت قطعات داخلی</span>
-                        <i class="bi bi-chevron-down chevron"></i>
-                    </div>
-                    <div class="sidebar-group-items">
-                        <a href="/InternalComponents" class="nav-link-item @(Context.Request.Path.StartsWithSegments("/InternalComponents") ? "active" : "")">
-                            <i class="bi bi-pc-display"></i> لیست تجهیزات 
-                        </a>
-
-                        @* <a href="/Assembly/Create" class="nav-link-item">
-                            <i class="bi bi-plus-circle"></i> اسمبل جدید
-                        </a> *@
-
-
-                    </div>
-                </div>
+                  
 
                 <!-- ردیابی -->
                 <div class="sidebar-group">

@@ -121,7 +121,7 @@ public class CreateModel : PageModel
 
         //TempData["Success"] = $"سیستم #{pcAsset.AssemblyNumber} با موفقیت اسمبل شد.";
         //return RedirectToPage("/Assembly/Details", new { id = pcAsset.Id });
-        return RedirectToPage("/Assembly/Details");
+        return RedirectToPage("/InternalComponents/Details");
 
     }
 
