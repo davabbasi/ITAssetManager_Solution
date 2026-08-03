@@ -4,6 +4,7 @@ using ITAssetManager.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace ITAssetManager.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260803083454_addReceiptAndIssue")]
+    partial class addReceiptAndIssue
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -726,28 +729,6 @@ namespace ITAssetManager.Migrations
                     b.ToTable("WarehouseIssueItems");
                 });
 
-            modelBuilder.Entity("ITAssetManager.Models.WarehouseKeeper", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("FullName")
-                        .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)");
-
-                    b.Property<string>("PersonnelNumber")
-                        .HasMaxLength(11)
-                        .HasColumnType("nvarchar(11)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("WarehouseKeepers");
-                });
-
             modelBuilder.Entity("ITAssetManager.Models.WarehouseReceipt", b =>
                 {
                     b.Property<int>("Id")
@@ -759,9 +740,8 @@ namespace ITAssetManager.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("CreatedBy")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int>("CreatedBy")
+                        .HasColumnType("int");
 
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
@@ -786,8 +766,6 @@ namespace ITAssetManager.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("WarehouseId");
-
                     b.ToTable("WarehouseReceipts");
                 });
 
@@ -805,15 +783,13 @@ namespace ITAssetManager.Migrations
                     b.Property<int>("Quantity")
                         .HasColumnType("int");
 
-                    b.Property<int?>("ReceiptId")
+                    b.Property<int>("ReceiptId")
                         .HasColumnType("int");
 
                     b.Property<int>("RowNumber")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("ProductId");
 
                     b.HasIndex("ReceiptId");
 
@@ -1162,31 +1138,13 @@ namespace ITAssetManager.Migrations
                     b.Navigation("Issue");
                 });
 
-            modelBuilder.Entity("ITAssetManager.Models.WarehouseReceipt", b =>
-                {
-                    b.HasOne("ITAssetManager.Models.Warehouse", "Warehouse")
-                        .WithMany("Receipts")
-                        .HasForeignKey("WarehouseId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("Warehouse");
-                });
-
             modelBuilder.Entity("ITAssetManager.Models.WarehouseReceiptItem", b =>
                 {
-                    b.HasOne("ITAssetManager.Models.Product", "Product")
-                        .WithMany("Receipts")
-                        .HasForeignKey("ProductId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
                     b.HasOne("ITAssetManager.Models.WarehouseReceipt", "Receipt")
                         .WithMany("Items")
                         .HasForeignKey("ReceiptId")
-                        .OnDelete(DeleteBehavior.Cascade);
-
-                    b.Navigation("Product");
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("Receipt");
                 });
@@ -1264,11 +1222,6 @@ namespace ITAssetManager.Migrations
                     b.Navigation("Products");
                 });
 
-            modelBuilder.Entity("ITAssetManager.Models.Product", b =>
-                {
-                    b.Navigation("Receipts");
-                });
-
             modelBuilder.Entity("ITAssetManager.Models.Specification", b =>
                 {
                     b.Navigation("AssetSpecValues");
@@ -1286,11 +1239,6 @@ namespace ITAssetManager.Migrations
             modelBuilder.Entity("ITAssetManager.Models.Vendor", b =>
                 {
                     b.Navigation("Assets");
-                });
-
-            modelBuilder.Entity("ITAssetManager.Models.Warehouse", b =>
-                {
-                    b.Navigation("Receipts");
                 });
 
             modelBuilder.Entity("ITAssetManager.Models.WarehouseIssue", b =>

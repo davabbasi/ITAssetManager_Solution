@@ -1,0 +1,75 @@
+﻿@page
+@model ITAssetManager.Pages.WarehouseManagements.Receipts.EditModel
+
+@{
+    ViewData["Title"] = "Edit";
+}
+
+<h1>Edit</h1>
+
+<h4>WarehouseReceipt</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form method="post">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input type="hidden" asp-for="WarehouseReceipt.Id" />
+            <div class="form-group">
+                <label asp-for="WarehouseReceipt.ReceiptNumber" class="control-label"></label>
+                <input asp-for="WarehouseReceipt.ReceiptNumber" class="form-control" />
+                <span asp-validation-for="WarehouseReceipt.ReceiptNumber" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="WarehouseReceipt.ReceiptDate" class="control-label"></label>
+                <input asp-for="WarehouseReceipt.ReceiptDate" class="form-control" />
+                <span asp-validation-for="WarehouseReceipt.ReceiptDate" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="WarehouseReceipt.WarehouseId" class="control-label"></label>
+                <input asp-for="WarehouseReceipt.WarehouseId" class="form-control" />
+                <span asp-validation-for="WarehouseReceipt.WarehouseId" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="WarehouseReceipt.WarehouseKeeperId" class="control-label"></label>
+                <input asp-for="WarehouseReceipt.WarehouseKeeperId" class="form-control" />
+                <span asp-validation-for="WarehouseReceipt.WarehouseKeeperId" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="WarehouseReceipt.ReferenceNumber" class="control-label"></label>
+                <input asp-for="WarehouseReceipt.ReferenceNumber" class="form-control" />
+                <span asp-validation-for="WarehouseReceipt.ReferenceNumber" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="WarehouseReceipt.CreatedBy" class="control-label"></label>
+                <input asp-for="WarehouseReceipt.CreatedBy" class="form-control" />
+                <span asp-validation-for="WarehouseReceipt.CreatedBy" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="WarehouseReceipt.CreatedAt" class="control-label"></label>
+                <input asp-for="WarehouseReceipt.CreatedAt" class="form-control" />
+                <span asp-validation-for="WarehouseReceipt.CreatedAt" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="WarehouseReceipt.Description" class="control-label"></label>
+                <input asp-for="WarehouseReceipt.Description" class="form-control" />
+                <span asp-validation-for="WarehouseReceipt.Description" class="text-danger"></span>
+            </div>
+            <div class="form-group form-check">
+                <label class="form-check-label">
+                    <input class="form-check-input" asp-for="WarehouseReceipt.Status" /> @Html.DisplayNameFor(model => model.WarehouseReceipt.Status)
+                </label>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Save" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-page="./Index">Back to List</a>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

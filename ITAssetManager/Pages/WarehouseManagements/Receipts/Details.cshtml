@@ -1,0 +1,218 @@
+﻿@page
+@model ITAssetManager.Pages.WarehouseManagements.Receipts.DetailsModel
+
+@{
+    ViewData["Title"] = "Details";
+}
+
+<h1>Details</h1>
+<div class="card mb-3">
+
+    <div class="card-header">
+
+        اطلاعات رسید
+
+    </div>
+
+    <div class="card-body">
+
+        <div class="row">
+
+            <div class="col-md-3">
+
+                <strong>شماره رسید</strong>
+
+                <br />
+
+                @Model.WarehouseReceipt.ReceiptNumber
+
+            </div>
+
+            <div class="col-md-3">
+
+                <strong>تاریخ</strong>
+
+                <br />
+
+                @Model.WarehouseReceipt.ReceiptDate
+
+            </div>
+
+            <div class="col-md-3">
+
+                <strong>انبار</strong>
+
+                <br />
+
+                @Model.WarehouseReceipt.Warehouse?.WarehouseName
+
+            </div>
+
+            <div class="col-md-3">
+
+                <strong>انباردار</strong>
+
+                <br />
+
+                @Model.WarehouseReceipt.Warehouse.KeeperEmployeeFullName
+
+            </div>
+
+        </div>
+
+        <hr />
+
+        <div class="row">
+
+            <div class="col-md-4">
+
+                <strong>شماره درخواست خرید</strong>
+
+                <br />
+
+                @Model.WarehouseReceipt.ReferenceNumber
+
+            </div>
+
+            <div class="col-md-8">
+
+                <strong>توضیحات</strong>
+
+                <br />
+
+                @Model.WarehouseReceipt.Description
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<div class="card">
+
+    <div class="card-header">
+
+        اقلام رسید
+
+    </div>
+
+    <div class="card-body p-0">
+
+        <table class="table table-bordered mb-0">
+
+            <thead>
+
+                <tr>
+
+                    <th>#</th>
+
+                    <th>کالا</th>
+
+                    <th>تعداد</th>
+
+                </tr>
+
+            </thead>
+
+            <tbody>
+
+                @{
+                    int row = 1;
+                }
+
+                @foreach (var item in Model.WarehouseReceipt.Items)
+                {
+                    <tr>
+
+                        <td>@row</td>
+
+                        <td>@item.Product?.ProductName</td>
+
+                        <td>@item.Quantity</td>
+
+                    </tr>
+
+                    row++;
+                }
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+</div>
+
+
+
+
+@* <div>
+    <h4>WarehouseReceipt</h4>
+    <hr />
+    <dl class="row">
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.WarehouseReceipt.ReceiptNumber)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.WarehouseReceipt.ReceiptNumber)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.WarehouseReceipt.ReceiptDate)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.WarehouseReceipt.ReceiptDate)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.WarehouseReceipt.WarehouseId)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.WarehouseReceipt.WarehouseId)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.WarehouseReceipt.WarehouseKeeperId)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.WarehouseReceipt.WarehouseKeeperId)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.WarehouseReceipt.ReferenceNumber)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.WarehouseReceipt.ReferenceNumber)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.WarehouseReceipt.CreatedBy)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.WarehouseReceipt.CreatedBy)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.WarehouseReceipt.CreatedAt)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.WarehouseReceipt.CreatedAt)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.WarehouseReceipt.Description)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.WarehouseReceipt.Description)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.WarehouseReceipt.Status)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.WarehouseReceipt.Status)
+        </dd>
+    </dl>
+</div>
+ *@
+
+
+<div>
+    <a asp-page="./Edit" asp-route-id="@Model.WarehouseReceipt.Id">Edit</a> |
+    <a asp-page="./Index">Back to List</a>
+</div>

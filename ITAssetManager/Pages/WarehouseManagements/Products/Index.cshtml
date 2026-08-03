@@ -1,0 +1,113 @@
+﻿@page
+@model ITAssetManager.Pages.Products.IndexModel
+
+@{
+    ViewData["Title"] = "لیست کالاها";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h5 class="mb-0 fw-bold"> لیست کالاها</h5>
+    <a asp-page="Create" class="btn btn-primary btn-sm">
+        <i class="bi bi-plus-lg me-1"></i>
+        ایجاد کالای جدید       
+    </a>
+</div>
+<!-- Filters -->
+<div class="card mb-3">
+    <div class="card-body py-2">
+        <form method="get" class="row g-2 align-items-end">
+            <div class="col-md-4">
+                <input type="text" name="search" value="@Model.Search"
+                       class="form-control form-control-sm search-box"
+                       placeholder="جستجو در نام، شرح..." />
+            </div>
+            <div class="col-md-2">
+                <select name="categoryId" class="form-select form-select-sm">
+                    <option value="">همه دسته‌ها</option>
+                    @foreach (var cat in Model.Categories)
+                    {
+                        <option value="@cat.Id" selected="@(Model.CategoryId == cat.Id)">@cat.Name</option>
+                    }
+                </select>
+            </div>          
+            <div class="col-md-2 d-flex gap-1">
+                <button type="submit" class="btn btn-primary btn-sm flex-fill">
+                    <i class="bi bi-search"></i> جستجو
+                </button>
+                <a href="/Products" class="btn btn-outline-secondary btn-sm">
+                    <i class="bi bi-x"></i>
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Results -->
+<div class="card">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <span><i class="bi bi-table me-2"></i>@Model.TotalCount کالا</span>
+    </div>
+     <div class="card-body p-0">
+        @if (!Model.Product.Any())
+        {
+            <div class="text-center py-5 text-muted">
+                <i class="bi bi-inbox" style="font-size:2.5rem;"></i>
+                <p class="mt-2">کالایی یافت نشد</p>
+            </div>
+        }
+        else
+        {
+            <div class="table-responsive">
+                <table class=" table table-hover mb-0">
+                    <thead>
+                        <tr>
+                            <th>
+                                @Html.DisplayNameFor(model => model.Product[0].ProductName)
+                            </th>
+                            <th>
+                                @Html.DisplayNameFor(model => model.Product[0].ProductDescription)
+                            </th>
+                            <th>
+                                @Html.DisplayNameFor(model => model.Product[0].Model)
+                            </th>
+                            <th>
+                                @Html.DisplayNameFor(model => model.Product[0].Category)
+                            </th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model.Product)
+                        {
+                            <tr>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.ProductName)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.ProductDescription)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.Model)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.Category.Name)
+                                </td>
+                                <td>
+                                    <a asp-page="./Edit" asp-route-id="@item.Id">Edit</a> |
+                                    <a asp-page="./Details" asp-route-id="@item.Id">Details</a> |
+                                    <a asp-page="./Delete" asp-route-id="@item.Id">Delete</a>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+           </div>
+        }
+     </div>
+</div>
+<style>
+    .btn-xs {
+        padding: 0.15rem 0.4rem;
+        font-size: 0.75rem;
+    }
+</style>

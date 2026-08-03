@@ -22,6 +22,16 @@ public class ApplicationDbContext : IdentityDbContext
     public DbSet<VwPurchaseRequest> VwPurchaseRequests { get; set; }
     public DbSet<AssemblyComponent> AssemblyComponents { get; set; }
     public DbSet<CategorySpecification> CategorySpecifications { get; set; }
+    public DbSet<Product> Products { get; set; }
+    public DbSet<Warehouse> Warehouses { get; set; }
+    public DbSet<WarehouseReceipt> WarehouseReceipts { get; set; }
+    public DbSet<WarehouseReceiptItem> WarehouseReceiptItems { get; set; }
+    public DbSet<WarehouseIssue> WarehouseIssues { get; set; }
+    public DbSet<WarehouseIssueItem> WarehouseIssueItems { get; set; }
+    public DbSet<WarehouseKeeper> WarehouseKeepers { get; set; }
+
+
+
     protected override void OnModelCreating(ModelBuilder builder)
     {
         base.OnModelCreating(builder);
@@ -42,14 +52,29 @@ public class ApplicationDbContext : IdentityDbContext
             new Category { Id = 12, Name = "سایر"}
         );
 
-        // تنظیم رابطه‌ها - همه ON DELETE NO ACTION تا از cascade cycle جلوگیری بشه
+        builder.Entity<WarehouseReceiptItem>()
+            .HasOne(r=>r.Product)
+            .WithMany(r=>r.Receipts)
+            .HasForeignKey(r=>r.ProductId)
+            .OnDelete(DeleteBehavior.Restrict);
 
+        builder.Entity<WarehouseReceipt>()
+            .HasOne(r=>r.Warehouse)
+            .WithMany(r=>r.Receipts)
+            .HasForeignKey(r=>r.WarehouseId)
+            .OnDelete(DeleteBehavior.Restrict);
 
-        //builder.Entity<Specification>()
-        //    .HasOne(s => s.CategorySpecifications)
-        //    .WithMany()
-        //    .HasForeignKey(s => s.SpecificationId)
-        //    .OnDelete(DeleteBehavior.NoAction);
+        builder.Entity<WarehouseReceiptItem>()
+            .HasOne(r=>r.Receipt)
+            .WithMany(r=>r.Items)
+            .HasForeignKey(r=>r.ReceiptId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        builder.Entity<WarehouseIssueItem>()
+             .HasOne(r => r.Issue)
+             .WithMany(r => r.Items)
+             .HasForeignKey(r => r.IssueId)
+             .OnDelete(DeleteBehavior.Cascade);
 
         builder.Entity<Asset>()
             .HasOne(a=>a.Category)
@@ -121,5 +146,11 @@ public class ApplicationDbContext : IdentityDbContext
             .WithMany(a => a.AsComponentOf)
             .HasForeignKey(ac => ac.ComponentAssetId)
             .OnDelete(DeleteBehavior.NoAction);
+
+        builder.Entity<Product>()
+           .HasOne(p=>p.Category)
+           .WithMany(a => a.Products)
+           .HasForeignKey(p=>p.CategoryId)
+           .OnDelete(DeleteBehavior.Restrict);
     }
 }

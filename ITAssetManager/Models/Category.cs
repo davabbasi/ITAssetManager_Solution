@@ -9,6 +9,7 @@ public class Category
     public Boolean HasInternalComponent { get; set; } = false;
     public ICollection<Asset> Assets { get; set; } = new List<Asset>();
     public ICollection<CategorySpecification> CategorySpecifications { get; set; } = new List<CategorySpecification>();
+    public ICollection<Product> Products { get; set; } = new List<Product>();
 }
 
 public enum AssetCategoryType
