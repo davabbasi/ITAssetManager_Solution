@@ -9,7 +9,7 @@ using Microsoft.EntityFrameworkCore;
 using ITAssetManager.Data;
 using ITAssetManager.Models;
 
-namespace ITAssetManager.Pages.Warehouses
+namespace ITAssetManager.Pages.WarehouseManagements.Issues
 {
     public class EditModel : PageModel
     {
@@ -19,18 +19,25 @@ namespace ITAssetManager.Pages.Warehouses
         {
             _context = context;
         }
+        [BindProperty] public string ShamsiDate { get; set; }
 
         [BindProperty]
-        public Warehouse Warehouse { get; set; } = default!;
-        public SelectList KeeperList { get; set; } = null!;
+        public WarehouseIssue WarehouseIssue { get; set; } = default!;
+        public SelectList WarehouseList { get; set; } = null!;
 
-        public async Task<IActionResult> OnGetAsync(int id)
+        public async Task<IActionResult> OnGetAsync(int? id)
         {
-            Warehouse = await _context.Warehouses
-                .FirstOrDefaultAsync(x => x.Id == id);
-            if (Warehouse == null)
+            if (id == null)
+            {
                 return NotFound();
-            await LoadLists();
+            }
+
+            var warehouseissue =  await _context.WarehouseIssues.FirstOrDefaultAsync(m => m.Id == id);
+            if (warehouseissue == null)
+            {
+                return NotFound();
+            }
+            WarehouseIssue = warehouseissue;
             return Page();
         }
 
@@ -40,11 +47,10 @@ namespace ITAssetManager.Pages.Warehouses
         {
             if (!ModelState.IsValid)
             {
-                await LoadLists();
                 return Page();
             }
 
-            _context.Attach(Warehouse).State = EntityState.Modified;
+            _context.Attach(WarehouseIssue).State = EntityState.Modified;
 
             try
             {
@@ -52,7 +58,7 @@ namespace ITAssetManager.Pages.Warehouses
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!WarehouseExists(Warehouse.Id))
+                if (!WarehouseIssueExists(WarehouseIssue.Id))
                 {
                     return NotFound();
                 }
@@ -65,29 +71,9 @@ namespace ITAssetManager.Pages.Warehouses
             return RedirectToPage("./Index");
         }
 
-        private bool WarehouseExists(int id)
+        private bool WarehouseIssueExists(int id)
         {
-            return _context.Warehouses.Any(e => e.Id == id);
-        }
-        private async Task LoadLists()
-        {
-            var keepers = await _context.WarehouseKeepers
-                .OrderBy(x => x.FullName)
-                .Select(x => new
-                {
-                    x.Id,
-                    Name = x.FullName
-                })
-                .ToListAsync();
-
-            KeeperList = new SelectList(
-                keepers,
-                "Id",
-                "Name",
-                Warehouse.KeeperId
-            );
-
-
+            return _context.WarehouseIssues.Any(e => e.Id == id);
         }
     }
 }

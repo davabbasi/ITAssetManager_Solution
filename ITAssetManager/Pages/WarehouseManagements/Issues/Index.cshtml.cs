@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using ITAssetManager.Data;
 using ITAssetManager.Models;
 
-namespace ITAssetManager.Pages.WarehouseManagements.Receipts
+namespace ITAssetManager.Pages.WarehouseManagements.Issues
 {
     public class IndexModel : PageModel
     {
@@ -19,11 +19,11 @@ namespace ITAssetManager.Pages.WarehouseManagements.Receipts
             _context = context;
         }
 
-        public IList<WarehouseReceipt> WarehouseReceipt { get;set; } = default!;
+        public IList<WarehouseIssue> WarehouseIssue { get;set; } = default!;
 
         public async Task OnGetAsync()
         {
-            WarehouseReceipt = await _context.WarehouseReceipts.Include(r=>r.Warehouse).ToListAsync();
+            WarehouseIssue = await _context.WarehouseIssues.ToListAsync();
         }
     }
 }

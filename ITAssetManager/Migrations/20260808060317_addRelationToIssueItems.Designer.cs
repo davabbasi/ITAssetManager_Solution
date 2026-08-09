@@ -4,6 +4,7 @@ using ITAssetManager.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace ITAssetManager.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260808060317_addRelationToIssueItems")]
+    partial class addRelationToIssueItems
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -646,7 +649,10 @@ namespace ITAssetManager.Migrations
                         .HasMaxLength(400)
                         .HasColumnType("nvarchar(400)");
 
-                    b.Property<int>("KeeperId")
+                    b.Property<string>("KeeperEmployeeFullName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("KeeperEmployeeId")
                         .HasColumnType("int");
 
                     b.Property<string>("WarehouseName")
@@ -655,8 +661,6 @@ namespace ITAssetManager.Migrations
                         .HasColumnType("nvarchar(200)");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("KeeperId");
 
                     b.ToTable("Warehouses");
                 });
@@ -672,8 +676,8 @@ namespace ITAssetManager.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("CreatedBy")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int>("CreatedBy")
+                        .HasColumnType("int");
 
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
@@ -690,14 +694,10 @@ namespace ITAssetManager.Migrations
                     b.Property<bool>("Status")
                         .HasColumnType("bit");
 
-                    b.Property<int?>("ToWarehouseId")
+                    b.Property<int>("ToWarehouseId")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("FromWarehouseId");
-
-                    b.HasIndex("ToWarehouseId");
 
                     b.ToTable("WarehouseIssues");
                 });
@@ -784,6 +784,9 @@ namespace ITAssetManager.Migrations
                         .HasColumnType("bit");
 
                     b.Property<int>("WarehouseId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("WarehouseKeeperId")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
@@ -1153,35 +1156,6 @@ namespace ITAssetManager.Migrations
                     b.Navigation("Specification");
                 });
 
-            modelBuilder.Entity("ITAssetManager.Models.Warehouse", b =>
-                {
-                    b.HasOne("ITAssetManager.Models.WarehouseKeeper", "Keeper")
-                        .WithMany("Warehouses")
-                        .HasForeignKey("KeeperId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("Keeper");
-                });
-
-            modelBuilder.Entity("ITAssetManager.Models.WarehouseIssue", b =>
-                {
-                    b.HasOne("ITAssetManager.Models.Warehouse", "FromWarehouse")
-                        .WithMany("OutgoingIssues")
-                        .HasForeignKey("FromWarehouseId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("ITAssetManager.Models.Warehouse", "ToWarehouse")
-                        .WithMany("IncomingIssues")
-                        .HasForeignKey("ToWarehouseId")
-                        .OnDelete(DeleteBehavior.Restrict);
-
-                    b.Navigation("FromWarehouse");
-
-                    b.Navigation("ToWarehouse");
-                });
-
             modelBuilder.Entity("ITAssetManager.Models.WarehouseIssueItem", b =>
                 {
                     b.HasOne("ITAssetManager.Models.WarehouseIssue", "Issue")
@@ -1331,21 +1305,12 @@ namespace ITAssetManager.Migrations
 
             modelBuilder.Entity("ITAssetManager.Models.Warehouse", b =>
                 {
-                    b.Navigation("IncomingIssues");
-
-                    b.Navigation("OutgoingIssues");
-
                     b.Navigation("Receipts");
                 });
 
             modelBuilder.Entity("ITAssetManager.Models.WarehouseIssue", b =>
                 {
                     b.Navigation("Items");
-                });
-
-            modelBuilder.Entity("ITAssetManager.Models.WarehouseKeeper", b =>
-                {
-                    b.Navigation("Warehouses");
                 });
 
             modelBuilder.Entity("ITAssetManager.Models.WarehouseReceipt", b =>

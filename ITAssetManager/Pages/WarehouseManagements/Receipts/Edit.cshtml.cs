@@ -1,77 +1,166 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using ITAssetManager.Convertor;
+using ITAssetManager.Data;
+using ITAssetManager.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-using ITAssetManager.Data;
-using ITAssetManager.Models;
 
-namespace ITAssetManager.Pages.WarehouseManagements.Receipts
+namespace ITAssetManager.Pages.WarehouseManagements.Receipts;
+
+[Authorize]
+public class EditModel : PageModel
 {
-    public class EditModel : PageModel
+    private readonly ApplicationDbContext _context;
+
+    public EditModel(ApplicationDbContext context)
     {
-        private readonly ITAssetManager.Data.ApplicationDbContext _context;
+        _context = context;
+    }
 
-        public EditModel(ITAssetManager.Data.ApplicationDbContext context)
+    [BindProperty]
+    public WarehouseReceipt WarehouseReceipt { get; set; } = new();
+
+    [BindProperty] public List<WarehouseReceiptItem> Items { get; set; } = new();
+
+    public SelectList WarehouseList { get; set; } = new SelectList(Enumerable.Empty<SelectListItem>());
+
+    public SelectList KeeperList { get; set; } = new SelectList(Enumerable.Empty<SelectListItem>());
+
+    public List<Product> Products { get; set; } = new();
+
+    [BindProperty] public string ShamsiDate { get; set; }
+
+    // =========================
+    // GET
+    // =========================
+
+    public async Task<IActionResult> OnGetAsync(int id)
+    {
+        var receipt = await _context.WarehouseReceipts
+            .Include(x => x.Items)
+                .ThenInclude(x => x.Product)
+            .FirstOrDefaultAsync(x => x.Id == id);
+
+        if (receipt == null)
+            return NotFound();
+
+        WarehouseReceipt = receipt;
+        ShamsiDate = WarehouseReceipt.ReceiptDate.ToShamsi();
+        Items = receipt.Items
+            .OrderBy(x => x.RowNumber)
+            .ToList();
+
+        await LoadListsAsync();
+
+        return Page();
+    }
+
+
+    // =========================
+    // POST
+    // =========================
+
+    public async Task<IActionResult> OnPostAsync()
+    {
+        if (!ModelState.IsValid)
         {
-            _context = context;
-        }
-
-        [BindProperty]
-        public WarehouseReceipt WarehouseReceipt { get; set; } = default!;
-
-        public async Task<IActionResult> OnGetAsync(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var warehousereceipt =  await _context.WarehouseReceipts.FirstOrDefaultAsync(m => m.Id == id);
-            if (warehousereceipt == null)
-            {
-                return NotFound();
-            }
-            WarehouseReceipt = warehousereceipt;
+            await LoadListsAsync();
             return Page();
         }
 
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more information, see https://aka.ms/RazorPagesCRUD.
-        public async Task<IActionResult> OnPostAsync()
+        var receipt = await _context.WarehouseReceipts
+            .Include(x => x.Items)
+            .FirstOrDefaultAsync(x => x.Id == WarehouseReceipt.Id);
+
+        if (receipt == null)
+            return NotFound();
+
+
+        // =========================
+        // ویرایش هدر
+        // =========================
+
+        receipt.ReceiptNumber = WarehouseReceipt.ReceiptNumber;
+        receipt.ReceiptDate = WarehouseReceipt.ReceiptDate;
+        receipt.WarehouseId = WarehouseReceipt.WarehouseId;
+        receipt.ReferenceNumber = WarehouseReceipt.ReferenceNumber;
+        receipt.Description = WarehouseReceipt.Description;
+        receipt.ReceiptDate = (DateTime)ShamsiDate.ToMiladi();
+        // =========================
+        // حذف اقلام قبلی
+        // =========================
+
+        _context.WarehouseReceiptItems.RemoveRange(receipt.Items);
+
+
+        // =========================
+        // ثبت اقلام جدید
+        // =========================
+
+        if (Items != null)
         {
-            if (!ModelState.IsValid)
-            {
-                return Page();
-            }
+            int rowNumber = 1;
 
-            _context.Attach(WarehouseReceipt).State = EntityState.Modified;
-
-            try
+            foreach (var item in Items)
             {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!WarehouseReceiptExists(WarehouseReceipt.Id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
+                if (item.ProductId <= 0 || item.Quantity <= 0)
+                    continue;
 
-            return RedirectToPage("./Index");
+                _context.WarehouseReceiptItems.Add(
+                    new WarehouseReceiptItem
+                    {
+                        ReceiptId = receipt.Id,
+                        RowNumber = rowNumber++,
+                        ProductId = item.ProductId,
+                        Quantity = item.Quantity
+                    });
+            }
         }
 
-        private bool WarehouseReceiptExists(int id)
-        {
-            return _context.WarehouseReceipts.Any(e => e.Id == id);
-        }
+
+        await _context.SaveChangesAsync();
+
+        TempData["Success"] = "رسید انبار با موفقیت ویرایش شد.";
+
+        return RedirectToPage(
+            "/WarehouseManagements/Receipts/Details",
+            new { id = receipt.Id });
+    }
+
+
+    // =========================
+    // لیست‌های فرم
+    // =========================
+
+    private async Task LoadListsAsync()
+    {
+        var warehouses = await _context.Warehouses
+            .OrderBy(x => x.WarehouseName)
+            .ToListAsync();
+
+        WarehouseList = new SelectList(
+            warehouses,
+            "Id",
+            "WarehouseName",
+            WarehouseReceipt.WarehouseId
+        );
+
+
+        var keepers = await _context.VwEmployees
+            .OrderBy(x => x.FullName)
+            .Select(x => new
+            {
+                x.Id,
+                Name = x.FullName
+            })
+            .ToListAsync();
+
+
+        Products = await _context.Products
+            .OrderBy(x => x.ProductName)
+            .ToListAsync();
+
     }
 }

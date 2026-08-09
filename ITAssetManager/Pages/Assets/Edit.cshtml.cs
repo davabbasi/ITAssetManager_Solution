@@ -95,22 +95,6 @@ public class EditModel : PageModel
         _context.AssetSpecValues.RemoveRange(oldSpecs);
 
 
-        // مشخصات فنی جدید
-        //foreach (var (specId, valueId) in SpecValues)
-        //{
-        //    if (valueId > 0)
-        //    {
-        //        _context.AssetSpecValues.Add(new AssetSpecificationValue
-        //        {
-        //            AssetId = asset.Id,
-        //            SpecDefinitionId = specId,
-        //            SpecValueId = valueId
-        //        });
-        //    }
-        //}
-
-
-        //await _context.SaveChangesAsync();
 
         if (SpecValues.Any())
         {

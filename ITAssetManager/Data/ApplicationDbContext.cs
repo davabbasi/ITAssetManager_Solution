@@ -52,6 +52,30 @@ public class ApplicationDbContext : IdentityDbContext
             new Category { Id = 12, Name = "سایر"}
         );
 
+        builder.Entity<WarehouseIssue>()
+            .HasOne(x => x.FromWarehouse)
+            .WithMany(x => x.OutgoingIssues)
+            .HasForeignKey(x => x.FromWarehouseId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        builder.Entity<WarehouseIssue>()
+            .HasOne(x => x.ToWarehouse)
+            .WithMany(x => x.IncomingIssues)
+            .HasForeignKey(x => x.ToWarehouseId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        builder.Entity<Warehouse>()
+           .HasOne(r => r.Keeper)
+           .WithMany(r => r.Warehouses)
+           .HasForeignKey(r => r.KeeperId)
+           .OnDelete(DeleteBehavior.Restrict);
+
+        builder.Entity<WarehouseIssueItem>()
+            .HasOne(r => r.Product)
+            .WithMany(r => r.Issues)
+            .HasForeignKey(r => r.ProductId)
+            .OnDelete(DeleteBehavior.Restrict);
+
         builder.Entity<WarehouseReceiptItem>()
             .HasOne(r=>r.Product)
             .WithMany(r=>r.Receipts)

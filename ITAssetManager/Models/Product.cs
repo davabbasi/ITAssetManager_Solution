@@ -26,6 +26,7 @@ namespace ITAssetManager.Models
         public int CategoryId { get; set; }
 
         public ICollection<WarehouseReceiptItem> Receipts { get; set; } = new List<WarehouseReceiptItem>();
+        public ICollection<WarehouseIssueItem> Issues { get; set; } = new List<WarehouseIssueItem>();
 
 
     }

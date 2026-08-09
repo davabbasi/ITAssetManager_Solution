@@ -1,4 +1,5 @@
 ﻿@page
+@using ITAssetManager.Convertor
 @model ITAssetManager.Pages.WarehouseManagements.Receipts.IndexModel
 
 @{
@@ -22,24 +23,18 @@
             <th>
                 @Html.DisplayNameFor(model => model.WarehouseReceipt[0].WarehouseId)
             </th>
-            <th>
-                @Html.DisplayNameFor(model => model.WarehouseReceipt[0].WarehouseKeeperId)
-            </th>
+          
             <th>
                 @Html.DisplayNameFor(model => model.WarehouseReceipt[0].ReferenceNumber)
             </th>
             <th>
                 @Html.DisplayNameFor(model => model.WarehouseReceipt[0].CreatedBy)
             </th>
-            <th>
-                @Html.DisplayNameFor(model => model.WarehouseReceipt[0].CreatedAt)
-            </th>
+         
             <th>
                 @Html.DisplayNameFor(model => model.WarehouseReceipt[0].Description)
             </th>
-            <th>
-                @Html.DisplayNameFor(model => model.WarehouseReceipt[0].Status)
-            </th>
+           
             <th></th>
         </tr>
     </thead>
@@ -50,29 +45,23 @@
                 @Html.DisplayFor(modelItem => item.ReceiptNumber)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.ReceiptDate)
+                @item.ReceiptDate.ToShamsi()
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.WarehouseId)
+                @Html.DisplayFor(modelItem => item.Warehouse.WarehouseName)
             </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.WarehouseKeeperId)
-            </td>
+         
             <td>
                 @Html.DisplayFor(modelItem => item.ReferenceNumber)
             </td>
             <td>
                 @Html.DisplayFor(modelItem => item.CreatedBy)
             </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.CreatedAt)
-            </td>
+          
             <td>
                 @Html.DisplayFor(modelItem => item.Description)
             </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Status)
-            </td>
+         
             <td>
                 <a asp-page="./Edit" asp-route-id="@item.Id">Edit</a> |
                 <a asp-page="./Details" asp-route-id="@item.Id">Details</a> |

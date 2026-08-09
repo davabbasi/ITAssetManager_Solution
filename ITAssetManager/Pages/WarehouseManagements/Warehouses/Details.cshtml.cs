@@ -28,7 +28,7 @@ namespace ITAssetManager.Pages.Warehouses
                 return NotFound();
             }
 
-            var warehouse = await _context.Warehouses.FirstOrDefaultAsync(m => m.Id == id);
+            var warehouse = await _context.Warehouses.Include(w=>w.Keeper).FirstOrDefaultAsync(m => m.Id == id);
             if (warehouse == null)
             {
                 return NotFound();

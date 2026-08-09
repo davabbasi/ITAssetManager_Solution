@@ -23,7 +23,7 @@ namespace ITAssetManager.Pages.Warehouses
 
         public async Task OnGetAsync()
         {
-            Warehouse = await _context.Warehouses.ToListAsync();
+            Warehouse = await _context.Warehouses.Include(w=>w.Keeper).ToListAsync();
         }
     }
 }

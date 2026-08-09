@@ -7,9 +7,8 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
 using ITAssetManager.Data;
 using ITAssetManager.Models;
-using ITAssetManager.Convertor;
 
-namespace ITAssetManager.Pages.WarehouseManagements.Receipts
+namespace ITAssetManager.Pages.WarehouseManagements.Issues
 {
     public class DetailsModel : PageModel
     {
@@ -19,9 +18,9 @@ namespace ITAssetManager.Pages.WarehouseManagements.Receipts
         {
             _context = context;
         }
-        [BindProperty] public string ShamsiDate { get; set; }
 
-        public WarehouseReceipt WarehouseReceipt { get; set; } = default!;
+        public WarehouseIssue WarehouseIssue { get; set; } = default!;
+
         public async Task<IActionResult> OnGetAsync(int? id)
         {
             if (id == null)
@@ -29,17 +28,17 @@ namespace ITAssetManager.Pages.WarehouseManagements.Receipts
                 return NotFound();
             }
 
-            WarehouseReceipt = await _context.WarehouseReceipts
-             .Include(x => x.Warehouse).ThenInclude(w=>w.Keeper)
+            WarehouseIssue = await _context.WarehouseIssues
+             
              .Include(x => x.Items)
              .ThenInclude(x => x.Product)
              .FirstOrDefaultAsync(x => x.Id == id);
-            ShamsiDate = WarehouseReceipt.ReceiptDate.ToShamsi();
-            if (WarehouseReceipt == null)
+
+            if (WarehouseIssue == null)
             {
                 return NotFound();
             }
-           
+
             return Page();
         }
     }

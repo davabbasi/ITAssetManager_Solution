@@ -17,7 +17,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Pages\WarehouseManagements\Issues\" />
     <Folder Include="wwwroot\NewFolder\" />
     <Folder Include="wwwroot\persian_datepicker\" />
   </ItemGroup>

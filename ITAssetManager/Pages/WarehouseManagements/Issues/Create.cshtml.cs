@@ -9,26 +9,27 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 
-namespace ITAssetManager.Pages.Warehouses
+namespace ITAssetManager.Pages.WarehouseManagements.Issues
 {
     public class CreateModel : PageModel
     {
         private readonly ITAssetManager.Data.ApplicationDbContext _context;
-        public SelectList KeeperList { get; set; } = null!;
-
+      
         public CreateModel(ITAssetManager.Data.ApplicationDbContext context)
         {
             _context = context;
         }
-
-        public async Task<IActionResult> OnGet()
+        public SelectList WarehouseList { get; set; } = null!;
+        public List<Product> Products { get; set; } = new();
+        [BindProperty] public string ShamsiDate { get; set; }
+        public async Task< IActionResult> OnGet()
         {
             await LoadLists();
             return Page();
         }
 
         [BindProperty]
-        public Warehouse Warehouse { get; set; } = default!;
+        public WarehouseIssue WarehouseIssue { get; set; } = default!;
 
         // For more information, see https://aka.ms/RazorPagesCRUD.
         public async Task<IActionResult> OnPostAsync()
@@ -39,30 +40,26 @@ namespace ITAssetManager.Pages.Warehouses
                 return Page();
             }
 
-            _context.Warehouses.Add(Warehouse);
+            _context.WarehouseIssues.Add(WarehouseIssue);
             await _context.SaveChangesAsync();
-
-         
 
             return RedirectToPage("./Index");
         }
+
         private async Task LoadLists()
         {
-           
-
-            KeeperList = new SelectList(
-                await _context.WarehouseKeepers
-                    .OrderBy(x => x.FullName)
-                    .Select(x => new
-                    {
-                        x.Id,
-                        Name = x.FullName
-                    })
+            WarehouseList = new SelectList(
+                await _context.Warehouses
+                    .OrderBy(x => x.WarehouseName)
                     .ToListAsync(),
                 "Id",
-                "Name");
+                "WarehouseName");
 
            
+
+            Products = await _context.Products
+                .OrderBy(x => x.ProductName)
+                .ToListAsync();
         }
     }
 }

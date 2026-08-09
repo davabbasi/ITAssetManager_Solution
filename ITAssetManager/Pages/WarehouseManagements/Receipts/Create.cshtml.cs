@@ -24,9 +24,11 @@ namespace ITAssetManager.Pages.WarehouseManagements.Receipts
         [BindProperty]public WarehouseReceipt WarehouseReceipt { get; set; } = new();
         [BindProperty] public List<WarehouseReceiptItem> Items { get; set; } = new();
         public SelectList WarehouseList { get; set; } = null!;
-        public SelectList KeeperList { get; set; } = null!;
+        public SelectList PurchaseList { get; set; } = null!;
         public List<Product> Products { get; set; } = new();
         [BindProperty] public string ShamsiDate { get; set; }
+        [BindProperty] public int ReceiptNumber { get; set; }
+
         public async Task< IActionResult> OnGet()
         {
             await LoadLists();
@@ -46,7 +48,9 @@ namespace ITAssetManager.Pages.WarehouseManagements.Receipts
 
             WarehouseReceipt.ReceiptDate = (DateTime)ShamsiDate.ToMiladi();
             WarehouseReceipt.CreatedAt = DateTime.Now;
-            WarehouseReceipt.CreatedBy = User.FindFirstValue(ClaimTypes.NameIdentifier)!; 
+            WarehouseReceipt.CreatedBy = User.FindFirstValue(ClaimTypes.Name)!;
+            //WarehouseReceipt.CreatedBy = User.Identity?.Name;
+            WarehouseReceipt.ReceiptNumber = ReceiptNumber;
             _context.WarehouseReceipts.Add(WarehouseReceipt);
             await _context.SaveChangesAsync();
 
@@ -60,30 +64,28 @@ namespace ITAssetManager.Pages.WarehouseManagements.Receipts
 
             return RedirectToPage("Details", new { id = WarehouseReceipt.Id });
         }
+
+       
         private async Task LoadLists()
         {
+            var maxReceiptNumber = await _context.WarehouseReceipts.Select(r => (int?)r.ReceiptNumber).MaxAsync() ?? 0;
+            ReceiptNumber = maxReceiptNumber + 1;
             WarehouseList = new SelectList(
                 await _context.Warehouses
                     .OrderBy(x => x.WarehouseName)
                     .ToListAsync(),
                 "Id",
                 "WarehouseName");
-
-            KeeperList = new SelectList(
-                await _context.WarehouseKeepers
-                    .OrderBy(x => x.FullName)
-                    .Select(x => new
-                    {
-                        x.Id,
-                        Name = x.FullName
-                    })
-                    .ToListAsync(),
-                "Id",
-                "Name");
-
             Products = await _context.Products
                 .OrderBy(x => x.ProductName)
                 .ToListAsync();
+
+            PurchaseList = new SelectList(
+                await _context.VwPurchaseRequests
+                    .OrderByDescending(x => x.RequestNo)
+                    .ToListAsync(),
+                "RequestNo",
+                "RequestNo");
         }
     }
 }

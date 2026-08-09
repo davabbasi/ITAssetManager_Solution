@@ -21,7 +21,7 @@
             </th>
          
             <th>
-                @Html.DisplayNameFor(model => model.Warehouse[0].KeeperEmployeeFullName)
+                @Html.DisplayNameFor(model => model.Warehouse[0].Keeper.FullName)
             </th>
             <th></th>
         </tr>
@@ -37,7 +37,7 @@
             </td>
            
             <td>
-                @Html.DisplayFor(modelItem => item.KeeperEmployeeFullName)
+                @Html.DisplayFor(modelItem => item.Keeper.FullName)
             </td>
             <td>
                 <a asp-page="./Edit" asp-route-id="@item.Id">Edit</a> |
