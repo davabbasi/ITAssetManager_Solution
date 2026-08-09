@@ -27,16 +27,11 @@
             </th>
             <th>
                 @Html.DisplayNameFor(model => model.WarehouseIssue[0].CreatedBy)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.WarehouseIssue[0].CreatedAt)
-            </th>
+            </th>        
             <th>
                 @Html.DisplayNameFor(model => model.WarehouseIssue[0].Description)
             </th>
-            <th>
-                @Html.DisplayNameFor(model => model.WarehouseIssue[0].Status)
-            </th>
+           
             <th></th>
         </tr>
     </thead>
@@ -50,23 +45,19 @@
                 @Html.DisplayFor(modelItem => item.IssueDate)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.FromWarehouseId)
+                @(item.FromWarehouse?.WarehouseName ?? "-")
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.ToWarehouseId)
+                @(item.ToWarehouse?.WarehouseName ?? "-")
             </td>
             <td>
                 @Html.DisplayFor(modelItem => item.CreatedBy)
             </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.CreatedAt)
-            </td>
+           
             <td>
                 @Html.DisplayFor(modelItem => item.Description)
             </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Status)
-            </td>
+          
             <td>
                 <a asp-page="./Edit" asp-route-id="@item.Id">Edit</a> |
                 <a asp-page="./Details" asp-route-id="@item.Id">Details</a> |

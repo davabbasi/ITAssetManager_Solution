@@ -316,31 +316,40 @@
                 <!--مدیریت کالا-->
                 <div class="sidebar-group">
                     <div class="sidebar-group-header" onclick="toggleGroup(this)">
-                        <span><i class="bi bi-cpu me-1"></i>مدیریت کالا</span>
+                        <span><i class="bi bi-cpu me-1"></i>مدیریت انبار</span>
                         <i class="bi bi-chevron-down chevron"></i>
                     </div>
                     <div class="sidebar-group-items">
                         <a href="/WarehouseManagements/Products" class="nav-link-item @(Context.Request.Path.StartsWithSegments("/WarehouseManagements/Products") ? "active" : "")">
-                            <i class="bi bi-cpu"></i>  لیست کالاها
+                            <i class="bi bi-cpu"></i>  کالا
                         </a>
                         <a href="/WarehouseManagements/Keepers" class="nav-link-item @(Context.Request.Path.StartsWithSegments("/WarehouseManagements/Keepers") ? "active" : "")">
-                            <i class="bi bi-pc-display"></i> لیست انباردارها
+                            <i class="bi bi-pc-display"></i> انباردار
                         </a>
                         <a href="/WarehouseManagements/Warehouses" class="nav-link-item @(Context.Request.Path.StartsWithSegments("/WarehouseManagements/Warehouses") ? "active" : "")">
-                            <i class="bi bi-pc-display"></i> لیست انبارها
+                            <i class="bi bi-pc-display"></i> انبار
                         </a>                      
                         <a href="/WarehouseManagements/Receipts" class="nav-link-item @(Context.Request.Path.StartsWithSegments("/WarehouseManagements/Receipts") ? "active" : "")">
-                            <i class="bi bi-pc-display"></i> لیست رسیدها
-                        </a>
+                            <i class="bi bi-pc-display"></i> رسید
+                        </a>                       
                         <a href="/WarehouseManagements/Issues" class="nav-link-item @(Context.Request.Path.StartsWithSegments("/WarehouseManagements/Issues") ? "active" : "")">
-                            <i class="bi bi-pc-display"></i> لیست حواله ها
+                            <i class="bi bi-pc-display"></i> حواله
+                        </a>
+                        <a href="/WarehouseManagements/WarehouseTransfers" class="nav-link-item @(Context.Request.Path.StartsWithSegments("/WarehouseManagements/WarehouseTransfers") ? "active" : "")">
+                            <i class="bi bi-pc-display"></i> انتقال بین انباری
+                        </a>
+                        <a href="/WarehouseManagements/WarehouseStocks" class="nav-link-item @(Context.Request.Path.StartsWithSegments("/WarehouseManagements/WarehouseStocks") ? "active" : "")">
+                            <i class="bi bi-pc-display"></i> موجودی
+                        </a>
+                        <a href="/WarehouseManagements/InventoryTransactions" class="nav-link-item @(Context.Request.Path.StartsWithSegments("/WarehouseManagements/InventoryTransactions") ? "active" : "")">
+                            <i class="bi bi-pc-display"></i> کاردکس کالا
                         </a>
                     </div>
                 </div>
                 <!-- تجهیزات -->
                 <div class="sidebar-group">
                     <div class="sidebar-group-header" onclick="toggleGroup(this)">
-                        <span><i class="bi bi-cpu me-1"></i>تجهیزات</span>
+                        <span><i class="bi bi-cpu me-1"></i>مدیریت تجهیزات</span>
                         <i class="bi bi-chevron-down chevron"></i>
                     </div>
                     <div class="sidebar-group-items">

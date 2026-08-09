@@ -1,0 +1,70 @@
+﻿@page
+@model ITAssetManager.Pages.WarehouseManagements.WarehouseTransfers.DeleteModel
+
+@{
+    ViewData["Title"] = "Delete";
+}
+
+<h1>Delete</h1>
+
+<h3>Are you sure you want to delete this?</h3>
+<div>
+    <h4>WarehouseTransfer</h4>
+    <hr />
+    <dl class="row">
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.WarehouseTransfer.TransferNumber)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.WarehouseTransfer.TransferNumber)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.WarehouseTransfer.SourceWarehouse)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.WarehouseTransfer.SourceWarehouse.WarehouseName)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.WarehouseTransfer.DestinationWarehouse)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.WarehouseTransfer.DestinationWarehouse.WarehouseName)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.WarehouseTransfer.TransferDate)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.WarehouseTransfer.TransferDate)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.WarehouseTransfer.Status)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.WarehouseTransfer.Status)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.WarehouseTransfer.Description)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.WarehouseTransfer.Description)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.WarehouseTransfer.CreatedBy)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.WarehouseTransfer.CreatedBy)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.WarehouseTransfer.CreatedAt)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.WarehouseTransfer.CreatedAt)
+        </dd>
+    </dl>
+    
+    <form method="post">
+        <input type="hidden" asp-for="WarehouseTransfer.Id" />
+        <input type="submit" value="Delete" class="btn btn-danger" /> |
+        <a asp-page="./Index">Back to List</a>
+    </form>
+</div>

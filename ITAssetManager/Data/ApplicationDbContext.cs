@@ -1,3 +1,4 @@
+using System.Reflection.Emit;
 using ITAssetManager.Models;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
@@ -29,6 +30,10 @@ public class ApplicationDbContext : IdentityDbContext
     public DbSet<WarehouseIssue> WarehouseIssues { get; set; }
     public DbSet<WarehouseIssueItem> WarehouseIssueItems { get; set; }
     public DbSet<WarehouseKeeper> WarehouseKeepers { get; set; }
+    public DbSet<WarehouseStock> WarehouseStocks { get; set; }
+    public DbSet<WarehouseTransfer> WarehouseTransfers { get; set; }
+    public DbSet<WarehouseTransferItem> WarehouseTransferItems { get; set; }
+    public DbSet<InventoryTransaction> InventoryTransactions { get; set; }
 
 
 
@@ -51,6 +56,47 @@ public class ApplicationDbContext : IdentityDbContext
             new Category { Id = 11, Name = "هدست"},
             new Category { Id = 12, Name = "سایر"}
         );
+
+        // InventoryTransaction
+        builder.Entity<InventoryTransaction>()
+            .HasOne(x => x.Warehouse)
+            .WithMany()
+            .HasForeignKey(x => x.WarehouseId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        builder.Entity<InventoryTransaction>()
+            .HasOne(x => x.Product)
+            .WithMany()
+            .HasForeignKey(x => x.ProductId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+
+        // WarehouseStock
+        builder.Entity<WarehouseStock>()
+            .HasOne(x => x.Warehouse)
+            .WithMany()
+            .HasForeignKey(x => x.WarehouseId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        builder.Entity<WarehouseStock>()
+            .HasOne(x => x.Product)
+            .WithMany()
+            .HasForeignKey(x => x.ProductId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+
+        // WarehouseTransfer
+        builder.Entity<WarehouseTransfer>()
+            .HasOne(x => x.SourceWarehouse)
+            .WithMany()
+            .HasForeignKey(x => x.SourceWarehouseId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        builder.Entity<WarehouseTransfer>()
+            .HasOne(x => x.DestinationWarehouse)
+            .WithMany()
+            .HasForeignKey(x => x.DestinationWarehouseId)
+            .OnDelete(DeleteBehavior.Restrict);
 
         builder.Entity<WarehouseIssue>()
             .HasOne(x => x.FromWarehouse)

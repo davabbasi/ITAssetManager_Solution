@@ -1,4 +1,5 @@
 using ITAssetManager.Data;
+using ITAssetManager.Services;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
@@ -56,7 +57,7 @@ builder.Services.AddRazorPages(options =>
     options.Conventions.AuthorizeFolder("/Assembly");
 });
 
-
+builder.Services.AddScoped<InventoryService>();
 
 var app = builder.Build();
 

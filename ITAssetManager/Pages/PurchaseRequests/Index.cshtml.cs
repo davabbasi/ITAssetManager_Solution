@@ -1,7 +1,6 @@
 ﻿using ITAssetManager.Data;
 using ITAssetManager.Models;
 using ITAssetManager.Models.DTOs;
-using ITAssetManager.Paging;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
