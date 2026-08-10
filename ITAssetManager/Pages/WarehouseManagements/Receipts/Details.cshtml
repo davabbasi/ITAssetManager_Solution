@@ -1,21 +1,15 @@
 ﻿@page
 @model ITAssetManager.Pages.WarehouseManagements.Receipts.DetailsModel
-
+@using ITAssetManager.Convertor
 @{
-    ViewData["Title"] = "Details";
+    ViewData["Title"] = "جزئیات رسید";
 }
 
-<h1>Details</h1>
 <div class="card mb-3">
 
-    <div class="card-header">
-
-        اطلاعات رسید
-
-    </div>
+    <div class="card-header">اطلاعات رسید</div>
 
     <div class="card-body">
-
         <div class="row">
 
             <div class="col-md-3">
@@ -25,35 +19,36 @@
             </div>
 
             <div class="col-md-3">
-
                 <strong>تاریخ</strong>
-
                 <br />
-
                 @Model.ShamsiDate
-
             </div>
-
             <div class="col-md-3">
-
                 <strong>انبار</strong>
-
-                <br />
-
+               <br />
                 @Model.WarehouseReceipt.Warehouse?.WarehouseName
-
             </div>
-
             <div class="col-md-3">
-
                 <strong>انباردار</strong>
-
                 <br />
-
                 @Model.WarehouseReceipt.Warehouse.Keeper.FullName
-
             </div>
-
+            <div class="col-md-3">
+                <strong>وضعیت رسید</strong>
+                <br />
+                @if (Model.WarehouseReceipt.Status == DocumentStatus.Posted)
+                {
+                    <span class="badge bg-success">
+                        نهایی شده
+                    </span>
+                }
+                @if (Model.WarehouseReceipt.Status == DocumentStatus.Draft)
+                {
+                    <span class="badge bg-warning">
+                        پیش نویس
+                    </span>
+                }
+            </div>
         </div>
 
         <hr />
@@ -143,72 +138,52 @@
 </div>
 
 
+@if (Model.WarehouseReceipt.Status == DocumentStatus.Draft)
+{
+    <br />
+    <a asp-page="./Edit"
+       asp-route-id="@Model.WarehouseReceipt.Id"
+       class="btn btn-warning">
+        ویرایش
+    </a>
 
+    <form method="post"
+          asp-page-handler="Post"
+          asp-route-id="@Model.WarehouseReceipt.Id"
+          style="display:inline">
 
-@* <div>
-    <h4>WarehouseReceipt</h4>
-    <hr />
-    <dl class="row">
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.WarehouseReceipt.ReceiptNumber)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.WarehouseReceipt.ReceiptNumber)
-        </dd>
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.WarehouseReceipt.ReceiptDate)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.WarehouseReceipt.ReceiptDate)
-        </dd>
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.WarehouseReceipt.WarehouseId)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.WarehouseReceipt.WarehouseId)
-        </dd>
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.WarehouseReceipt.WarehouseKeeperId)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.WarehouseReceipt.WarehouseKeeperId)
-        </dd>
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.WarehouseReceipt.ReferenceNumber)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.WarehouseReceipt.ReferenceNumber)
-        </dd>
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.WarehouseReceipt.CreatedBy)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.WarehouseReceipt.CreatedBy)
-        </dd>
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.WarehouseReceipt.CreatedAt)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.WarehouseReceipt.CreatedAt)
-        </dd>
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.WarehouseReceipt.Description)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.WarehouseReceipt.Description)
-        </dd>
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.WarehouseReceipt.Status)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.WarehouseReceipt.Status)
-        </dd>
-    </dl>
-</div>
- *@
+        <button type="submit"
+                class="btn btn-success"
+                onclick="return confirm('آیا از ثبت نهایی این رسید اطمینان دارید؟');">
 
+            ثبت نهایی
 
+        </button>
+        <br />
+    </form>
+}
+
+@if (Model.WarehouseReceipt.Status == DocumentStatus.Posted)
+{
+    <form method="post"
+          asp-page-handler="Cancel"
+          asp-route-id="@Model.WarehouseReceipt.Id"
+          class="d-inline">
+
+        <button type="submit"
+                class="btn btn-danger"
+                onclick="return confirm('آیا از ابطال این رسید اطمینان دارید؟');">
+
+            <i class="bi bi-x-circle"></i>
+            ابطال رسید
+
+        </button>
+
+    </form>
+}
+<br />
 <div>
-    <a asp-page="./Edit" asp-route-id="@Model.WarehouseReceipt.Id">Edit</a> |
-    <a asp-page="./Index">Back to List</a>
+    <a asp-page="./Index" class="btn btn-secondary">
+        بازگشت به لیست
+    </a>
 </div>

@@ -1,9 +1,16 @@
-﻿namespace ITAssetManager.Models
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace ITAssetManager.Models
 {
     public enum DocumentStatus
     {
+        [Display(Name = "پیش‌ نویس")]
         Draft = 1,
+
+        [Display(Name = "نهایی شده")]
         Posted = 2,
+
+        [Display(Name = "لغو شده")]
         Cancelled = 3
     }
     public class WarehouseTransfer

@@ -20,11 +20,9 @@
                 @Html.DisplayNameFor(model => model.WarehouseIssue[0].IssueDate)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.WarehouseIssue[0].FromWarehouseId)
+                @Html.DisplayNameFor(model => model.WarehouseIssue[0].WarehouseId)
             </th>
-            <th>
-                @Html.DisplayNameFor(model => model.WarehouseIssue[0].ToWarehouseId)
-            </th>
+          
             <th>
                 @Html.DisplayNameFor(model => model.WarehouseIssue[0].CreatedBy)
             </th>        
@@ -45,11 +43,9 @@
                 @Html.DisplayFor(modelItem => item.IssueDate)
             </td>
             <td>
-                @(item.FromWarehouse?.WarehouseName ?? "-")
+                @(item.Warehouse?.WarehouseName ?? "-")
             </td>
-            <td>
-                @(item.ToWarehouse?.WarehouseName ?? "-")
-            </td>
+         
             <td>
                 @Html.DisplayFor(modelItem => item.CreatedBy)
             </td>

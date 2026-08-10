@@ -32,22 +32,19 @@
                 </div>
 
                 <div class="col-md-6">
-                    <label class="form-label">انبار مبدا</label>
-
-                    <select id="fromWarehouseSelect"
-                            asp-for="WarehouseIssue.FromWarehouseId"
+                    <label class="form-label">انبار </label>
+                    <select asp-for="WarehouseIssue.WarehouseId"
                             asp-items="Model.WarehouseList"
+                            id="fromWarehouseSelect"
                             class="form-select">
-
                         <option value="">انتخاب کنید...</option>
-
                     </select>
                 </div>
 
-                <div class="col-md-6">
-                    <label class="form-label">انبار مقصد</label>
-                    <select asp-for="WarehouseIssue.ToWarehouseId" asp-items="Model.WarehouseList" class="form-select">
-                        <option value=""> انتخاب کنید...</option>
+                <div class="col-md-4">
+                    <label class="form-label">تحویل گیرنده</label>
+                    <select asp-for="WarehouseIssue.EmployeeId" asp-items="Model.EmployeeList" class="form-select">
+                        <option value="">انتخاب کنید...</option>
                     </select>
                 </div>
                
@@ -81,7 +78,7 @@
 
                             <tr id="emptyRow">
                                 <td colspan="4" class="text-center text-muted py-3">
-                                    ابتدا انبار مبدا را انتخاب کنید.
+                                    ابتدا انبار را انتخاب کنید.
                                 </td>
                             </tr>
 
@@ -93,8 +90,7 @@
             <div class="mt-3">
                 <button type="button"
                         id="btnAddItem"
-                        class="btn btn-success"
-                        disabled>
+                        class="btn btn-success">
                     <i class="bi bi-plus"></i>
                     افزودن کالا
                 </button>
@@ -122,137 +118,65 @@
 
     <script>
 
-        let availableProducts = [];
+        let warehouseStocks = [];
         let rowIndex = 0;
 
-        const warehouseSelect =
-            document.getElementById("fromWarehouseSelect");
+        document
+            .getElementById("fromWarehouseSelect")
+            .addEventListener("change", async function () {
 
-        const btnAddItem =
-            document.getElementById("btnAddItem");
+                const warehouseId = this.value;
 
-        const itemsBody =
-            document.getElementById("itemsBody");
+                // اگر انبار انتخاب نشده
+                if (!warehouseId) {
 
+                    warehouseStocks = [];
 
-        // وقتی انبار مبدا تغییر کرد
-        warehouseSelect.addEventListener("change", async function () {
+                    document.getElementById("itemsBody").innerHTML = "";
 
-            const warehouseId = this.value;
+                    return;
+                }
 
-            // پاک کردن اقلام قبلی
-            itemsBody.innerHTML = "";
+                const response = await fetch(
+                    `/WarehouseManagements/Issues/Create?handler=WarehouseStock&warehouseId=${warehouseId}`
+                );
 
-            rowIndex = 0;
-            availableProducts = [];
+                if (!response.ok) {
+                    alert("خطا در دریافت موجودی انبار");
+                    return;
+                }
 
-            // اگر انبار انتخاب نشده
-            if (!warehouseId) {
+                warehouseStocks = await response.json();
 
-                btnAddItem.disabled = true;
+                // با تغییر انبار، اقلام قبلی پاک شوند
+                document.getElementById("itemsBody").innerHTML = "";
 
-                itemsBody.innerHTML = `
-                    <tr>
-                        <td colspan="4"
-                            class="text-center text-muted py-3">
-                            ابتدا انبار مبدا را انتخاب کنید.
-                        </td>
-                    </tr>
-                `;
-
-                return;
-            }
+                rowIndex = 0;
+            });
 
 
-            // دریافت کالاهای موجود در انبار
-            const response = await fetch(
-                `/WarehouseManagements/Issues/Create?handler=AvailableProducts&warehouseId=${warehouseId}`
-            );
-
-
-            if (!response.ok) {
-
-                alert("خطا در دریافت موجودی انبار.");
-
-                btnAddItem.disabled = true;
-
-                return;
-            }
-
-
-            availableProducts = await response.json();
-
-
-            // اگر هیچ کالایی موجود نبود
-            if (availableProducts.length === 0) {
-
-                itemsBody.innerHTML = `
-                    <tr>
-                        <td colspan="4"
-                            class="text-center text-muted py-3">
-
-                            کالایی در این انبار موجود نیست.
-
-                        </td>
-                    </tr>
-                `;
-
-                btnAddItem.disabled = true;
-
-                return;
-            }
-
-
-            // کالا داریم
-            btnAddItem.disabled = false;
-
-            itemsBody.innerHTML = `
-                <tr>
-                    <td colspan="4"
-                        class="text-center text-success py-3">
-
-                        ${availableProducts.length}
-                        کالا در این انبار موجود است.
-                        برای افزودن کالا روی دکمه «افزودن کالا» کلیک کنید.
-
-                    </td>
-                </tr>
-            `;
-
-        });
-
-
-        // افزودن سطر
-        btnAddItem.addEventListener("click", addRow);
+        document
+            .getElementById("btnAddItem")
+            .addEventListener("click", addRow);
 
 
         function addRow() {
 
-            // اگر کالایی موجود نیست
-            if (availableProducts.length === 0) {
+            if (warehouseStocks.length === 0) {
+
+                alert("برای این انبار کالایی با موجودی موجود نیست.");
+
                 return;
             }
 
-
-            // پیام اولیه را حذف کن
-            const messageRow = itemsBody.querySelector("tr");
-
-            if (messageRow &&
-                !messageRow.querySelector("select")) {
-
-                messageRow.remove();
-            }
-
+            const tbody = document.getElementById("itemsBody");
 
             const row = document.createElement("tr");
 
-
             row.innerHTML = `
-
                 <td>
                     ${rowIndex + 1}
                 </td>
-
 
                 <td>
 
@@ -264,19 +188,15 @@
                             انتخاب کالا...
                         </option>
 
-                        ${
-                            availableProducts.map(product => `
-                                <option value="${product.productId}">
-                                    ${product.productName}
-                                    - موجودی: ${product.stock}
-                                </option>
-                            `).join("")
-                        }
+                        ${warehouseStocks.map(x => `
+                            <option value="${x.productId}">
+                                ${x.productName} - موجودی: ${x.quantity}
+                            </option>
+                        `).join("")}
 
                     </select>
 
                 </td>
-
 
                 <td>
 
@@ -288,7 +208,6 @@
                         name="Items[${rowIndex}].Quantity" />
 
                 </td>
-
 
                 <td>
 
@@ -302,39 +221,21 @@
                     </button>
 
                 </td>
-
             `;
 
-
-            itemsBody.appendChild(row);
+            tbody.appendChild(row);
 
             rowIndex++;
         }
 
 
-        // حذف سطر
         function removeRow(button) {
 
             button.closest("tr").remove();
 
-            renumberRows();
-        }
-
-
-        // شماره‌گذاری مجدد
-        function renumberRows() {
-
-            const rows =
-                itemsBody.querySelectorAll("tr");
-
-            rows.forEach((row, index) => {
-
-                row.children[0].innerText = index + 1;
-
-            });
-
         }
 
     </script>
+
 
 }

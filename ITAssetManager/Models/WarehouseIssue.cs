@@ -20,6 +20,11 @@ namespace ITAssetManager.Models
         [Display(Name = "ثبت کننده")]
         public string? CreatedBy { get; set; }
 
+        [Display(Name = "تحویل گیرنده ")]
+        public int? EmployeeId { get; set; }
+        public string? EmployeeName { get; set; }
+
+
         [Display(Name = "تاریخ ایجاد")]
         public DateTime CreatedAt { get; set; } = DateTime.Now;
 
@@ -30,16 +35,13 @@ namespace ITAssetManager.Models
         public bool Status { get; set; }
 
         public ICollection<WarehouseIssueItem> Items { get; set; } = new List<WarehouseIssueItem>();
-        public Warehouse? FromWarehouse { get; set; }
-        public Warehouse? ToWarehouse { get; set; }
+        public Warehouse? Warehouse { get; set; }
 
-        [ForeignKey(nameof(FromWarehouse))]
+        [ForeignKey(nameof(Warehouse))]
         [Display(Name = "انبار مبدا")]
-        public int FromWarehouseId { get; set; }
+        public int WarehouseId { get; set; }
 
-        [ForeignKey(nameof(ToWarehouse))]
-        [Display(Name = "انبار مقصد")]
-        public int? ToWarehouseId { get; set; }
+       
 
     }
 }

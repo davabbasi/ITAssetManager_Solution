@@ -38,8 +38,6 @@ namespace ITAssetManager.Pages.WarehouseManagements.Receipts
 
         public async Task<IActionResult> OnPostAsync()
         {
-            ModelState.Remove("Items.Receipt");
-
             if (!ModelState.IsValid)
             {
                 await LoadLists();
@@ -59,156 +57,36 @@ namespace ITAssetManager.Pages.WarehouseManagements.Receipts
                 return Page();
             }
 
-            // شروع Transaction
-            using var transaction = await _context.Database.BeginTransactionAsync();
+            var maxReceiptNumber = await _context.WarehouseReceipts.Select(r => (int?)r.ReceiptNumber).MaxAsync() ?? 0;
+            ReceiptNumber = maxReceiptNumber + 1;
 
-            try
+            WarehouseReceipt.ReceiptNumber = ReceiptNumber;
+            WarehouseReceipt.ReceiptDate = receiptDate.Value;
+            WarehouseReceipt.CreatedAt = DateTime.Now;
+            WarehouseReceipt.CreatedBy = User.Identity?.Name ?? "سیستم";
+            WarehouseReceipt.Status = DocumentStatus.Draft;
+
+            for (int i = 0; i < Items.Count; i++)
             {
-                // --------------------------------
-                // 1. تکمیل اطلاعات رسید
-                // --------------------------------
-
-                WarehouseReceipt.ReceiptDate = receiptDate.Value;
-                WarehouseReceipt.CreatedAt = DateTime.Now;
-                WarehouseReceipt.CreatedBy =User.FindFirstValue(ClaimTypes.Name)!;
-                WarehouseReceipt.ReceiptNumber = ReceiptNumber;
-
-                // ثبت رسید
-                _context.WarehouseReceipts.Add(WarehouseReceipt);
-                await _context.SaveChangesAsync();
-
-
-                // --------------------------------
-                // 2. ثبت اقلام رسید
-                // --------------------------------
-
-                foreach (var item in Items)
-                {
-                    item.ReceiptId = WarehouseReceipt.Id;
-                }
-
-                _context.WarehouseReceiptItems.AddRange(Items);
-                await _context.SaveChangesAsync();
-
-
-                // --------------------------------
-                // 3. ثبت گردش موجودی و افزایش موجودی
-                // --------------------------------
-
-                foreach (var item in Items)
-                {
-                    // پیدا کردن موجودی فعلی کالا در این انبار
-                    var stock = await _context.WarehouseStocks
-                        .FirstOrDefaultAsync(x =>
-                            x.WarehouseId == WarehouseReceipt.WarehouseId &&
-                            x.ProductId == item.ProductId);
-
-                    // اگر برای این کالا در این انبار
-                    // رکورد موجودی نداریم
-                    if (stock == null)
-                    {
-                        stock = new WarehouseStock
-                        {
-                            WarehouseId = WarehouseReceipt.WarehouseId,
-                            ProductId = item.ProductId,
-                            Quantity = item.Quantity
-                        };
-
-                        _context.WarehouseStocks.Add(stock);
-                    }
-                    else
-                    {
-                        // افزایش موجودی
-                        stock.Quantity += item.Quantity;
-                    }
-
-
-                    // ثبت گردش کالا
-                    var transactionItem = new InventoryTransaction
-                    {
-                        WarehouseId = WarehouseReceipt.WarehouseId,
-                        ProductId = item.ProductId,
-                        Quantity = item.Quantity,
-                        Type = InventoryTransactionType.Receipt,
-                        ReceiptItemId = item.Id,
-                        TransactionDate = WarehouseReceipt.ReceiptDate
-                    };
-
-                    _context.InventoryTransactions.Add(transactionItem);
-                }
-
-                await _context.SaveChangesAsync();
-
-
-                // --------------------------------
-                // 4. همه چیز موفق بود
-                // --------------------------------
-
-                await transaction.CommitAsync();
-
-                return RedirectToPage(
-                    "Details",
-                    new { id = WarehouseReceipt.Id }
-                );
+                Items[i].RowNumber = i + 1;
             }
-            catch (Exception)
+
+            WarehouseReceipt.Items = Items;
+
+            _context.WarehouseReceipts.Add(WarehouseReceipt);
+
+            await _context.SaveChangesAsync();
+
+            TempData["Success"] = "رسید با موفقیت ذخیره شد.";
+
+            return RedirectToPage("./Details", new
             {
-                // اگر هر مرحله‌ای خطا داد
-                // تمام عملیات برگردانده می‌شود
-                await transaction.RollbackAsync();
-
-                ModelState.AddModelError(
-                    "",
-                    "در هنگام ثبت رسید خطایی رخ داد. هیچ اطلاعاتی ثبت نشد."
-                );
-
-                await LoadLists();
-                return Page();
-            }
+                id = WarehouseReceipt.Id
+            });
         }
 
-        //public async Task<IActionResult> OnPostAsync()
-        //{
-        //    ModelState.Remove("Items.Receipt");
 
-        //    if (!ModelState.IsValid)
-        //    {
-
-        //        await LoadLists();
-        //        return Page();
-        //    }
-
-        //    var receiptDate = ShamsiDate.ToMiladi();
-        //    if (!receiptDate.HasValue)
-        //    {
-        //        ModelState.AddModelError(
-        //            "WarehouseIssue.IssueDate",
-        //            "لطفاً تاریخ رسید را به‌درستی وارد کنید."
-        //        );
-
-        //        await LoadLists();
-        //        return Page();
-        //    }
-        //    WarehouseReceipt.ReceiptDate = receiptDate.Value;
-
-        //    WarehouseReceipt.CreatedAt = DateTime.Now;
-        //    WarehouseReceipt.CreatedBy = User.FindFirstValue(ClaimTypes.Name)!;
-        //    //WarehouseReceipt.CreatedBy = User.Identity?.Name;
-        //    WarehouseReceipt.ReceiptNumber = ReceiptNumber;
-        //    _context.WarehouseReceipts.Add(WarehouseReceipt);
-        //    await _context.SaveChangesAsync();
-
-        //    foreach (var item in Items)
-        //    {
-        //        item.ReceiptId = WarehouseReceipt.Id;
-        //    }
-
-        //    _context.WarehouseReceiptItems.AddRange(Items);
-        //    await _context.SaveChangesAsync();
-
-        //    return RedirectToPage("Details", new { id = WarehouseReceipt.Id });
-        //}
-
+        
 
         private async Task LoadLists()
         {

@@ -83,7 +83,6 @@ public class EditModel : PageModel
         // =========================
 
         receipt.ReceiptNumber = WarehouseReceipt.ReceiptNumber;
-        receipt.ReceiptDate = WarehouseReceipt.ReceiptDate;
         receipt.WarehouseId = WarehouseReceipt.WarehouseId;
         receipt.ReferenceNumber = WarehouseReceipt.ReferenceNumber;
         receipt.Description = WarehouseReceipt.Description;

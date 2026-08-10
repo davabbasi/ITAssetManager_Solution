@@ -8,7 +8,7 @@ namespace ITAssetManager.Models
         public int RowNumber { get; set; }
         public int Quantity { get; set; }
 
-        public required WarehouseIssue Issue { get; set; }
+        public  WarehouseIssue? Issue { get; set; }
 
         [ForeignKey(nameof(Issue))]
         public int IssueId { get; set; }

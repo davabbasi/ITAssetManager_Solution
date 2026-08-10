@@ -21,8 +21,7 @@ namespace ITAssetManager.Models
         [Display(Name = "توضیحات")]
         public string? Description { get; set; }
         [Display(Name = "وضعیت")]
-        public bool Status { get; set; } = true;
-
+        public DocumentStatus Status { get; set; } = DocumentStatus.Draft;
         public ICollection<WarehouseReceiptItem> Items { get; set; } = new List<WarehouseReceiptItem>();
         public Warehouse? Warehouse { get; set; }
 

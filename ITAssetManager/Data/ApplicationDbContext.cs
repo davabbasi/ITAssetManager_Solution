@@ -99,16 +99,12 @@ public class ApplicationDbContext : IdentityDbContext
             .OnDelete(DeleteBehavior.Restrict);
 
         builder.Entity<WarehouseIssue>()
-            .HasOne(x => x.FromWarehouse)
+            .HasOne(x => x.Warehouse)
             .WithMany(x => x.OutgoingIssues)
-            .HasForeignKey(x => x.FromWarehouseId)
+            .HasForeignKey(x => x.WarehouseId)
             .OnDelete(DeleteBehavior.Restrict);
 
-        builder.Entity<WarehouseIssue>()
-            .HasOne(x => x.ToWarehouse)
-            .WithMany(x => x.IncomingIssues)
-            .HasForeignKey(x => x.ToWarehouseId)
-            .OnDelete(DeleteBehavior.Restrict);
+       
 
         builder.Entity<Warehouse>()
            .HasOne(r => r.Keeper)
