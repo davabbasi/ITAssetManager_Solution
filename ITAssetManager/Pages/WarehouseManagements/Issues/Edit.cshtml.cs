@@ -2,12 +2,13 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using ITAssetManager.Convertor;
+using ITAssetManager.Data;
+using ITAssetManager.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-using ITAssetManager.Data;
-using ITAssetManager.Models;
 
 namespace ITAssetManager.Pages.WarehouseManagements.Issues
 {
@@ -19,61 +20,145 @@ namespace ITAssetManager.Pages.WarehouseManagements.Issues
         {
             _context = context;
         }
+        [BindProperty] public WarehouseIssue WarehouseIssue { get; set; } = new();
+
+        [BindProperty] public List<WarehouseIssueItem> Items { get; set; } = new();
+
+        public SelectList WarehouseList { get; set; } = new SelectList(Enumerable.Empty<SelectListItem>());
+
+        public SelectList KeeperList { get; set; } = new SelectList(Enumerable.Empty<SelectListItem>());
+
+        public List<Product> Products { get; set; } = new();
+
         [BindProperty] public string ShamsiDate { get; set; }
+        public SelectList EmployeeList { get; set; } = null!;
 
-        [BindProperty]
-        public WarehouseIssue WarehouseIssue { get; set; } = default!;
-        public SelectList WarehouseList { get; set; } = null!;
 
-        public async Task<IActionResult> OnGetAsync(int? id)
+        // =========================
+        // GET
+        // =========================
+
+        public async Task<IActionResult> OnGetAsync(int id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
+            var issue = await _context.WarehouseIssues
+                .Include(x => x.Items)
+                    .ThenInclude(x => x.Product)
+                .FirstOrDefaultAsync(x => x.Id == id);
 
-            var warehouseissue =  await _context.WarehouseIssues.FirstOrDefaultAsync(m => m.Id == id);
-            if (warehouseissue == null)
-            {
+            if (issue == null)
                 return NotFound();
-            }
-            WarehouseIssue = warehouseissue;
+
+            WarehouseIssue = issue;
+            ShamsiDate = WarehouseIssue.IssueDate.ToShamsi();
+            Items = issue.Items
+                .OrderBy(x => x.RowNumber)
+                .ToList();
+
+            await LoadListsAsync();
             return Page();
         }
 
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more information, see https://aka.ms/RazorPagesCRUD.
+
+        // =========================
+        // POST
+        // =========================
+
         public async Task<IActionResult> OnPostAsync()
         {
             if (!ModelState.IsValid)
             {
+                await LoadListsAsync();
                 return Page();
             }
 
-            _context.Attach(WarehouseIssue).State = EntityState.Modified;
+            var issue = await _context.WarehouseIssues
+                .Include(x => x.Items)
+                .FirstOrDefaultAsync(x => x.Id == WarehouseIssue.Id);
 
-            try
+            if (issue == null)
+                return NotFound();
+
+
+            // =========================
+            // ویرایش هدر
+            // =========================
+
+            issue.IssueNumber = WarehouseIssue.IssueNumber;
+            issue.WarehouseId = WarehouseIssue.WarehouseId;
+            issue.Description = WarehouseIssue.Description;
+            issue.IssueDate = (DateTime)ShamsiDate.ToMiladi();
+            // =========================
+            // حذف اقلام قبلی
+            // =========================
+
+            _context.WarehouseIssueItems.RemoveRange(issue.Items);
+
+
+            // =========================
+            // ثبت اقلام جدید
+            // =========================
+
+            if (Items != null)
             {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!WarehouseIssueExists(WarehouseIssue.Id))
+                int rowNumber = 1;
+
+                foreach (var item in Items)
                 {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
+                    if (item.ProductId <= 0 || item.Quantity <= 0)
+                        continue;
+
+                    _context.WarehouseIssueItems.Add(
+                        new WarehouseIssueItem
+                        {
+                            IssueId = issue.Id,
+                            RowNumber = rowNumber++,
+                            ProductId = item.ProductId,
+                            Quantity = item.Quantity
+                        });
                 }
             }
 
-            return RedirectToPage("./Index");
+
+            await _context.SaveChangesAsync();
+
+            TempData["Success"] = "حواله انبار با موفقیت ویرایش شد.";
+
+            return RedirectToPage(
+                "/WarehouseManagements/Issues/Details",
+                new { id = issue.Id });
         }
 
-        private bool WarehouseIssueExists(int id)
+
+        // =========================
+        // لیست‌های فرم
+        // =========================
+
+        private async Task LoadListsAsync()
         {
-            return _context.WarehouseIssues.Any(e => e.Id == id);
+            var warehouses = await _context.Warehouses
+                .OrderBy(x => x.WarehouseName)
+                .ToListAsync();
+
+            WarehouseList = new SelectList(
+                warehouses,
+                "Id",
+                "WarehouseName",
+                WarehouseIssue.WarehouseId
+            );
+
+            EmployeeList = new SelectList(
+                await _context.VwEmployees
+              .OrderBy(e => e.FullName)
+              .Select(e => new { e.Id, Name = e.FullName + " - " + e.DepartmentName })
+              .ToListAsync(), "Id", "Name",
+              WarehouseIssue.EmployeeId
+              );
+
+           
+            Products = await _context.Products
+                .OrderBy(x => x.ProductName)
+                .ToListAsync();
+
         }
     }
 }

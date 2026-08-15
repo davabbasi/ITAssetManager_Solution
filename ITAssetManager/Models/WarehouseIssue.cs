@@ -20,8 +20,9 @@ namespace ITAssetManager.Models
         [Display(Name = "ثبت کننده")]
         public string? CreatedBy { get; set; }
 
-        [Display(Name = "تحویل گیرنده ")]
         public int? EmployeeId { get; set; }
+
+        [Display(Name = "تحویل گیرنده ")]
         public string? EmployeeName { get; set; }
 
 
@@ -32,7 +33,7 @@ namespace ITAssetManager.Models
         public string? Description { get; set; }
 
         [Display(Name = "وضعیت")]
-        public bool Status { get; set; }
+        public DocumentStatus Status { get; set; } = DocumentStatus.Draft;
 
         public ICollection<WarehouseIssueItem> Items { get; set; } = new List<WarehouseIssueItem>();
         public Warehouse? Warehouse { get; set; }

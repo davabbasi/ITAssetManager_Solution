@@ -1,16 +1,52 @@
 ﻿@page
+@using ITAssetManager.Convertor
 @model ITAssetManager.Pages.WarehouseManagements.InventoryTransactions.IndexModel
 
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "گردش کالا";
 }
 
-<h1>Index</h1>
+<!-- Filters -->
+<div class="card mb-3">
+    <div class="card-body py-2">
+        <form method="get" class="row g-2 align-items-end">
+           
 
-<p>
-    <a asp-page="Create">Create New</a>
-</p>
-<table class="table">
+            <div class="col-md-2">
+                <select name="WarehouseId" class="form-select form-select-sm">
+                    <option value="">همه انبارها</option>
+                    @foreach (var warehouse in Model.WarehouseList)
+                    {
+                        <option value="@warehouse.Id" selected="@(Model.WarehouseId == warehouse.Id)">@warehouse.WarehouseName</option>
+                    }
+                </select>
+            </div>
+            <div class="col-md-2">
+                <select name="status" class="form-select form-select-sm">
+                    <option value="">همه تراکنش‌ها</option>
+                    <option value="1" selected="@(Model.Status == 1)">رسید</option>
+                    <option value="2" selected="@(Model.Status == 2)">حواله</option>
+                    <option value="3" selected="@(Model.Status == 3)">انتقال به انبار</option>
+                    <option value="4" selected="@(Model.Status == 4)">انتقال از انبار</option>
+                    <option value="5" selected="@(Model.Status == 5)"> اصلاح موجودی (افزایش)</option>
+                    <option value="6" selected="@(Model.Status == 6)"> اصلاح موجودی (کاهش)</option>
+                </select>
+            </div>
+
+            <div class="col-md-2 d-flex gap-1">
+                <button type="submit" class="btn btn-primary btn-sm flex-fill">
+                    <i class="bi bi-search"></i> جستجو
+                </button>
+                <a href="/WarehouseManagements/Receipts" class="btn btn-outline-secondary btn-sm">
+                    <i class="bi bi-x"></i>
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+
+
+<table class="table table-hover mb-0">
     <thead>
         <tr>
             <th>
@@ -22,12 +58,7 @@
             <th>
                 @Html.DisplayNameFor(model => model.InventoryTransaction[0].TransactionDate)
             </th>
-            <th>
-                @Html.DisplayNameFor(model => model.InventoryTransaction[0].ReceiptItemId)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.InventoryTransaction[0].IssueItemId)
-            </th>
+          
             <th>
                 @Html.DisplayNameFor(model => model.InventoryTransaction[0].Description)
             </th>
@@ -43,7 +74,6 @@
             <th>
                 @Html.DisplayNameFor(model => model.InventoryTransaction[0].Product)
             </th>
-            <th></th>
         </tr>
     </thead>
     <tbody>
@@ -53,22 +83,21 @@
                 @Html.DisplayFor(modelItem => item.Quantity)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.Type)
+                    @item.Type.GetDisplayName()
+
+
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.TransactionDate)
+                    @item.TransactionDate.ToShamsi()
+
             </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.ReceiptItemId)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.IssueItemId)
-            </td>
+           
             <td>
                 @Html.DisplayFor(modelItem => item.Description)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.CreatedAt)
+                    @item.CreatedAt.ToShamsi()
+
             </td>
             <td>
                 @Html.DisplayFor(modelItem => item.CreatedBy)
@@ -79,11 +108,7 @@
             <td>
                 @Html.DisplayFor(modelItem => item.Product.ProductName)
             </td>
-            <td>
-                <a asp-page="./Edit" asp-route-id="@item.Id">Edit</a> |
-                <a asp-page="./Details" asp-route-id="@item.Id">Details</a> |
-                <a asp-page="./Delete" asp-route-id="@item.Id">Delete</a>
-            </td>
+          
         </tr>
 }
     </tbody>

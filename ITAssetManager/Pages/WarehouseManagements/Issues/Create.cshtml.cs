@@ -23,21 +23,19 @@ namespace ITAssetManager.Pages.WarehouseManagements.Issues
             _context = context;
             _inventoryService = inventoryService;
         }
-        public SelectList EmployeeList { get; set; } = null!;
-        public SelectList WarehouseList { get; set; } = null!;
-        [BindProperty] public string ShamsiDate { get; set; }
         [BindProperty] public WarehouseIssue WarehouseIssue { get; set; } = default!;
-         public int IssueNumber { get; set; }
         [BindProperty] public List<WarehouseIssueItem> Items { get; set; } = new();
-
-
+        public SelectList WarehouseList { get; set; } = null!;
+        public List<Product> Products { get; set; } = new();
+        [BindProperty] public string ShamsiDate { get; set; } = string.Empty;
+        public int IssueNumber { get; set; }
+        public SelectList EmployeeList { get; set; } = null!;
 
         public async Task< IActionResult> OnGet()
         {
             await LoadLists();
             return Page();
         }
-
         public async Task<IActionResult> OnPostAsync()
         {
             if (!ModelState.IsValid)
@@ -61,119 +59,89 @@ namespace ITAssetManager.Pages.WarehouseManagements.Issues
                 await LoadLists();
                 return Page();
             }
-
-            // شروع Transaction
             using var transaction = await _context.Database.BeginTransactionAsync();
 
             try
             {
-                // --------------------------------
-                // 1. تکمیل اطلاعات حواله
-                // --------------------------------
-
+                // 1. تکمیل هدر
                 WarehouseIssue.IssueDate = issueDate.Value;
                 WarehouseIssue.CreatedAt = DateTime.Now;
                 WarehouseIssue.CreatedBy = User.FindFirstValue(ClaimTypes.Name)!;
                 WarehouseIssue.IssueNumber = IssueNumber;
+                WarehouseIssue.Status = DocumentStatus.Draft;
 
-                // ثبت حواله
+                WarehouseIssue.EmployeeName = await _context.VwEmployees
+                    .Where(e => e.Id == WarehouseIssue.EmployeeId)
+                    .Select(e => e.FullName)
+                    .FirstOrDefaultAsync();
+
                 _context.WarehouseIssues.Add(WarehouseIssue);
+
                 await _context.SaveChangesAsync();
 
 
-                // --------------------------------
-                // 2. ثبت اقلام حواله
-                // --------------------------------
+                // 2. بررسی موجودی تمام اقلام
+                foreach (var item in Items)
+                {
+                    var stock = await _context.WarehouseStocks
+                        .FirstOrDefaultAsync(x =>
+                            x.WarehouseId == WarehouseIssue.WarehouseId &&
+                            x.ProductId == item.ProductId);
 
+                    if (stock == null || stock.Quantity < item.Quantity)
+                    {
+                        ModelState.AddModelError(
+                            "",
+                            $"موجودی برخی از کالاهای انتخاب شده کافی نیست."
+                        );
+
+                        await transaction.RollbackAsync();
+                        ModelState.Remove("WarehouseIssue.WarehouseId");
+                        WarehouseIssue.WarehouseId = 0;
+
+                        await LoadLists();
+                        return Page();
+                    }
+                }
+
+
+                // 3. ثبت اقلام
                 foreach (var item in Items)
                 {
                     item.IssueId = WarehouseIssue.Id;
                 }
 
                 _context.WarehouseIssueItems.AddRange(Items);
-                await _context.SaveChangesAsync();
-
-
-                // --------------------------------
-                // 3. ثبت گردش موجودی و افزایش موجودی
-                // --------------------------------
-
-                foreach (var item in Items)
-                {
-                    // پیدا کردن موجودی فعلی کالا در این انبار
-                    var stock = await _context.WarehouseStocks
-                        .FirstOrDefaultAsync(x =>
-                            x.WarehouseId == WarehouseIssue.WarehouseId &&
-                            x.ProductId == item.ProductId);
-
-                    // اگر موجودی وجود نداشت
-                    if (stock == null)
-                    {
-                        throw new Exception(
-                            $"برای کالا با شناسه {item.ProductId} در انبار مبدا موجودی ثبت نشده است."
-                        );
-                    }
-
-
-                    // بررسی موجودی
-                    if (stock.Quantity < item.Quantity)
-                    {
-                        throw new Exception(
-                            $"موجودی کالای {item.ProductId} در انبار مبدا کافی نیست."
-                        );
-                    }
-
-
-                    stock.Quantity -= item.Quantity;
-                    stock.UpdatedAt = DateTime.Now;
-
-
-                    // ثبت گردش کالا
-                    var transactionItem = new InventoryTransaction
-                    {
-                        WarehouseId = WarehouseIssue.WarehouseId,
-                        ProductId = item.ProductId,
-                        Quantity = item.Quantity,
-                        Type = InventoryTransactionType.Issue,
-                        IssueItemId = item.Id,
-                        TransactionDate = WarehouseIssue.IssueDate,
-                        Description = $"حواله شماره {WarehouseIssue.IssueNumber}",
-                        CreatedBy = User.FindFirstValue(ClaimTypes.Name)!
-                    };
-
-                    _context.InventoryTransactions.Add(transactionItem);
-                }
 
                 await _context.SaveChangesAsync();
 
 
-                // --------------------------------
-                // 4. همه چیز موفق بود
-                // --------------------------------
-
+                // 4. تأیید نهایی Transaction
                 await transaction.CommitAsync();
 
-                return RedirectToPage(
-                    "Details",
-                    new { id = WarehouseIssue.Id }
-                );
+                TempData["IssueDraftedSuccess"] =
+                    "پیش‌نویس حواله با موفقیت ایجاد شد.";
+
+                return RedirectToPage("./Details", new
+                {
+                    id = WarehouseIssue.Id
+                });
             }
             catch (Exception)
             {
-                // اگر هر مرحله‌ای خطا داد
-                // تمام عملیات برگردانده می‌شود
                 await transaction.RollbackAsync();
 
                 ModelState.AddModelError(
                     "",
-                    "در هنگام ثبت حواله خطایی رخ داد. هیچ اطلاعاتی ثبت نشد."
+                    "در هنگام ایجاد پیش‌نویس حواله خطایی رخ داد. هیچ اطلاعاتی ثبت نشد."
                 );
 
                 await LoadLists();
+
                 return Page();
             }
-        }
 
+        }
         private async Task LoadLists()
         {
             var maxIssueNumber = await _context.WarehouseIssues.Select(r => (int?)r.IssueNumber).MaxAsync() ?? 0;
@@ -191,9 +159,7 @@ namespace ITAssetManager.Pages.WarehouseManagements.Issues
                     .ToListAsync(),
                 "Id",
                 "WarehouseName");
-        }
-
-       
+        }    
         public async Task<IActionResult> OnGetWarehouseStockAsync(int warehouseId)
         {
             var stocks = await _context.WarehouseStocks
@@ -210,6 +176,6 @@ namespace ITAssetManager.Pages.WarehouseManagements.Issues
 
             return new JsonResult(stocks);
         }
-
+        
     }
 }

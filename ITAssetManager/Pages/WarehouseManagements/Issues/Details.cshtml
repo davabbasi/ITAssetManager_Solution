@@ -2,65 +2,123 @@
 @model ITAssetManager.Pages.WarehouseManagements.Issues.DetailsModel
 
 @{
-    ViewData["Title"] = "Details";
+    ViewData["Title"] = "جزئیات حواله";
+}
+@if (TempData["IssuedSuccess"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        @TempData["IssuedSuccess"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
 }
 
-<h1>Details</h1>
+@if (TempData["IssuedError"] != null)
+{
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        @TempData["IssuedError"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+}
+@if (TempData["IssueCancelError"] != null)
+{
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        @TempData["IssueCancelError"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+}
 
-<div>
-    <h4>WarehouseIssue</h4>
-    <hr />
-    <dl class="row">
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.WarehouseIssue.IssueNumber)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.WarehouseIssue.IssueNumber)
-        </dd>
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.WarehouseIssue.IssueDate)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.WarehouseIssue.IssueDate)
-        </dd>
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.WarehouseIssue.WarehouseId)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.WarehouseIssue.WarehouseId)
-        </dd>
-      
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.WarehouseIssue.CreatedBy)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.WarehouseIssue.CreatedBy)
-        </dd>
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.WarehouseIssue.CreatedAt)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.WarehouseIssue.CreatedAt)
-        </dd>
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.WarehouseIssue.Description)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.WarehouseIssue.Description)
-        </dd>
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.WarehouseIssue.Status)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.WarehouseIssue.Status)
-        </dd>
-    </dl>
+@if (TempData["IssueCancelSuccess"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        @TempData["IssueCancelSuccess"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+}
+
+<div class="card mb-3">
+
+    <div class="card-header">اطلاعات حواله</div>
+
+    <div class="card-body">
+        <div class="row">
+
+            <div class="col-md-3">
+                <strong>شماره حواله</strong>
+                <br />
+                @Model.WarehouseIssue.IssueNumber
+            </div>
+
+            <div class="col-md-3">
+                <strong>تاریخ</strong>
+                <br />
+                @Model.ShamsiDate
+            </div>
+            <div class="col-md-3">
+                <strong>انبار</strong>
+                <br />
+                @Model.WarehouseIssue.Warehouse?.WarehouseName
+            </div>
+            <div class="col-md-3">
+                <strong>انباردار</strong>
+                <br />
+                @Model.WarehouseIssue.Warehouse.Keeper.FullName
+            </div>
+            <div class="col-md-3">
+                <strong>تحویل گیرنده</strong>
+                <br />
+                @Model.WarehouseIssue.EmployeeName 
+            </div>
+            <div class="col-md-3">
+                <strong>وضعیت حواله</strong>
+                <br />
+                @if (Model.WarehouseIssue.Status == DocumentStatus.Posted)
+                {
+                    <span class="badge bg-success">
+                        نهایی شده
+                    </span>
+                }
+                @if (Model.WarehouseIssue.Status == DocumentStatus.Draft)
+                {
+                    <span class="badge bg-warning">
+                        پیش نویس
+                    </span>
+                }
+                @if (Model.WarehouseIssue.Status == DocumentStatus.Cancelled)
+                {
+                    <span class="badge bg-danger">
+                        ابطال شده
+                    </span>
+                }
+            </div>
+        </div>
+
+        <hr />
+
+        <div class="row">
+         
+
+            <div class="col-md-8">
+
+                <strong>توضیحات</strong>
+
+                <br />
+
+                @Model.WarehouseIssue.Description
+
+            </div>
+
+        </div>
+
+    </div>
+
 </div>
+
+
 <div class="card">
 
     <div class="card-header">
 
-        اقلام رسید
+        اقلام حواله
 
     </div>
 
@@ -111,7 +169,54 @@
 
 </div>
 
+
+@if (Model.WarehouseIssue.Status == DocumentStatus.Draft)
+{
+    <br />
+    <a asp-page="./Edit"
+       asp-route-id="@Model.WarehouseIssue.Id"
+       class="btn btn-warning">
+        ویرایش
+    </a>
+
+    <form method="post"
+          asp-page-handler="Post"
+          asp-route-id="@Model.WarehouseIssue.Id"
+          style="display:inline">
+
+        <button type="submit"
+                class="btn btn-success"
+                onclick="return confirm('آیا از ثبت نهایی این حواله اطمینان دارید؟');">
+
+            ثبت نهایی
+
+        </button>
+        <br />
+    </form>
+}
+
+@if (Model.WarehouseIssue.Status == DocumentStatus.Posted)
+{
+    <form method="post"
+          asp-page-handler="Cancel"
+          asp-route-id="@Model.WarehouseIssue.Id"
+          class="d-inline">
+        <br />
+        <button type="submit"
+                class="btn btn-danger"
+                onclick="return confirm('آیا از ابطال این حواله اطمینان دارید؟');">
+
+            <i class="bi bi-x-circle"></i>
+            ابطال حواله
+
+        </button>
+        <br />
+
+    </form>
+}
+<br />
 <div>
-    <a asp-page="./Edit" asp-route-id="@Model.WarehouseIssue.Id">Edit</a> |
-    <a asp-page="./Index">Back to List</a>
+    <a asp-page="./Index" class="btn btn-secondary">
+        بازگشت به لیست
+    </a>
 </div>
