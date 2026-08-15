@@ -48,6 +48,12 @@
                         پیش نویس
                     </span>
                 }
+                @if (Model.WarehouseReceipt.Status == DocumentStatus.Cancelled)
+                {
+                    <span class="badge bg-danger">
+                        ابطال شده
+                    </span>
+                }
             </div>
         </div>
 
@@ -169,7 +175,7 @@
           asp-page-handler="Cancel"
           asp-route-id="@Model.WarehouseReceipt.Id"
           class="d-inline">
-
+        <br />
         <button type="submit"
                 class="btn btn-danger"
                 onclick="return confirm('آیا از ابطال این رسید اطمینان دارید؟');">
@@ -178,6 +184,7 @@
             ابطال رسید
 
         </button>
+        <br />
 
     </form>
 }

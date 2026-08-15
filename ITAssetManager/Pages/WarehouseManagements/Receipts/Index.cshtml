@@ -42,7 +42,9 @@
                 <select name="status" class="form-select form-select-sm">
                     <option value="">همه وضعیت‌ها</option>
                     <option value="1" selected="@(Model.Status == 1)">پیش‌ نویس</option>
-                    <option value="2" selected="@(Model.Status == 2)">نهایی شده</option>                  
+                    <option value="2" selected="@(Model.Status == 2)">نهایی شده</option>
+                    <option value="3" selected="@(Model.Status == 3)">ابطال شده</option>
+
                 </select>
             </div>
            
@@ -127,7 +129,12 @@
                                 نهایی شده
                             </span>
                         }
-
+                        @if (item.Status == DocumentStatus.Cancelled)
+                        {
+                            <span class="badge bg-danger">
+                                ابطال شده
+                            </span>
+                        }
                     </td>
                     <td>
 

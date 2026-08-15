@@ -42,7 +42,6 @@ namespace ITAssetManager.Pages.WarehouseManagements.Receipts
 
             return Page();
         }
-
         public async Task<IActionResult> OnPostPostAsync(int id)
         {
             var receipt = await _context.WarehouseReceipts
@@ -136,6 +135,7 @@ namespace ITAssetManager.Pages.WarehouseManagements.Receipts
         {
             var receipt = await _context.WarehouseReceipts
                 .Include(x => x.Items)
+                .ThenInclude(x => x.Product)
                 .FirstOrDefaultAsync(x => x.Id == id);
 
             if (receipt == null)
@@ -147,14 +147,99 @@ namespace ITAssetManager.Pages.WarehouseManagements.Receipts
                 return RedirectToPage(new { id });
             }
 
-            // فعلاً فقط وضعیت را ابطال می‌کنیم
-            receipt.Status = DocumentStatus.Cancelled;
+            using var transaction = await _context.Database.BeginTransactionAsync();
 
-            await _context.SaveChangesAsync();
+            try
+            {
+                foreach (var item in receipt.Items)
+                {
+                    // پیدا کردن موجودی فعلی
+                    var stock = await _context.WarehouseStocks
+                        .FirstOrDefaultAsync(x =>
+                            x.WarehouseId == receipt.WarehouseId &&
+                            x.ProductId == item.ProductId);
 
-            TempData["Success"] = "رسید با موفقیت ابطال شد.";
+                    if (stock == null)
+                    {
+                        throw new Exception(
+                            $"موجودی کالا با شناسه {item.ProductId} در انبار پیدا نشد."
+                        );
+                    }
 
-            return RedirectToPage(new { id });
+                    // بررسی اینکه موجودی برای برگشت کافی باشد
+                    if (stock.Quantity < item.Quantity)
+                    {
+                        TempData["Error"] =
+                            $"امکان ابطال رسید وجود ندارد؛ موجودی کالا «{item.Product?.ProductName}» کافی نیست.";
+
+                        await transaction.RollbackAsync();
+
+                        return RedirectToPage(new { id });
+                    }
+
+                    // --------------------------------
+                    // 1. کاهش موجودی
+                    // --------------------------------
+
+                    stock.Quantity -= item.Quantity;
+                    stock.UpdatedAt = DateTime.Now;
+
+
+                    // --------------------------------
+                    // 2. ثبت تراکنش معکوس
+                    // --------------------------------
+
+                    var reverseTransaction = new InventoryTransaction
+                    {
+                        WarehouseId = receipt.WarehouseId,
+                        ProductId = item.ProductId,
+
+                        // مقدار منفی چون داریم اثر رسید را برمی‌گردانیم
+                        Quantity = -item.Quantity,
+
+                        Type = InventoryTransactionType.AdjustmentOut,
+
+                        TransactionDate = DateTime.Now,
+
+                        ReceiptItemId = item.Id,
+
+                        Description =
+                            $"ابطال رسید شماره {receipt.ReceiptNumber}",
+
+                        CreatedAt = DateTime.Now,
+
+                        CreatedBy = User.Identity?.Name ?? "سیستم"
+                    };
+
+                    _context.InventoryTransactions.Add(reverseTransaction);
+                }
+
+
+                // --------------------------------
+                // 3. تغییر وضعیت رسید
+                // --------------------------------
+
+                receipt.Status = DocumentStatus.Cancelled;
+
+
+                await _context.SaveChangesAsync();
+
+                await transaction.CommitAsync();
+
+                TempData["Success"] =
+                    "رسید با موفقیت ابطال شد و اثر آن از موجودی برگشت داده شد.";
+
+                return RedirectToPage(new { id = receipt.Id });
+            }
+            catch (Exception)
+            {
+                await transaction.RollbackAsync();
+
+                TempData["Error"] =
+                    "در هنگام ابطال رسید خطایی رخ داد. هیچ تغییری اعمال نشد.";
+
+                return RedirectToPage(new { id });
+            }
         }
     }
 }
