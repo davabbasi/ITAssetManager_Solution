@@ -2,41 +2,104 @@
 @model ITAssetManager.Pages.WarehouseManagements.Keeper.IndexModel
 
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "انباردارها";
 }
 
-<h1>Index</h1>
-
-<p>
-    <a asp-page="Create">Create New</a>
-</p>
-<table class="table">
-    <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.WarehouseKeeper[0].FullName)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.WarehouseKeeper[0].PersonnelNumber)
-            </th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-@foreach (var item in Model.WarehouseKeeper) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.FullName)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.PersonnelNumber)
-            </td>
-            <td>
-                <a asp-page="./Edit" asp-route-id="@item.Id">Edit</a> |
-                <a asp-page="./Details" asp-route-id="@item.Id">Details</a> |
-                <a asp-page="./Delete" asp-route-id="@item.Id">Delete</a>
-            </td>
-        </tr>
+@if (TempData["KeeperDeleteSuccess"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        @TempData["KeeperDeleteSuccess"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
 }
-    </tbody>
-</table>
+
+@if (TempData["KeeperDeleteError"] != null)
+{
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        @TempData["KeeperDeleteError"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <a asp-page="Create" class="btn btn-primary btn-sm">
+        <i class="bi bi-plus-lg me-1"></i>
+        ایجاد انباردار جدید
+    </a>
+</div>
+
+
+
+<!-- Results -->
+<div class="card">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <span><i class="bi bi-table me-2"></i> لیست انباردارها</span>
+    </div>
+    <div class="card-body p-0">
+        @if (!Model.WarehouseKeeper.Any())
+        {
+            <div class="text-center py-5 text-muted">
+                <i class="bi bi-inbox" style="font-size:2.5rem;"></i>
+                <p class="mt-2">انبارداری یافت نشد</p>
+            </div>
+        }
+        else
+        {
+            <div class="table-responsive">
+                <table class=" table table-hover mb-0">
+                    <thead>
+                        <tr>
+                            <th>
+                                @Html.DisplayNameFor(model => model.WarehouseKeeper[0].FullName)
+                            </th>
+                            <th>
+                                @Html.DisplayNameFor(model => model.WarehouseKeeper[0].PersonnelNumber)
+                            </th>
+                           
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model.WarehouseKeeper)
+                        {
+                            <tr>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.FullName)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.PersonnelNumber)
+                                </td>
+
+                                <td>
+                                    <div class="d-flex gap-1">
+
+                                        <a asp-page="./Edit"
+                                           asp-route-id="@item.Id"
+                                           class="btn btn-xs btn-outline-primary" title="ویرایش">
+                                            <i class="bi bi-pencil"></i>
+                                        </a>
+
+                                        <form method="post" asp-page-handler="Delete">
+                                            <input type="hidden" name="id" value="@item.Id" />
+                                            <button type="submit" class="btn btn-xs btn-outline-danger" title="حذف"
+                                                    onclick="return confirm('حذف شود؟')">
+                                                <i class="bi bi-trash"></i>
+                                            </button>
+                                        </form>
+                                    </div>
+                                </td>
+
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+    </div>
+</div>
+<style>
+    .btn-xs {
+        padding: 0.15rem 0.4rem;
+        font-size: 0.75rem;
+    }
+</style>

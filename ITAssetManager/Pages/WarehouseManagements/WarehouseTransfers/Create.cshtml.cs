@@ -36,16 +36,12 @@ namespace ITAssetManager.Pages.WarehouseManagements.WarehouseTransfers
         public SelectList WarehouseList { get; set; } = null!;
 
         public List<Product> Products { get; set; } = new();
-
-
         public async Task<IActionResult> OnGetAsync()
         {
             await LoadLists();
 
             return Page();
         }
-
-
         public async Task<IActionResult> OnPostAsync()
         {
             ModelState.Remove("Items.WarehouseTransfer");
@@ -107,40 +103,23 @@ namespace ITAssetManager.Pages.WarehouseManagements.WarehouseTransfers
                 // --------------------------------
                 // 1. اطلاعات سند انتقال
                 // --------------------------------
-
-                WarehouseTransfer.TransferDate = transferDate.Value;
+                var maxTransferNumber =
+               await _context.WarehouseTransfers
+                   .Select(x => (int?)x.TransferNumber)
+                   .MaxAsync() ?? 0;
+                TransferNumber = maxTransferNumber + 1;
 
                 WarehouseTransfer.TransferNumber = TransferNumber;
-
+                WarehouseTransfer.TransferDate = transferDate.Value;
+                WarehouseTransfer.TransferNumber = TransferNumber;
                 WarehouseTransfer.CreatedAt = DateTime.Now;
-
                 WarehouseTransfer.CreatedBy =User.FindFirstValue(ClaimTypes.Name)!;
-
-                WarehouseTransfer.Status = DocumentStatus.Posted;
-
-
+                WarehouseTransfer.Status = DocumentStatus.Draft;
                 _context.WarehouseTransfers.Add(WarehouseTransfer);
-
                 await _context.SaveChangesAsync();
 
-
                 // --------------------------------
-                // 2. ثبت اقلام انتقال
-                // --------------------------------
-
-                foreach (var item in Items)
-                {
-                    item.WarehouseTransferId =
-                        WarehouseTransfer.Id;
-                }
-
-                _context.WarehouseTransferItems.AddRange(Items);
-
-                await _context.SaveChangesAsync();
-
-
-                // --------------------------------
-                // 3. بررسی موجودی و تغییر موجودی
+                // 2. بررسی موجودی و ثبت اقلام انتقال
                 // --------------------------------
 
                 foreach (var item in Items)
@@ -173,133 +152,20 @@ namespace ITAssetManager.Pages.WarehouseManagements.WarehouseTransfers
                     }
 
 
-                    // --------------------------------
-                    // کم کردن از انبار مبدا
-                    // --------------------------------
+                    //  ثبت اقلام انتقال
 
-                    sourceStock.Quantity -= item.Quantity;
+                    item.WarehouseTransferId = WarehouseTransfer.Id;
+                    _context.WarehouseTransferItems.AddRange(Items);
+                    await _context.SaveChangesAsync();
 
-                    sourceStock.UpdatedAt = DateTime.Now;
-
-
-                    // --------------------------------
-                    // پیدا کردن موجودی انبار مقصد
-                    // --------------------------------
-
-                    var destinationStock =
-                        await _context.WarehouseStocks
-                            .FirstOrDefaultAsync(x =>
-                                x.WarehouseId ==
-                                WarehouseTransfer.DestinationWarehouseId
-                                &&
-                                x.ProductId == item.ProductId);
-
-
-                    // اگر کالا قبلاً در مقصد وجود نداشته
-                    if (destinationStock == null)
-                    {
-                        destinationStock = new WarehouseStock
-                        {
-                            WarehouseId =
-                                WarehouseTransfer.DestinationWarehouseId,
-
-                            ProductId = item.ProductId,
-
-                            Quantity = item.Quantity,
-
-                            UpdatedAt = DateTime.Now
-                        };
-
-                        _context.WarehouseStocks.Add(
-                            destinationStock
-                        );
-                    }
-                    else
-                    {
-                        // اضافه کردن به موجودی مقصد
-                        destinationStock.Quantity += item.Quantity;
-
-                        destinationStock.UpdatedAt = DateTime.Now;
-                    }
-
-
-                    // --------------------------------
-                    // ثبت TransferOut
-                    // --------------------------------
-
-                    var transferOut =
-                        new InventoryTransaction
-                        {
-                            WarehouseId =
-                                WarehouseTransfer.SourceWarehouseId,
-
-                            ProductId = item.ProductId,
-
-                            Quantity = item.Quantity,
-
-                            Type =
-                                InventoryTransactionType.TransferOut,
-
-                            TransactionDate =
-                                WarehouseTransfer.TransferDate,
-
-                            CreatedAt = DateTime.Now,
-
-                            CreatedBy =WarehouseTransfer.CreatedBy,
-                            TransferItemId=item.Id,
-                        };
-
-                    _context.InventoryTransactions.Add(
-                        transferOut
-                    );
-
-
-                    // --------------------------------
-                    // ثبت TransferIn
-                    // --------------------------------
-
-                    var transferIn =
-                        new InventoryTransaction
-                        {
-                            WarehouseId =
-                                WarehouseTransfer.DestinationWarehouseId,
-
-                            ProductId = item.ProductId,
-
-                            Quantity = item.Quantity,
-
-                            Type =
-                                InventoryTransactionType.TransferIn,
-
-                            TransactionDate =
-                                WarehouseTransfer.TransferDate,
-
-                            CreatedAt = DateTime.Now,
-
-                            CreatedBy =
-                                WarehouseTransfer.CreatedBy
-                        };
-
-                    _context.InventoryTransactions.Add(
-                        transferIn
-                    );
                 }
 
 
                 // --------------------------------
-                // 4. ذخیره تغییرات موجودی
-                // --------------------------------
-
-                await _context.SaveChangesAsync();
-
-
-                // --------------------------------
-                // 5. همه چیز موفق بود
+                // 3. همه چیز موفق بود
                 // --------------------------------
 
                 await transaction.CommitAsync();
-
-
                 return RedirectToPage(
                     "Details",
                     new { id = WarehouseTransfer.Id }
@@ -322,8 +188,6 @@ namespace ITAssetManager.Pages.WarehouseManagements.WarehouseTransfers
                 return Page();
             }
         }
-
-
         private async Task LoadLists()
         {
             var maxTransferNumber =
@@ -347,5 +211,22 @@ namespace ITAssetManager.Pages.WarehouseManagements.WarehouseTransfers
                 .OrderBy(x => x.ProductName)
                 .ToListAsync();
         }
+        public async Task<IActionResult> OnGetWarehouseStockAsync(int warehouseId)
+        {
+            var stocks = await _context.WarehouseStocks
+                .Where(x => x.WarehouseId == warehouseId && x.Quantity > 0)
+                .Include(x => x.Product)
+                .OrderBy(x => x.Product.ProductName)
+                .Select(x => new
+                {
+                    productId = x.ProductId,
+                    productName = x.Product.ProductName,
+                    quantity = x.Quantity
+                })
+                .ToListAsync();
+
+            return new JsonResult(stocks);
+        }
+
     }
 }

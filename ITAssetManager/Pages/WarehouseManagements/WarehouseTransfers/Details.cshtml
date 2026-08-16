@@ -2,66 +2,198 @@
 @model ITAssetManager.Pages.WarehouseManagements.WarehouseTransfers.DetailsModel
 
 @{
-    ViewData["Title"] = "Details";
+    ViewData["Title"] = "جزئیات انتقال";
+}
+@if (TempData["WarehouseTransferSuccess"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        @TempData["WarehouseTransferSuccess"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
 }
 
-<h1>Details</h1>
+@if (TempData["WarehouseTransferError"] != null)
+{
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        @TempData["WarehouseTransferError"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+}
+@if (TempData["WarehouseTransferCancelError"] != null)
+{
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        @TempData["WarehouseTransferCancelError"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+}
 
-<div>
-    <h4>WarehouseTransfer</h4>
-    <hr />
-    <dl class="row">
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.WarehouseTransfer.TransferNumber)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.WarehouseTransfer.TransferNumber)
-        </dd>
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.WarehouseTransfer.SourceWarehouse)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.WarehouseTransfer.SourceWarehouse.WarehouseName)
-        </dd>
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.WarehouseTransfer.DestinationWarehouse)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.WarehouseTransfer.DestinationWarehouse.WarehouseName)
-        </dd>
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.WarehouseTransfer.TransferDate)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.WarehouseTransfer.TransferDate)
-        </dd>
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.WarehouseTransfer.Status)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.WarehouseTransfer.Status)
-        </dd>
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.WarehouseTransfer.Description)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.WarehouseTransfer.Description)
-        </dd>
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.WarehouseTransfer.CreatedBy)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.WarehouseTransfer.CreatedBy)
-        </dd>
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.WarehouseTransfer.CreatedAt)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.WarehouseTransfer.CreatedAt)
-        </dd>
-    </dl>
+@if (TempData["WarehouseTransferCancelSuccess"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        @TempData["WarehouseTransferCancelSuccess"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+}
+
+
+<div class="card mb-3">
+
+    <div class="card-header">اطلاعات انتقال</div>
+
+    <div class="card-body">
+        <div class="row">
+            <div class="col-md-3">
+                <strong>شماره انتقال</strong>
+                <br />
+                @Model.WarehouseTransfer.TransferNumber
+            </div>
+
+            <div class="col-md-3">
+                <strong>تاریخ</strong>
+                <br />
+                @Model.ShamsiDate
+            </div>
+            <div class="col-md-3">
+                <strong>انبار مبدا</strong>
+                <br />
+                @Model.WarehouseTransfer.SourceWarehouse.WarehouseName
+            </div>
+          
+            <div class="col-md-3">
+                <strong>انبار مقصد</strong>
+                <br />
+                @Model.WarehouseTransfer.DestinationWarehouse.WarehouseName
+            </div>
+            <div class="col-md-3">
+                <strong>وضعیت انتقال</strong>
+                <br />
+                @if (Model.WarehouseTransfer.Status == DocumentStatus.Posted)
+                {
+                    <span class="badge bg-success">
+                        نهایی شده
+                    </span>
+                }
+                @if (Model.WarehouseTransfer.Status == DocumentStatus.Draft)
+                {
+                    <span class="badge bg-warning">
+                        پیش نویس
+                    </span>
+                }
+                @if (Model.WarehouseTransfer.Status == DocumentStatus.Cancelled)
+                {
+                    <span class="badge bg-danger">
+                        ابطال شده
+                    </span>
+                }
+            </div>
+
+
+        </div>
+
+        <hr />
+
+        <div class="row">
+            <div class="col-md-8">
+                <strong>توضیحات</strong>
+                <br />
+                @Model.WarehouseTransfer.Description
+            </div>
+        </div>
+    </div>
 </div>
 <div>
-    <a asp-page="./Edit" asp-route-id="@Model.WarehouseTransfer.Id">Edit</a> |
-    <a asp-page="./Index">Back to List</a>
-</div>
+    <div class="card">
+        <div class="card-header">
+            اقلام انتقال
+        </div>
+        <div class="card-body p-0">
+            <table class="table table-bordered mb-0">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>کالا</th>
+                        <th>تعداد</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @{
+                        int row = 1;
+                    }
+                    @foreach (var item in Model.WarehouseTransfer.Items)
+                    {
+                        <tr>
+
+                            <td>@row</td>
+
+                            <td>@item.Product?.ProductName</td>
+
+                            <td>@item.Quantity</td>
+
+                        </tr>
+
+                        row++;
+                    }
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+
+
+    @if (Model.WarehouseTransfer.Status == DocumentStatus.Draft)
+    {
+        <br />
+        <a asp-page="./Edit"
+           asp-route-id="@Model.WarehouseTransfer.Id"
+           class="btn btn-warning">
+            ویرایش
+        </a>
+
+        <form method="post"
+              asp-page-handler="Post"
+              asp-route-id="@Model.WarehouseTransfer.Id"
+              style="display:inline">
+
+            <button type="submit"
+                    class="btn btn-success"
+                    onclick="return confirm('آیا از ثبت نهایی این حواله اطمینان دارید؟');">
+
+                ثبت نهایی
+
+            </button>
+            <br />
+        </form>
+    }
+
+    @if (Model.WarehouseTransfer.Status == DocumentStatus.Posted)
+    {
+        <form method="post"
+              asp-page-handler="Cancel"
+              asp-route-id="@Model.WarehouseTransfer.Id"
+              class="d-inline">
+            <br />
+            <button type="submit"
+                    class="btn btn-danger"
+                    onclick="return confirm('آیا از ابطال این حواله اطمینان دارید؟');">
+
+                <i class="bi bi-x-circle"></i>
+                ابطال حواله
+
+            </button>
+            <br />
+
+        </form>
+    }
+    <br />
+    <div>
+        <a asp-page="./Index" class="btn btn-secondary">
+            بازگشت به لیست
+        </a>
+    </div>
+
+
+
+   

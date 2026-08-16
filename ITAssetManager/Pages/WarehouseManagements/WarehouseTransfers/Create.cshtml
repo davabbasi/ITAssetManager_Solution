@@ -2,13 +2,10 @@
 @model ITAssetManager.Pages.WarehouseManagements.WarehouseTransfers.CreateModel
 
 @{
-    ViewData["Title"] = "Create";
+    ViewData["Title"] = "ثبت انتقال بین انبار";
 }
 
-<h1>Create</h1>
 
-<h4>WarehouseTransfer</h4>
-<hr />
 
 <div class="card">
 
@@ -96,17 +93,16 @@
             </div>
 
             <hr />
-
-            <button class="btn btn-primary">ثبت انتقال</button>
+            <div>
+                <button class="btn btn-primary">ثبت انتقال</button>
+                <a asp-page="./Index" class="btn btn-secondary">
+                    انصراف
+                </a>
+            </div>
 
         </form>
     </div>
 
-</div>
-
-
-<div>
-    <a asp-page="Index">Back to List</a>
 </div>
 
 @section Scripts {
@@ -160,7 +156,7 @@
 
             // دریافت کالاهای موجود در انبار
             const response = await fetch(
-                `/WarehouseManagements/Issues/Create?handler=AvailableProducts&warehouseId=${warehouseId}`
+                `/WarehouseManagements/WarehouseTransfers/Create?handler=WarehouseStock&warehouseId=${warehouseId}`
             );
 
 
@@ -258,14 +254,13 @@
                             انتخاب کالا...
                         </option>
 
-                        ${
-                            availableProducts.map(product => `
-                                <option value="${product.productId}">
-                                    ${product.productName}
-                                    - موجودی: ${product.stock}
-                                </option>
-                            `).join("")
-                        }
+                      
+
+                         ${availableProducts.map(x => `
+                            <option value="${x.productId}">
+                                ${x.productName} - موجودی: ${x.quantity}
+                            </option>
+                        `).join("")}
 
                     </select>
 
@@ -332,93 +327,3 @@
     </script>
 
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-@* <div class="row">
-    <div class="col-md-4">
-        <form method="post">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <div class="form-group">
-                <label asp-for="TransferNumber" class="control-label"></label>
-                <input type="text" asp-for="TransferNumber" class="form-control"  readonly/>
-                <span asp-validation-for="TransferNumber" class="text-danger"></span>
-            </div>
-            <div class="col-md-6">
-                <span class="text-danger">*</span>
-                <label class="form-label">انبار مبدا</label>
-                <select id="selectWarehouse"
-                        asp-for="WarehouseTransfer.SourceWarehouseId" asp-items="Model.WarehouseList" class="form-select">
-                    <option value=""> انتخاب کنید...</option>
-                </select>
-            </div>
-            <div class="col-md-6">
-                <span class="text-danger">*</span>
-                <label class="form-label">انبار مقصد</label>
-                <select id="selectWarehouse"
-                        asp-for="WarehouseTransfer.DestinationWarehouseId" asp-items="Model.WarehouseList" class="form-select">
-                    <option value=""> انتخاب کنید...</option>
-                </select>
-            </div>
-            <div class="form-group">
-                <label asp-for="WarehouseTransfer.TransferDate" class="control-label"></label>
-                <input asp-for="WarehouseTransfer.TransferDate" class="form-control" />
-                <span asp-validation-for="WarehouseTransfer.TransferDate" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="WarehouseTransfer.Status" class="control-label"></label>
-                <select asp-for="WarehouseTransfer.Status" class="form-control" ></select>
-                <span asp-validation-for="WarehouseTransfer.Status" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="WarehouseTransfer.Description" class="control-label"></label>
-                <input asp-for="WarehouseTransfer.Description" class="form-control" />
-                <span asp-validation-for="WarehouseTransfer.Description" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="WarehouseTransfer.CreatedBy" class="control-label"></label>
-                <input asp-for="WarehouseTransfer.CreatedBy" class="form-control" />
-                <span asp-validation-for="WarehouseTransfer.CreatedBy" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="WarehouseTransfer.CreatedAt" class="control-label"></label>
-                <input asp-for="WarehouseTransfer.CreatedAt" class="form-control" />
-                <span asp-validation-for="WarehouseTransfer.CreatedAt" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <input type="submit" value="Create" class="btn btn-primary" />
-            </div>
-        </form>
-    </div>
-</div>
-
-<div>
-    <a asp-page="Index">Back to List</a>
-</div>
-
-@section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
-}
- *@

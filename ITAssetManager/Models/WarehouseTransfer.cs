@@ -13,43 +13,35 @@ namespace ITAssetManager.Models
         [Display(Name = "لغو شده")]
         Cancelled = 3
     }
+
     public class WarehouseTransfer
     {
         public int Id { get; set; }
 
-        /// <summary>
-        /// شماره انتقال
-        /// </summary>
+        [Display(Name = "شماره انتقال")]
         public int TransferNumber { get; set; }
-
-        /// <summary>
-        /// انبار مبدا
-        /// </summary>
         public int SourceWarehouseId { get; set; }
 
+        [Display(Name = "انبار مبدا")]
         public Warehouse? SourceWarehouse { get; set; } = null!;
-
-        /// <summary>
-        /// انبار مقصد
-        /// </summary>
         public int DestinationWarehouseId { get; set; }
 
+        [Display(Name = "انبار مقصد")]
         public Warehouse? DestinationWarehouse { get; set; } = null!;
 
-        /// <summary>
-        /// تاریخ انتقال
-        /// </summary>
+        [Display(Name = "تاریخ انتقال")]
         public DateTime TransferDate { get; set; }
 
-        /// <summary>
-        /// وضعیت سند
-        /// </summary>
+        [Display(Name = "وضعیت")]
         public DocumentStatus Status { get; set; }
 
+        [Display(Name = "توضیحات")]
         public string? Description { get; set; }
 
+        [Display(Name = "ایجاد کننده")]
         public string? CreatedBy { get; set; }
 
+        [Display(Name = "تاریخ ایجاد")]
         public DateTime CreatedAt { get; set; }
 
         public ICollection<WarehouseTransferItem> Items { get; set; }

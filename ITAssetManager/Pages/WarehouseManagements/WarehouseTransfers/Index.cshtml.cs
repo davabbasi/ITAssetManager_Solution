@@ -20,9 +20,15 @@ namespace ITAssetManager.Pages.WarehouseManagements.WarehouseTransfers
         }
 
         public IList<WarehouseTransfer> WarehouseTransfer { get;set; } = default!;
+        [BindProperty(SupportsGet = true)] public int? WarehouseId { get; set; }
+        [BindProperty(SupportsGet = true)] public int? TransferNumber { get; set; }
+        public List<Warehouse> WarehouseList { get; set; } = null!;
+        [BindProperty(SupportsGet = true)] public int? Status { get; set; }
 
         public async Task OnGetAsync()
         {
+            WarehouseList = await _context.Warehouses.Include(r => r.Keeper).ToListAsync();
+
             WarehouseTransfer = await _context.WarehouseTransfers
                 .Include(w => w.DestinationWarehouse)
                 .Include(w => w.SourceWarehouse).ToListAsync();

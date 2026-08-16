@@ -7,7 +7,6 @@
 }
 
 <div class="d-flex justify-content-between align-items-center mb-3">
-    <h5 class="mb-0 fw-bold">رسید</h5>  
     <a asp-page="Create" class="btn btn-primary btn-sm">
         <i class="bi bi-plus-lg me-1"></i>ثبت رسید جدید
     </a>
@@ -47,12 +46,12 @@
 
                 </select>
             </div>
-           
+
             <div class="col-md-2 d-flex gap-1">
                 <button type="submit" class="btn btn-primary btn-sm flex-fill">
                     <i class="bi bi-search"></i> جستجو
                 </button>
-                <a href="/WarehouseManagements/Receipts" class="btn btn-outline-secondary btn-sm">
+                <a asp-page="./Index" class="btn btn-outline-secondary btn-sm">
                     <i class="bi bi-x"></i>
                 </a>
             </div>

@@ -5,6 +5,7 @@
         public int Id { get; set; }
 
         public int WarehouseTransferId { get; set; }
+        public int RowNumber { get; set; }
 
         public WarehouseTransfer? WarehouseTransfer { get; set; } = null!;
 

@@ -2,69 +2,435 @@
 @model ITAssetManager.Pages.WarehouseManagements.WarehouseTransfers.EditModel
 
 @{
-    ViewData["Title"] = "Edit";
+    ViewData["Title"] = "ویرایش انتقال";
 }
 
-<h1>Edit</h1>
 
-<h4>WarehouseTransfer</h4>
-<hr />
-<div class="row">
-    <div class="col-md-4">
+<div class="card">
+
+    <div class="card-header">
+        <i class="bi bi-pencil-square me-2"></i>
+        ویرایش انتقال بین انبار
+    </div>
+
+    <div class="card-body">
         <form method="post">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <input type="hidden" asp-for="WarehouseTransfer.Id" />
-            <div class="form-group">
-                <label asp-for="WarehouseTransfer.TransferNumber" class="control-label"></label>
-                <input asp-for="WarehouseTransfer.TransferNumber" class="form-control" />
-                <span asp-validation-for="WarehouseTransfer.TransferNumber" class="text-danger"></span>
+
+            <!-- ========================= -->
+            <!-- هدر انتقال -->
+            <!-- ========================= -->
+
+            <div class="row g-3">
+                <div class="col-md-3">
+                    <label class="form-label">
+                        شماره انتقال
+                    </label>
+                    <input type="text" asp-for="WarehouseTransfer.TransferNumber" class="form-control" readonly />
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">
+                        تاریخ
+                    </label>
+                    <input asp-for="@Model.ShamsiDate" class="persian-date form-control" />
+                </div>
+
+
+                <div class="col-md-6">
+                    <label class="form-label">
+                        انبار مبدا
+                    </label>
+                    <select id="fromWarehouseSelect" asp-for="WarehouseTransfer.SourceWarehouseId"
+                            asp-items="Model.SourceWarehouseList"
+                            class="form-select">
+                        <option value="">
+                            انتخاب کنید...
+                        </option>
+                    </select>
+                </div>
+
+                <div class="col-md-6">
+                    <label class="form-label">
+                        انبار مقصد
+                    </label>
+                    <select  asp-for="WarehouseTransfer.DestinationWarehouseId"
+                            asp-items="Model.DestinationWarehouseList"
+                            class="form-select">
+                        <option value="">
+                            انتخاب کنید...
+                        </option>
+                    </select>
+                </div>
+
+                <div class="col-md-12">
+                    <label class="form-label">
+                        توضیحات
+                    </label>
+                    <textarea asp-for="WarehouseTransfer.Description"
+                             class="form-control"></textarea>
+                </div>
             </div>
-            <div class="form-group">
-                <label asp-for="WarehouseTransfer.SourceWarehouseId" class="control-label"></label>
-                <select asp-for="WarehouseTransfer.SourceWarehouseId" class="form-control" asp-items="ViewBag.SourceWarehouseId" ></select>
-                <span asp-validation-for="WarehouseTransfer.SourceWarehouseId" class="text-danger"></span>
+            <hr />
+
+
+            <!-- ========================= -->
+            <!-- اقلام -->
+            <!-- ========================= -->
+
+            <h5 class="mb-3">
+                اقلام انتقال
+            </h5>
+
+            <div class="card">
+                <div class="card-body p-0">
+                    <table class="table table-bordered mb-0">
+                        <thead>
+                            <tr>
+                                <th style="width:50px">
+                                    #
+                                </th>
+                                <th>
+                                    کالا
+                                </th>
+                                <th style="width:150px">
+                                    تعداد
+                                </th>
+                                <th style="width:70px">
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody id="itemsBody">
+                            @for (int i = 0; i < Model.Items.Count; i++)
+                            {
+                                <tr>
+
+                                    <td class="row-number">
+                                        @(i + 1)
+                                    </td>
+
+
+                                    <td>
+
+                                        <select asp-for="Items[i].ProductId"
+                                                class="form-select">
+
+                                            <option value="">
+                                                انتخاب کالا...
+                                            </option>
+
+                                            @foreach (var product in Model.Products)
+                                            {
+                                                <option value="@product.Id">
+                                                    @product.ProductName
+                                                </option>
+                                            }
+
+                                        </select>
+
+                                    </td>
+
+
+                                    <td>
+
+                                        <input asp-for="Items[i].Quantity"
+                                               type="number"
+                                               min="1"
+                                               class="form-control" />
+
+                                    </td>
+
+
+                                    <td>
+
+                                        <button type="button"
+                                                class="btn btn-danger btn-sm"
+                                                onclick="removeRow(this)">
+
+                                            ❌
+
+                                        </button>
+
+                                    </td>
+
+                                </tr>
+                            }
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
             </div>
-            <div class="form-group">
-                <label asp-for="WarehouseTransfer.DestinationWarehouseId" class="control-label"></label>
-                <select asp-for="WarehouseTransfer.DestinationWarehouseId" class="form-control" asp-items="ViewBag.DestinationWarehouseId" ></select>
-                <span asp-validation-for="WarehouseTransfer.DestinationWarehouseId" class="text-danger"></span>
+
+
+            <div class="mt-3">
+
+                <button type="button"
+                        id="btnAddItem"
+                        class="btn btn-success">
+
+                    <i class="bi bi-plus"></i>
+
+                    افزودن کالا
+
+                </button>
+
             </div>
-            <div class="form-group">
-                <label asp-for="WarehouseTransfer.TransferDate" class="control-label"></label>
-                <input asp-for="WarehouseTransfer.TransferDate" class="form-control" />
-                <span asp-validation-for="WarehouseTransfer.TransferDate" class="text-danger"></span>
+
+
+            <hr />
+
+
+            <div class="d-flex gap-2">
+
+                <button type="submit"
+                        class="btn btn-primary">
+
+                    <i class="bi bi-check-lg me-1"></i>
+
+                    ذخیره تغییرات
+
+                </button>
+
+
+                <a asp-page="Details"
+                   asp-route-id="@Model.WarehouseTransfer.Id"
+                   class="btn btn-outline-secondary">
+
+                    انصراف
+
+                </a>
+
             </div>
-            <div class="form-group">
-                <label asp-for="WarehouseTransfer.Status" class="control-label"></label>
-                <select asp-for="WarehouseTransfer.Status" class="form-control" ></select>
-                <span asp-validation-for="WarehouseTransfer.Status" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="WarehouseTransfer.Description" class="control-label"></label>
-                <input asp-for="WarehouseTransfer.Description" class="form-control" />
-                <span asp-validation-for="WarehouseTransfer.Description" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="WarehouseTransfer.CreatedBy" class="control-label"></label>
-                <input asp-for="WarehouseTransfer.CreatedBy" class="form-control" />
-                <span asp-validation-for="WarehouseTransfer.CreatedBy" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="WarehouseTransfer.CreatedAt" class="control-label"></label>
-                <input asp-for="WarehouseTransfer.CreatedAt" class="form-control" />
-                <span asp-validation-for="WarehouseTransfer.CreatedAt" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <input type="submit" value="Save" class="btn btn-primary" />
-            </div>
+
         </form>
+
     </div>
 </div>
 
-<div>
-    <a asp-page="./Index">Back to List</a>
-</div>
+
+
 
 @section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+
+    <script>
+
+        let availableProducts = [];
+        let rowIndex = 0;
+
+        const warehouseSelect =
+            document.getElementById("fromWarehouseSelect");
+
+        const btnAddItem =
+            document.getElementById("btnAddItem");
+
+        const itemsBody =
+            document.getElementById("itemsBody");
+
+
+        // وقتی انبار مبدا تغییر کرد
+        warehouseSelect.addEventListener("change", async function () {
+
+            const warehouseId = this.value;
+
+            // پاک کردن اقلام قبلی
+            itemsBody.innerHTML = "";
+
+            rowIndex = 0;
+            availableProducts = [];
+
+            // اگر انبار انتخاب نشده
+            if (!warehouseId) {
+
+                btnAddItem.disabled = true;
+
+                itemsBody.innerHTML = `
+                    <tr>
+                        <td colspan="4"
+                            class="text-center text-muted py-3">
+                            ابتدا انبار مبدا را انتخاب کنید.
+                        </td>
+                    </tr>
+                `;
+
+                return;
+            }
+
+
+            // دریافت کالاهای موجود در انبار
+            const response = await fetch(
+                `/WarehouseManagements/WarehouseTransfers/Create?handler=WarehouseStock&warehouseId=${warehouseId}`
+            );
+
+
+            if (!response.ok) {
+
+                alert("خطا در دریافت موجودی انبار.");
+
+                btnAddItem.disabled = true;
+
+                return;
+            }
+
+
+            availableProducts = await response.json();
+
+
+            // اگر هیچ کالایی موجود نبود
+            if (availableProducts.length === 0) {
+
+                itemsBody.innerHTML = `
+                    <tr>
+                        <td colspan="4"
+                            class="text-center text-muted py-3">
+
+                            کالایی در این انبار موجود نیست.
+
+                        </td>
+                    </tr>
+                `;
+
+                btnAddItem.disabled = true;
+
+                return;
+            }
+
+
+            // کالا داریم
+            btnAddItem.disabled = false;
+
+            itemsBody.innerHTML = `
+                <tr>
+                    <td colspan="4"
+                        class="text-center text-success py-3">
+
+                        ${availableProducts.length}
+                        کالا در این انبار موجود است.
+                        برای افزودن کالا روی دکمه «افزودن کالا» کلیک کنید.
+
+                    </td>
+                </tr>
+            `;
+
+        });
+
+
+        // افزودن سطر
+        btnAddItem.addEventListener("click", addRow);
+
+
+        function addRow() {
+
+            // اگر کالایی موجود نیست
+            if (availableProducts.length === 0) {
+                return;
+            }
+
+
+            // پیام اولیه را حذف کن
+            const messageRow = itemsBody.querySelector("tr");
+
+            if (messageRow &&
+                !messageRow.querySelector("select")) {
+
+                messageRow.remove();
+            }
+
+
+            const row = document.createElement("tr");
+
+
+            row.innerHTML = `
+
+                <td>
+                    ${rowIndex + 1}
+                </td>
+
+
+                <td>
+
+                    <select
+                        class="form-select"
+                        name="Items[${rowIndex}].ProductId">
+
+                        <option value="">
+                            انتخاب کالا...
+                        </option>
+
+
+
+                         ${availableProducts.map(x => `
+                            <option value="${x.productId}">
+                                ${x.productName} - موجودی: ${x.quantity}
+                            </option>
+                        `).join("")}
+
+                    </select>
+
+                </td>
+
+
+                <td>
+
+                    <input
+                        type="number"
+                        min="1"
+                        value="1"
+                        class="form-control"
+                        name="Items[${rowIndex}].Quantity" />
+
+                </td>
+
+
+                <td>
+
+                    <button
+                        type="button"
+                        class="btn btn-danger btn-sm"
+                        onclick="removeRow(this)">
+
+                        ❌
+
+                    </button>
+
+                </td>
+
+            `;
+
+
+            itemsBody.appendChild(row);
+
+            rowIndex++;
+        }
+
+
+        // حذف سطر
+        function removeRow(button) {
+
+            button.closest("tr").remove();
+
+            renumberRows();
+        }
+
+
+        // شماره‌گذاری مجدد
+        function renumberRows() {
+
+            const rows =
+                itemsBody.querySelectorAll("tr");
+
+            rows.forEach((row, index) => {
+
+                row.children[0].innerText = index + 1;
+
+            });
+
+        }
+
+    </script>
+
 }

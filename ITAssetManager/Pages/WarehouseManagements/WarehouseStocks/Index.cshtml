@@ -1,54 +1,85 @@
 ﻿@page
+@using ITAssetManager.Convertor
 @model ITAssetManager.Pages.WarehouseManagements.WarehouseStocks.IndexModel
 
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "موجودی";
 }
 
-<h1>Index</h1>
+<!-- Filters -->
+<div class="card mb-3">
+    <div class="card-body py-2">
+        <form method="get" class="row g-2 align-items-end">
+            
+            <div class="col-md-2">
+                <input type="text" name="productName" value="@Model.ProductName"
+                       class="form-control form-control-sm search-box"
+                       placeholder="جستجو در نام کالا ..." />
+            </div>
 
-<p>
-    <a asp-page="Create">Create New</a>
-</p>
-<table class="table">
-    <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.WarehouseStock[0].Quantity)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.WarehouseStock[0].UpdatedAt)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.WarehouseStock[0].Warehouse)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.WarehouseStock[0].Product)
-            </th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-@foreach (var item in Model.WarehouseStock) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.Quantity)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.UpdatedAt)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Warehouse.WarehouseName)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Product.ProductName)
-            </td>
-            <td>
-                <a asp-page="./Edit" asp-route-id="@item.Id">Edit</a> |
-                <a asp-page="./Details" asp-route-id="@item.Id">Details</a> |
-                <a asp-page="./Delete" asp-route-id="@item.Id">Delete</a>
-            </td>
-        </tr>
-}
-    </tbody>
-</table>
+            <div class="col-md-2">
+                <select name="WarehouseId" class="form-select form-select-sm">
+                    <option value="">همه انبارها</option>
+                    @foreach (var warehouse in Model.WarehouseList)
+                    {
+                        <option value="@warehouse.Id" selected="@(Model.WarehouseId == warehouse.Id)">@warehouse.WarehouseName</option>
+                    }
+                </select>
+            </div>
+          
+
+            <div class="col-md-2 d-flex gap-1">
+                <button type="submit" class="btn btn-primary btn-sm flex-fill">
+                    <i class="bi bi-search"></i> جستجو
+                </button>              
+                <a asp-page="./Index" class="btn btn-outline-secondary btn-sm">
+                    <i class="bi bi-x"></i>
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="table-responsive">
+    <table class="table table-hover mb-0">
+        <thead>
+            <tr>
+                <th>
+                    @Html.DisplayNameFor(model => model.WarehouseStock[0].Quantity)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.WarehouseStock[0].UpdatedAt)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.WarehouseStock[0].Warehouse)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.WarehouseStock[0].Product)
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model.WarehouseStock)
+            {
+                <tr>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Quantity)
+                    </td>
+                    <td>
+                        @item.UpdatedAt.ToShamsi()
+
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Warehouse.WarehouseName)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Product.ProductName)
+                    </td>
+
+                </tr>
+            }
+        </tbody>
+    </table>
+
+
+</div>

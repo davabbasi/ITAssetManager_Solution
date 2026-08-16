@@ -22,14 +22,14 @@
                 </select>
             </div>
             <div class="col-md-2">
-                <select name="status" class="form-select form-select-sm">
+                <select name="Type" class="form-select form-select-sm">
                     <option value="">همه تراکنش‌ها</option>
-                    <option value="1" selected="@(Model.Status == 1)">رسید</option>
-                    <option value="2" selected="@(Model.Status == 2)">حواله</option>
-                    <option value="3" selected="@(Model.Status == 3)">انتقال به انبار</option>
-                    <option value="4" selected="@(Model.Status == 4)">انتقال از انبار</option>
-                    <option value="5" selected="@(Model.Status == 5)"> اصلاح موجودی (افزایش)</option>
-                    <option value="6" selected="@(Model.Status == 6)"> اصلاح موجودی (کاهش)</option>
+                    <option value="1" selected="@(Model.Type == 1)">رسید</option>
+                    <option value="2" selected="@(Model.Type == 2)">حواله</option>
+                    <option value="3" selected="@(Model.Type == 3)">انتقال به انبار</option>
+                    <option value="4" selected="@(Model.Type == 4)">انتقال از انبار</option>
+                    <option value="5" selected="@(Model.Type == 5)"> اصلاح موجودی (افزایش)</option>
+                    <option value="6" selected="@(Model.Type == 6)"> اصلاح موجودی (کاهش)</option>
                 </select>
             </div>
 
@@ -37,7 +37,7 @@
                 <button type="submit" class="btn btn-primary btn-sm flex-fill">
                     <i class="bi bi-search"></i> جستجو
                 </button>
-                <a href="/WarehouseManagements/Receipts" class="btn btn-outline-secondary btn-sm">
+                <a href="/WarehouseManagements/InventoryTransactions" class="btn btn-outline-secondary btn-sm">
                     <i class="bi bi-x"></i>
                 </a>
             </div>

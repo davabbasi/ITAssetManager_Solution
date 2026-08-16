@@ -25,5 +25,23 @@ namespace ITAssetManager.Pages.Warehouses
         {
             Warehouse = await _context.Warehouses.Include(w=>w.Keeper).ToListAsync();
         }
+        public async Task<IActionResult> OnPostDeleteAsync(int id)
+        {
+            var warehousesTransactions = await _context.InventoryTransactions
+                
+                .FirstOrDefaultAsync(s => s.WarehouseId == id);
+            if (warehousesTransactions != null)
+            {
+                TempData["WarehouseDeleteError"] = "برای این این انبار تراکنش انبار ثبت شده است   .";
+                return RedirectToPage();
+            }
+            var warehouse = await _context.Warehouses.Where(p => p.Id == id).FirstOrDefaultAsync();
+            if (warehouse == null)
+                return NotFound();
+            _context.Warehouses.Remove(warehouse);
+            await _context.SaveChangesAsync();
+            TempData["WarehouseDeleteSuccess"] = "انبار با موفقیت حذف شد.";
+            return RedirectToPage();
+        }
     }
 }

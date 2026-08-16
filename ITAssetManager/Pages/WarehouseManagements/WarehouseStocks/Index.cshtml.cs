@@ -20,12 +20,24 @@ namespace ITAssetManager.Pages.WarehouseManagements.WarehouseStocks
         }
 
         public IList<WarehouseStock> WarehouseStock { get;set; } = default!;
+        public List<Warehouse> WarehouseList { get; set; } = null!;
+        [BindProperty(SupportsGet = true)] public string? ProductName { get; set; }
+        [BindProperty(SupportsGet = true)] public int? WarehouseId { get; set; }
+
 
         public async Task OnGetAsync()
         {
-            WarehouseStock = await _context.WarehouseStocks
+            WarehouseList = await _context.Warehouses.Include(r => r.Keeper).ToListAsync();
+
+            var query =  _context.WarehouseStocks
                 .Include(w => w.Product)
-                .Include(w => w.Warehouse).ToListAsync();
+                .Include(w => w.Warehouse).AsQueryable();
+            if(!string.IsNullOrEmpty(ProductName))
+                query=query.Where(x=>x.Product.ProductName.Contains(ProductName));
+            if(WarehouseId.HasValue)
+                query= query.Where(x=>x.WarehouseId==WarehouseId);
+
+            WarehouseStock = await query.ToListAsync();
         }
     }
 }

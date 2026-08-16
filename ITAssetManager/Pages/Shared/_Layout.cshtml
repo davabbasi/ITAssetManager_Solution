@@ -310,39 +310,39 @@
               
                 <div class="sidebar-group-items">
                     <a href="/" class="nav-link-item @(Context.Request.Path == "/" ? "active" : "")">
-                        <i class="bi bi-speedometer2"></i> داشبورد
+                        <i class="bi bi-columns-gap"></i> داشبورد
                     </a>
                 </div>
                 <!--مدیریت کالا-->
                 <div class="sidebar-group">
                     <div class="sidebar-group-header" onclick="toggleGroup(this)">
-                        <span><i class="bi bi-cpu me-1"></i>مدیریت انبار</span>
+                        <span><i class="bi bi-boxes me-1"></i>مدیریت انبار</span>
                         <i class="bi bi-chevron-down chevron"></i>
                     </div>
                     <div class="sidebar-group-items">
                         <a href="/WarehouseManagements/Products" class="nav-link-item @(Context.Request.Path.StartsWithSegments("/WarehouseManagements/Products") ? "active" : "")">
-                            <i class="bi bi-cpu"></i>  کالا
+                            <i class="bi  bi-box-seam"></i>  کالا
                         </a>
                         <a href="/WarehouseManagements/Keepers" class="nav-link-item @(Context.Request.Path.StartsWithSegments("/WarehouseManagements/Keepers") ? "active" : "")">
-                            <i class="bi bi-pc-display"></i> انباردار
+                            <i class="bi bi-people"></i> انباردار
                         </a>
                         <a href="/WarehouseManagements/Warehouses" class="nav-link-item @(Context.Request.Path.StartsWithSegments("/WarehouseManagements/Warehouses") ? "active" : "")">
-                            <i class="bi bi-pc-display"></i> انبار
+                            <i class="bi bi-building"></i> انبار
                         </a>                      
                         <a href="/WarehouseManagements/Receipts" class="nav-link-item @(Context.Request.Path.StartsWithSegments("/WarehouseManagements/Receipts") ? "active" : "")">
-                            <i class="bi bi-pc-display"></i> رسید
+                            <i class="bi bi-box-arrow-in-down"></i> رسید
                         </a>                       
                         <a href="/WarehouseManagements/Issues" class="nav-link-item @(Context.Request.Path.StartsWithSegments("/WarehouseManagements/Issues") ? "active" : "")">
-                            <i class="bi bi-pc-display"></i> حواله
+                            <i class="bi bi-box-arrow-up"></i> حواله
                         </a>
                         <a href="/WarehouseManagements/WarehouseTransfers" class="nav-link-item @(Context.Request.Path.StartsWithSegments("/WarehouseManagements/WarehouseTransfers") ? "active" : "")">
-                            <i class="bi bi-pc-display"></i> انتقال بین انباری
+                            <i class="bi bi-arrow-left-right"></i> انتقال بین انباری
                         </a>
                         <a href="/WarehouseManagements/WarehouseStocks" class="nav-link-item @(Context.Request.Path.StartsWithSegments("/WarehouseManagements/WarehouseStocks") ? "active" : "")">
-                            <i class="bi bi-pc-display"></i> موجودی
+                            <i class="bi bi-bar-chart"></i> گزارش موجودی
                         </a>
                         <a href="/WarehouseManagements/InventoryTransactions" class="nav-link-item @(Context.Request.Path.StartsWithSegments("/WarehouseManagements/InventoryTransactions") ? "active" : "")">
-                            <i class="bi bi-pc-display"></i> گردش کالا
+							<i class="bi bi-graph-up-arrow"></i> گزارش گردش کالا
                         </a>
                     </div>
                 </div>
@@ -365,7 +365,7 @@
                 <!-- ردیابی -->
                 <div class="sidebar-group">
                     <div class="sidebar-group-header" onclick="toggleGroup(this)">
-                        <span><i class="bi bi-arrow-left-right me-1"></i>ردیابی</span>
+                        <span><i class="bi bi-geo-alt me-1"></i>ردیابی تجهیزات</span>
                         <i class="bi bi-chevron-down chevron"></i>
                     </div>
                     <div class="sidebar-group-items">
@@ -377,28 +377,22 @@
                         </a>
                     </div>
                 </div>
-                <!-- فروشندگان -->
+             
+                <!-- خرید تدارکات -->
                 <div class="sidebar-group">
                     <div class="sidebar-group-header" onclick="toggleGroup(this)">
-                        <span><i class="bi bi-shop me-1"></i>فروشندگان</span>
-                        <i class="bi bi-chevron-down chevron"></i>
-                    </div>
-                    <div class="sidebar-group-items">
-                        <a href="/Vendors" class="nav-link-item @(Context.Request.Path.StartsWithSegments("/Vendors") ? "active" : "")">
-                            <i class="bi bi-shop"></i> فروشندگان
-                        </a>
-                    </div>
-                </div>
-                <!-- خرید -->
-                <div class="sidebar-group">
-                    <div class="sidebar-group-header" onclick="toggleGroup(this)">
-                        <span><i class="bi bi-cart3 me-1"></i>خرید</span>
+                        <span><i class="bi bi-cart3 me-1"></i>خرید تدارکات</span>
                         <i class="bi bi-chevron-down chevron"></i>
                     </div>
                     <div class="sidebar-group-items">
                         <a href="/PurchaseRequests" class="nav-link-item @(Context.Request.Path.StartsWithSegments("/PurchaseRequests") ? "active" : "")">
-                            <i class="bi bi-cart3"></i> درخواست‌های خرید
+                            <i class="bi bi-cart3"></i> درخواست‌های خرید(راهکاران)
                         </a>
+                        <div class="sidebar-group-items">
+                            <a href="/Vendors" class="nav-link-item @(Context.Request.Path.StartsWithSegments("/Vendors") ? "active" : "")">
+                                <i class="bi bi-shop"></i> فروشندگان
+                            </a>
+                        </div>
                     </div>
                 </div>
                 <!-- گزارش‌ها -->

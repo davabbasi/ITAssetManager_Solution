@@ -46,5 +46,23 @@ namespace ITAssetManager.Pages.Products
 
             Product = await query.OrderByDescending(a => a.ProductName).ToListAsync();
         }
+        public async Task<IActionResult> OnPostDeleteAsync(int id)
+        {
+            var transaction = await _context.InventoryTransactions
+                .Include(s => s.Product)
+                .FirstOrDefaultAsync(s => s.ProductId == id);
+            if (transaction!=null)
+            {
+                TempData["ProductError"] = "برای این کالا تراکنش انبار ثبت شده است .";
+                return RedirectToPage();
+            }
+            var product = await _context.Products.Where(p => p.Id == id).FirstOrDefaultAsync();
+            if (product == null)
+                return NotFound();
+            _context.Products.Remove(product);
+            await _context.SaveChangesAsync();
+            TempData["ProductSuccess"] = "کالا با موفقیت حذف شد.";
+            return RedirectToPage();
+        }
     }
 }

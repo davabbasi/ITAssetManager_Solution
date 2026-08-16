@@ -27,8 +27,6 @@ namespace ITAssetManager.Pages.Products
 
         [BindProperty]
         public Product Product { get; set; } = default!;
-
-        // For more information, see https://aka.ms/RazorPagesCRUD.
         public async Task<IActionResult> OnPostAsync()
         {
             if (!ModelState.IsValid)

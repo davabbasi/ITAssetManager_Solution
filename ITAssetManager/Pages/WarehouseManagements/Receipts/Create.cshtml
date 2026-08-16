@@ -2,10 +2,9 @@
 @model ITAssetManager.Pages.WarehouseManagements.Receipts.CreateModel
 
 @{
-    ViewData["Title"] = "Create";
+    ViewData["Title"] = "ایجاد رسید انبار";
 }
 
-<h1>Create</h1>
 
 <div class="card">
     <div class="card-header">ثبت رسید انبار</div>
@@ -68,17 +67,18 @@
                     <i class="bi bi-plus"></i> افزودن کالا</button>
             </div>
             <hr />
-            <button class="btn btn-primary">ثبت رسید</button>
+            <div>
+                <button class="btn btn-primary">ثبت رسید</button>
+                <a asp-page="./Index" class="btn btn-secondary">
+                    انصراف
+                </a>
+            </div>
         </form>
     </div>
 </div>
 
 <br />
-<div>
-    <a asp-page="./Index" class="btn btn-secondary">
-        انصراف
-    </a>
-</div>
+
 
 
 @section Scripts {

@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using ITAssetManager.Data;
 using ITAssetManager.Models;
+using ITAssetManager.Convertor;
 
 namespace ITAssetManager.Pages.WarehouseManagements.WarehouseTransfers
 {
@@ -20,8 +21,13 @@ namespace ITAssetManager.Pages.WarehouseManagements.WarehouseTransfers
             _context = context;
         }
 
-        [BindProperty]
-        public WarehouseTransfer WarehouseTransfer { get; set; } = default!;
+        [BindProperty]public WarehouseTransfer WarehouseTransfer { get; set; } = default!;
+        [BindProperty] public List<WarehouseTransferItem> Items { get; set; } = new();
+
+        [BindProperty] public string ShamsiDate { get; set; }
+        public SelectList SourceWarehouseList { get; set; } = new SelectList(Enumerable.Empty<SelectListItem>());
+        public SelectList DestinationWarehouseList { get; set; } = new SelectList(Enumerable.Empty<SelectListItem>());
+        public List<Product> Products { get; set; } = new();
 
         public async Task<IActionResult> OnGetAsync(int? id)
         {
@@ -30,50 +36,141 @@ namespace ITAssetManager.Pages.WarehouseManagements.WarehouseTransfers
                 return NotFound();
             }
 
-            var warehousetransfer =  await _context.WarehouseTransfers.FirstOrDefaultAsync(m => m.Id == id);
-            if (warehousetransfer == null)
-            {
-                return NotFound();
-            }
-            WarehouseTransfer = warehousetransfer;
-           ViewData["DestinationWarehouseId"] = new SelectList(_context.Warehouses, "Id", "WarehouseName");
-           ViewData["SourceWarehouseId"] = new SelectList(_context.Warehouses, "Id", "WarehouseName");
+            WarehouseTransfer =  await _context.WarehouseTransfers
+                .Include(x => x.Items)
+                .ThenInclude(x => x.Product)
+                .FirstOrDefaultAsync(m => m.Id == id);
+
+            if (WarehouseTransfer == null)
+                return NotFound();    
+            ShamsiDate = WarehouseTransfer.TransferDate.ToShamsi();
+
+            Items = WarehouseTransfer.Items
+                .OrderBy(x => x.RowNumber)
+                .ToList();
+
+            await LoadListsAsync();
             return Page();
+
         }
 
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more information, see https://aka.ms/RazorPagesCRUD.
         public async Task<IActionResult> OnPostAsync()
         {
             if (!ModelState.IsValid)
             {
+                await LoadListsAsync();
                 return Page();
             }
 
-            _context.Attach(WarehouseTransfer).State = EntityState.Modified;
+            var transfer = await _context.WarehouseTransfers
+                .Include(x => x.Items)
+                .FirstOrDefaultAsync(x => x.Id == WarehouseTransfer.Id);
 
-            try
+            if (transfer == null)
+                return NotFound();
+
+
+            // =========================
+            // ویرایش هدر
+            // =========================
+
+            transfer.TransferNumber = WarehouseTransfer.TransferNumber;
+            transfer.SourceWarehouseId = WarehouseTransfer.SourceWarehouseId;
+            transfer.DestinationWarehouseId = WarehouseTransfer.DestinationWarehouseId;
+            transfer.Description = WarehouseTransfer.Description;
+            transfer.TransferDate = (DateTime)ShamsiDate.ToMiladi();
+            // =========================
+            // حذف اقلام قبلی
+            // =========================
+
+            _context.WarehouseTransferItems.RemoveRange(transfer.Items);
+
+
+            // =========================
+            // ثبت اقلام جدید
+            // =========================
+
+            if (Items != null)
             {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!WarehouseTransferExists(WarehouseTransfer.Id))
+                int rowNumber = 1;
+
+                foreach (var item in Items)
                 {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
+                    if (item.ProductId <= 0 || item.Quantity <= 0)
+                        continue;
+
+                    _context.WarehouseTransferItems.Add(
+                        new WarehouseTransferItem
+                        {
+                            WarehouseTransferId = transfer.Id,
+                            RowNumber = rowNumber++,
+                            ProductId = item.ProductId,
+                            Quantity = item.Quantity
+                        });
                 }
             }
 
-            return RedirectToPage("./Index");
+
+            await _context.SaveChangesAsync();
+
+            TempData["Success"] = "انتقال بین انباری با موفقیت ویرایش شد.";
+
+            return RedirectToPage(
+                "/WarehouseManagements/WarehouseTransfers/Details",
+                new { id = transfer.Id });
         }
 
         private bool WarehouseTransferExists(int id)
         {
             return _context.WarehouseTransfers.Any(e => e.Id == id);
         }
+
+        // =========================
+        // لیست‌های فرم
+        // =========================
+
+        private async Task LoadListsAsync()
+        {
+            var warehouses = await _context.Warehouses
+                .OrderBy(x => x.WarehouseName)
+                .ToListAsync();
+
+            SourceWarehouseList = new SelectList(
+                warehouses,
+                "Id",
+                "WarehouseName",
+                WarehouseTransfer.SourceWarehouseId
+            );
+            DestinationWarehouseList = new SelectList(
+                   warehouses,
+                   "Id",
+                   "WarehouseName",
+                   WarehouseTransfer.DestinationWarehouseId
+               );
+
+
+            Products = await _context.Products
+                .OrderBy(x => x.ProductName)
+                .ToListAsync();
+
+        }
+
+        public async Task<IActionResult> OnGetWarehouseStockAsync(int warehouseId)
+        {
+            var stocks = await _context.WarehouseStocks
+                .Where(x => x.WarehouseId == warehouseId && x.Quantity > 0)
+                .Include(x => x.Product)
+                .OrderBy(x => x.Product.ProductName)
+                .Select(x => new
+                {
+                    productId = x.ProductId,
+                    productName = x.Product.ProductName,
+                    quantity = x.Quantity
+                })
+                .ToListAsync();
+
+            return new JsonResult(stocks);
+        }
+
     }
 }

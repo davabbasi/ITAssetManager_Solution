@@ -2,40 +2,50 @@
 @model ITAssetManager.Pages.WarehouseManagements.Keeper.EditModel
 
 @{
-    ViewData["Title"] = "Edit";
+    ViewData["Title"] = "ویرایش انباردار";
 }
 
-<h1>Edit</h1>
 
-<h4>WarehouseKeeper</h4>
-<hr />
-<div class="row">
-    <div class="col-md-4">
-        <form method="post">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <input type="hidden" asp-for="WarehouseKeeper.Id" />
-            <div class="form-group">
-<span class="text-danger">*</span>
-                <label asp-for="WarehouseKeeper.FullName" class="control-label"></label>
-                <input asp-for="WarehouseKeeper.FullName" class="form-control" aria-required="true"/>
-                <span asp-validation-for="WarehouseKeeper.FullName" class="text-danger"></span>
+<div class="row justify-content-center">
+    <div class="col-lg-5">
+        <div class="card">
+            <div class="card-header">
+                <i class="bi bi-pencil me-2"></i>ویرایش انباردار
+                <small class="text-muted me-2">— @Model.WarehouseKeeper.FullName</small>
             </div>
-            <div class="form-group">
-                <label asp-for="WarehouseKeeper.PersonnelNumber" class="control-label"></label>
-                <input asp-for="WarehouseKeeper.PersonnelNumber" class="form-control" />
-                <span asp-validation-for="WarehouseKeeper.PersonnelNumber" class="text-danger"></span>
+            <div class="card-body">
+                <form method="post">
+                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                    <input type="hidden" asp-for="WarehouseKeeper.Id" />
+                    <div class="form-group">
+                        <span class="text-danger">*</span>
+                        <label asp-for="WarehouseKeeper.FullName" class="control-label"></label>
+                        <input asp-for="WarehouseKeeper.FullName" class="form-control" aria-required="true" />
+                        <span asp-validation-for="WarehouseKeeper.FullName" class="text-danger"></span>
+                    </div>
+                    <div class="form-group mb-4">
+                        <label asp-for="WarehouseKeeper.PersonnelNumber" class="control-label"></label>
+                        <input asp-for="WarehouseKeeper.PersonnelNumber" class="form-control" />
+                        <span asp-validation-for="WarehouseKeeper.PersonnelNumber" class="text-danger"></span>
+                    </div>
+
+
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-check-lg me-1"></i>ذخیره
+                        </button>
+                        <a asp-page="./Index" class="btn btn-outline-secondary">انصراف</a>
+                    </div>
+                </form>
+
             </div>
-            <div class="form-group">
-                <input type="submit" value="Save" class="btn btn-primary" />
-            </div>
-        </form>
+        </div>
     </div>
 </div>
 
-<div>
-    <a asp-page="./Index">Back to List</a>
-</div>
-
 @section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
 }
+

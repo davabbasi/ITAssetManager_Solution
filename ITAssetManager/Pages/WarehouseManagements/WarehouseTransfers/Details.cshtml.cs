@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
 using ITAssetManager.Data;
 using ITAssetManager.Models;
+using ITAssetManager.Convertor;
 
 namespace ITAssetManager.Pages.WarehouseManagements.WarehouseTransfers
 {
@@ -20,6 +21,7 @@ namespace ITAssetManager.Pages.WarehouseManagements.WarehouseTransfers
         }
 
         public WarehouseTransfer WarehouseTransfer { get; set; } = default!;
+        [BindProperty] public string ShamsiDate { get; set; } = string.Empty;
 
         public async Task<IActionResult> OnGetAsync(int? id)
         {
@@ -28,15 +30,22 @@ namespace ITAssetManager.Pages.WarehouseManagements.WarehouseTransfers
                 return NotFound();
             }
 
-            var warehousetransfer = await _context.WarehouseTransfers.FirstOrDefaultAsync(m => m.Id == id);
-            if (warehousetransfer == null)
+            WarehouseTransfer = await _context.WarehouseTransfers
+                .Include(t=>t.Items)
+                .ThenInclude(t => t.Product)
+                .Include(t => t.SourceWarehouse)
+                .Include(t=>t.DestinationWarehouse)
+                .FirstOrDefaultAsync(m => m.Id == id);
+
+            if (WarehouseTransfer == null)
             {
                 return NotFound();
             }
-            else
-            {
-                WarehouseTransfer = warehousetransfer;
-            }
+           
+
+            ShamsiDate = WarehouseTransfer.TransferDate.ToShamsi();
+
+          
             return Page();
         }
     }

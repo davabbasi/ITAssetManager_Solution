@@ -25,5 +25,24 @@ namespace ITAssetManager.Pages.WarehouseManagements.Keeper
         {
             WarehouseKeeper = await _context.WarehouseKeepers.ToListAsync();
         }
+        public async Task<IActionResult> OnPostDeleteAsync(int id)
+        {
+            var keeperWarehouses = await _context.Warehouses
+                .Include(s => s.Keeper)
+                .FirstOrDefaultAsync(s => s.KeeperId == id);
+
+            if (keeperWarehouses != null)
+            {
+                TempData["KeeperDeleteError"] = "برای این این انباردار انبار تعریف شده است  .";
+                return RedirectToPage();
+            }
+            var keeper = await _context.WarehouseKeepers.Where(p => p.Id == id).FirstOrDefaultAsync();
+            if (keeper == null)
+                return NotFound();
+            _context.WarehouseKeepers.Remove(keeper);
+            await _context.SaveChangesAsync();
+            TempData["KeeperDeleteSuccess"] = "انباردار با موفقیت حذف شد.";
+            return RedirectToPage();
+        }
     }
 }

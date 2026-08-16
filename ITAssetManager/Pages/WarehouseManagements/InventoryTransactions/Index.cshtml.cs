@@ -22,15 +22,20 @@ namespace ITAssetManager.Pages.WarehouseManagements.InventoryTransactions
         public IList<InventoryTransaction> InventoryTransaction { get;set; } = default!;
         public List<Warehouse> WarehouseList { get; set; } = null!;
         [BindProperty(SupportsGet = true)] public int? WarehouseId { get; set; }
-        [BindProperty(SupportsGet = true)] public int? Status { get; set; }
+        [BindProperty(SupportsGet = true)] public int? Type { get; set; } 
 
         public async Task OnGetAsync()
         {
             WarehouseList = await _context.Warehouses.Include(r => r.Keeper).ToListAsync();
-
-            InventoryTransaction = await _context.InventoryTransactions
+            var query =  _context.InventoryTransactions
                 .Include(i => i.Product)
-                .Include(i => i.Warehouse).ToListAsync();
+                .Include(i => i.Warehouse).AsQueryable();
+            if (Type.HasValue)
+                query = query.Where(x => (int)x.Type == Type);
+            if(WarehouseId.HasValue)
+                query = query.Where(x => x.WarehouseId == WarehouseId);
+
+            InventoryTransaction =await query.ToListAsync();
         }
     }
 }
