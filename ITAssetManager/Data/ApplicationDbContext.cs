@@ -41,6 +41,8 @@ public class ApplicationDbContext : IdentityDbContext
     {
         base.OnModelCreating(builder);
 
+
+
         // Seed: دسته‌بندی‌های پیش‌فرض
         builder.Entity<Category>().HasData(
             new Category { Id = 1, Name = "لپ‌تاپ"},
@@ -56,6 +58,24 @@ public class ApplicationDbContext : IdentityDbContext
             new Category { Id = 11, Name = "هدست"},
             new Category { Id = 12, Name = "سایر"}
         );
+
+        builder.Entity<Asset>()
+            .HasOne(x => x.Product)
+            .WithMany()
+            .HasForeignKey(x => x.ProductId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        builder.Entity<Asset>()
+            .HasOne(x => x.Warehouse)
+            .WithMany()
+            .HasForeignKey(x => x.WarehouseId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        builder.Entity<Asset>()
+            .HasOne(x => x.WarehouseIssue)
+            .WithMany()
+            .HasForeignKey(x => x.WarehouseIssueId)
+            .OnDelete(DeleteBehavior.Restrict);
 
         // InventoryTransaction
         builder.Entity<InventoryTransaction>()

@@ -28,6 +28,9 @@ namespace ITAssetManager.Models
         public ICollection<WarehouseReceiptItem> Receipts { get; set; } = new List<WarehouseReceiptItem>();
         public ICollection<WarehouseIssueItem> Issues { get; set; } = new List<WarehouseIssueItem>();
 
-
+        public static implicit operator Product(int? v)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

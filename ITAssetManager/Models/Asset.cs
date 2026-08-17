@@ -1,3 +1,5 @@
+using System.ComponentModel.DataAnnotations;
+
 namespace ITAssetManager.Models;
 
 public enum AssetStatus
@@ -14,8 +16,18 @@ public class Asset
     public int Id { get; set; }
 
     // کالا
+    [Display(Name = "کالا")]
     public int ProductId { get; set; }
     public Product? Product { get; set; }
+
+    // تامین از انبار
+    [Display(Name = "انبار")]
+    public int WarehouseId { get; set; }
+    public Warehouse? Warehouse { get; set; }
+
+    // حواله خروج مربوط به این تجهیز
+    public int? WarehouseIssueId { get; set; }
+    public WarehouseIssue? WarehouseIssue { get; set; }
 
     // اطلاعات اصلی
     public string Name { get; set; } = string.Empty;

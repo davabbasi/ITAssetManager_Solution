@@ -31,9 +31,10 @@
                     <!-- بخش اول: اطلاعات اصلی -->
                     <h6 class=" text-muted mb-3 border-bottom pb-2 ">اطلاعات اصلی</h6>
                     <div class="row g-3 mb-3">
+
                         <div class="col-md-6">
                             <label class="form-label">نام تجهیز <span class="text-danger">*</span></label>
-                            <input asp-for="Asset.Name" class="form-control" placeholder="مثلاً: لپ‌تاپ دل اداری" />
+                            <input id="assetName" asp-for="Asset.Name" class="form-control" placeholder="مثلاً: لپ‌تاپ دل اداری" />
                             <span asp-validation-for="Asset.Name" class="text-danger small"></span>
                         </div>
 
@@ -44,6 +45,44 @@
                                 <option value="">انتخاب کنید...</option>
                             </select>
                         </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label">
+                                انبار <span class="text-danger">*</span>
+                            </label>
+
+                            <select asp-for="WarehouseId"
+                                    asp-items="Model.WarehouseList"
+                                    id="warehouseSelect"
+                                    class="form-select">
+                                <option value="">انتخاب انبار...</option>
+                            </select>
+
+                            <span asp-validation-for="WarehouseId"
+                                  class="text-danger small"></span>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label">
+                                کالا <span class="text-danger">*</span>
+                            </label>
+
+                            <select asp-for="ProductId"
+                                    id="productSelect"
+                                    class="form-select"
+                                    disabled>
+                                <option value="">ابتدا انبار را انتخاب کنید...</option>
+                            </select>
+
+                            <span asp-validation-for="ProductId"
+                                  class="text-danger small"></span>
+
+                            <div id="stockInfo"
+                                 class="form-text text-success">
+                            </div>
+                        </div>
+
+
                       
                         <div class="col-md-4">
                             <label class="form-label">مدل</label>
@@ -180,6 +219,113 @@
             const html = await response.text();
             document.getElementById('specs-container').innerHTML = html;
         });
+
+        const warehouseSelect = document.getElementById('warehouseSelect');
+        const productSelect = document.getElementById('productSelect');
+        const stockInfo = document.getElementById('stockInfo');
+        const assetName = document.getElementById('assetName');
+
+        warehouseSelect.addEventListener('change', async function () {
+
+            const warehouseId = this.value;
+
+            productSelect.innerHTML =
+                '<option value="">در حال بارگذاری...</option>';
+
+            productSelect.disabled = true;
+
+            stockInfo.innerHTML = '';
+
+            if (!warehouseId) {
+
+                productSelect.innerHTML =
+                    '<option value="">ابتدا انبار را انتخاب کنید...</option>';
+
+                return;
+            }
+
+            try {
+
+                const response = await fetch(
+                    `/Assets/Create?handler=WarehouseProducts&warehouseId=${warehouseId}`
+                );
+
+                if (!response.ok) {
+                    throw new Error('خطا در دریافت کالاها');
+                }
+
+                const products = await response.json();
+
+                productSelect.innerHTML =
+                    '<option value="">انتخاب کالا...</option>';
+
+                if (products.length === 0) {
+
+                    productSelect.innerHTML =
+                        '<option value="">کالایی با موجودی یافت نشد</option>';
+
+                    return;
+                }
+
+                products.forEach(product => {
+
+                    const option = document.createElement('option');
+
+                    option.value = product.id;
+
+                    option.textContent =
+                        `${product.name} - موجودی: ${product.quantity}`;
+
+                    option.dataset.quantity = product.quantity;
+
+                    productSelect.appendChild(option);
+                });
+
+                productSelect.disabled = false;
+
+            }
+            catch (error) {
+
+                productSelect.innerHTML =
+                    '<option value="">خطا در دریافت کالاها</option>';
+
+                console.error(error);
+            }
+        });
+
+        productSelect.addEventListener('change',async function () {
+            const productId = this.value;
+
+            // اگر کالایی انتخاب نشده
+            if (!productId) {
+            stockInfo.innerHTML = '';
+            document.getElementById('assetName').value = '';
+            return;}
+            // نمایش موجودی
+            const selectedOption = this.options[this.selectedIndex];
+            const quantity = selectedOption.dataset.quantity;
+            stockInfo.innerHTML =`موجودی فعلی: <strong>${quantity}</strong> عدد`;
+
+            // دریافت نام کالا
+            try {
+                const response = await fetch(
+                `/Assets/Create?handler=ProductName&productId=${productId}`
+                );
+
+            if (!response.ok) {
+                throw new Error('خطا در دریافت نام کالا');
+            }
+
+            const productName = await response.text();
+
+            // پر کردن فیلد نام تجهیز
+            document.getElementById('assetName').value = productName;
+            } 
+            catch (error) {
+                console.error(error);
+                document.getElementById('assetName').value = '';
+            }
+            });
 
         new TomSelect('#vendorSelect', {
             placeholder: 'جستجو در فروشندگان...',

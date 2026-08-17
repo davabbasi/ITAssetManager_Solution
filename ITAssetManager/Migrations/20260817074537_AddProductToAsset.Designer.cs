@@ -4,6 +4,7 @@ using ITAssetManager.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace ITAssetManager.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260817074537_AddProductToAsset")]
+    partial class AddProductToAsset
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -140,12 +143,6 @@ namespace ITAssetManager.Migrations
                     b.Property<int?>("VendorId")
                         .HasColumnType("int");
 
-                    b.Property<int>("WarehouseId")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("WarehouseIssueId")
-                        .HasColumnType("int");
-
                     b.Property<DateTime?>("WarrantyExpiry")
                         .HasColumnType("datetime2");
 
@@ -156,10 +153,6 @@ namespace ITAssetManager.Migrations
                     b.HasIndex("ProductId");
 
                     b.HasIndex("VendorId");
-
-                    b.HasIndex("WarehouseId");
-
-                    b.HasIndex("WarehouseIssueId");
 
                     b.ToTable("Assets");
                 });
@@ -1230,7 +1223,7 @@ namespace ITAssetManager.Migrations
                     b.HasOne("ITAssetManager.Models.Product", "Product")
                         .WithMany()
                         .HasForeignKey("ProductId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("ITAssetManager.Models.Vendor", "Vendor")
@@ -1238,26 +1231,11 @@ namespace ITAssetManager.Migrations
                         .HasForeignKey("VendorId")
                         .OnDelete(DeleteBehavior.NoAction);
 
-                    b.HasOne("ITAssetManager.Models.Warehouse", "Warehouse")
-                        .WithMany()
-                        .HasForeignKey("WarehouseId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("ITAssetManager.Models.WarehouseIssue", "WarehouseIssue")
-                        .WithMany()
-                        .HasForeignKey("WarehouseIssueId")
-                        .OnDelete(DeleteBehavior.Restrict);
-
                     b.Navigation("Category");
 
                     b.Navigation("Product");
 
                     b.Navigation("Vendor");
-
-                    b.Navigation("Warehouse");
-
-                    b.Navigation("WarehouseIssue");
                 });
 
             modelBuilder.Entity("ITAssetManager.Models.AssetAssignment", b =>

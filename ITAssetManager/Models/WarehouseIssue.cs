@@ -39,7 +39,7 @@ namespace ITAssetManager.Models
         public Warehouse? Warehouse { get; set; }
 
         [ForeignKey(nameof(Warehouse))]
-        [Display(Name = "انبار مبدا")]
+        [Display(Name = "انبار ")]
         public int WarehouseId { get; set; }
 
        
