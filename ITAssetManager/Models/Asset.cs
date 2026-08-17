@@ -13,6 +13,10 @@ public class Asset
 {
     public int Id { get; set; }
 
+    // کالا
+    public int ProductId { get; set; }
+    public Product? Product { get; set; }
+
     // اطلاعات اصلی
     public string Name { get; set; } = string.Empty;
     public string? Model { get; set; }

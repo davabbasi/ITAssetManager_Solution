@@ -4,33 +4,33 @@
 @{
     ViewData["Title"] = "جزئیات انتقال";
 }
-@if (TempData["WarehouseTransferSuccess"] != null)
+@if (TempData["TransferSuccess"] != null)
 {
     <div class="alert alert-success alert-dismissible fade show" role="alert">
-        @TempData["WarehouseTransferSuccess"]
+        @TempData["TransferSuccess"]
         <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
     </div>
 }
 
-@if (TempData["WarehouseTransferError"] != null)
+@if (TempData["TransferError"] != null)
 {
     <div class="alert alert-danger alert-dismissible fade show" role="alert">
-        @TempData["WarehouseTransferError"]
+        @TempData["TransferError"]
         <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
     </div>
 }
-@if (TempData["WarehouseTransferCancelError"] != null)
+@if (TempData["TransferCancelError"] != null)
 {
     <div class="alert alert-danger alert-dismissible fade show" role="alert">
-        @TempData["WarehouseTransferCancelError"]
+        @TempData["TransferCancelError"]
         <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
     </div>
 }
 
-@if (TempData["WarehouseTransferCancelSuccess"] != null)
+@if (TempData["TransferCancelSuccess"] != null)
 {
     <div class="alert alert-success alert-dismissible fade show" role="alert">
-        @TempData["WarehouseTransferCancelSuccess"]
+        @TempData["TransferCancelSuccess"]
         <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
     </div>
 }
@@ -159,7 +159,7 @@
 
             <button type="submit"
                     class="btn btn-success"
-                    onclick="return confirm('آیا از ثبت نهایی این حواله اطمینان دارید؟');">
+                    onclick="return confirm('آیا از ثبت نهایی این انتقال اطمینان دارید؟');">
 
                 ثبت نهایی
 
@@ -177,10 +177,10 @@
             <br />
             <button type="submit"
                     class="btn btn-danger"
-                    onclick="return confirm('آیا از ابطال این حواله اطمینان دارید؟');">
+                    onclick="return confirm('آیا از ابطال این انتقال اطمینان دارید؟');">
 
                 <i class="bi bi-x-circle"></i>
-                ابطال حواله
+                ابطال انتقال 
 
             </button>
             <br />
