@@ -24,6 +24,7 @@ namespace ITAssetManager.Models
 
         [Display(Name = "انبار مبدا")]
         public Warehouse? SourceWarehouse { get; set; } = null!;
+
         public int DestinationWarehouseId { get; set; }
 
         [Display(Name = "انبار مقصد")]

@@ -1,4 +1,5 @@
 ﻿@page
+@using ITAssetManager.Convertor
 @model ITAssetManager.Pages.WarehouseManagements.Issues.DetailsModel
 
 @{
@@ -41,7 +42,14 @@
 
     <div class="card-body">
         <div class="row">
-
+            <div class="col-md-4">
+                <label class="form-label">منبع حواله</label>
+                <br />              
+                <span class="badge bg-info">
+                    @Model.WarehouseIssue.Source.GetDisplayName()
+                </span>
+              
+            </div>
             <div class="col-md-3">
                 <strong>شماره حواله</strong>
                 <br />
@@ -197,22 +205,24 @@
 
 @if (Model.WarehouseIssue.Status == DocumentStatus.Posted)
 {
-    <form method="post"
-          asp-page-handler="Cancel"
-          asp-route-id="@Model.WarehouseIssue.Id"
-          class="d-inline">
-        <br />
-        <button type="submit"
-                class="btn btn-danger"
-                onclick="return confirm('آیا از ابطال این حواله اطمینان دارید؟');">
+    @if (Model.WarehouseIssue.Source == IssueSource.Manual)
+    {
+        <form method="post" asp-page-handler="Cancel" asp-route-id="@Model.WarehouseIssue.Id"
+              class="d-inline">
+            <br />
+            <button type="submit"
+                    class="btn btn-danger"
+                    onclick="return confirm('آیا از ابطال این حواله اطمینان دارید؟');">
 
-            <i class="bi bi-x-circle"></i>
-            ابطال حواله
+                <i class="bi bi-x-circle"></i>
+                ابطال حواله
 
-        </button>
-        <br />
+            </button>
+            <br />
 
-    </form>
+        </form>
+    }
+    
 }
 <br />
 <div>

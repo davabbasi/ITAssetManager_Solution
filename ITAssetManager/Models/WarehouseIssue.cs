@@ -4,6 +4,17 @@ using Microsoft.AspNetCore.Http.HttpResults;
 
 namespace ITAssetManager.Models
 {
+    public enum IssueSource
+    {
+        [Display(Name = "حواله مستقیم")]
+        Manual = 1,
+
+        [Display(Name = "ایجاد تجهیز")]
+        AssetCreation = 2,
+
+        [Display(Name = "انجام اسمبل")]
+        Assembly = 3
+    }
     public class WarehouseIssue
     {
         [Key]
@@ -34,6 +45,9 @@ namespace ITAssetManager.Models
 
         [Display(Name = "وضعیت")]
         public DocumentStatus Status { get; set; } = DocumentStatus.Draft;
+
+        [Display(Name = "منبع حواله")]
+        public IssueSource Source { get; set; } = IssueSource.Manual;
 
         public ICollection<WarehouseIssueItem> Items { get; set; } = new List<WarehouseIssueItem>();
         public Warehouse? Warehouse { get; set; }

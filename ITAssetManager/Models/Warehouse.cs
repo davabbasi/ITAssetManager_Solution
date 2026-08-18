@@ -3,6 +3,17 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace ITAssetManager.Models
 {
+    public enum WarehouseType
+    {
+        [Display(Name = "عادی")]
+        Main = 1,
+
+        [Display(Name = "اسقاط")]
+        Scrap = 2,
+
+        [Display(Name = "ضایعات")]
+        Waste = 3
+    }
     public class Warehouse
     {
         public int Id { get; set; }
@@ -22,6 +33,12 @@ namespace ITAssetManager.Models
         [Range(1, int.MaxValue, ErrorMessage = "لطفاً انباردار را انتخاب کنید.")]
         public int KeeperId { get; set; }
         public WarehouseKeeper? Keeper { get; set; }
+
+        [Display(Name = "نوع انبار")]
+        public WarehouseType Type { get; set; }=WarehouseType.Main;
+
+        [Display(Name = "انبار آی تی")]
+        public bool IsITWarehouse { get; set; }
 
         public ICollection<WarehouseReceipt> Receipts { get; set; }= new List<WarehouseReceipt>();
         public ICollection<WarehouseIssue> OutgoingIssues { get; set; }= new List<WarehouseIssue>();

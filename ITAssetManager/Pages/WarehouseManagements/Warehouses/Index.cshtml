@@ -1,4 +1,5 @@
 ﻿@page
+@using ITAssetManager.Convertor
 @model ITAssetManager.Pages.Warehouses.IndexModel
 
 @{
@@ -48,6 +49,9 @@
                     <thead>
                         <tr>
                             <th>
+                                @Html.DisplayNameFor(model => model.Warehouse[0].Type)
+                            </th>
+                            <th>
                                 @Html.DisplayNameFor(model => model.Warehouse[0].WarehouseName)
                             </th>
                             <th>
@@ -63,6 +67,9 @@
                         @foreach (var item in Model.Warehouse)
                         {
                             <tr>
+                                <td>
+                                    @item.Type.GetDisplayName()
+                                </td>
                                 <td>
                                     @Html.DisplayFor(modelItem => item.WarehouseName)
                                 </td>

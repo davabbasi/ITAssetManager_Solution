@@ -1,4 +1,5 @@
 ﻿@page
+@using ITAssetManager.Convertor
 @model ITAssetManager.Pages.Warehouses.DetailsModel
 
 @{
@@ -11,6 +12,9 @@
     <h4>Warehouse</h4>
     <hr />
     <dl class="row">
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Warehouse.Type.GetDisplayName())
+        </dt>
         <dt class="col-sm-2">
             @Html.DisplayNameFor(model => model.Warehouse.WarehouseName)
         </dt>

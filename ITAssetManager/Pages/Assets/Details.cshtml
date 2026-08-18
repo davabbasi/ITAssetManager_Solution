@@ -6,10 +6,19 @@
     ViewData["Title"] = Model.Asset.Name;
 }
 
-@if (TempData["Success"] != null)
+@if (TempData["AssetScrapSuccess"] != null)
 {
-    <div class="alert alert-success alert-dismissible">
-        @TempData["Success"] <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        @TempData["AssetScrapSuccess"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+}
+
+@if (TempData["AssetScrapError"] != null)
+{
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        @TempData["AssetScrapError"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
     </div>
 }
 
@@ -344,6 +353,21 @@
                 </div>
             </div>
         }
+
+        <hr />
+         @if (Model.Asset.Status != AssetStatus.Scrapped &&
+          Model.Asset.Status != AssetStatus.Waste)
+           {
+              <form method="post" asp-page-handler="Scrap" asp-route-id="@Model.Asset.Id" class="d-inline"
+              onsubmit="return confirm('آیا از اسقاط این تجهیز مطمئن هستید؟');">
+              <button type="submit" class="btn btn-danger">
+              <i class="bi bi-trash3 me-1"></i>
+              اسقاط کردن تجهیز
+              </button>
+             </form>
+           }  
+    </div>  
    
-    </div>
 </div>
+
+ 

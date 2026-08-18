@@ -147,7 +147,15 @@ namespace ITAssetManager.Pages.WarehouseManagements.Issues
                 TempData["IssueCancelError"] = "فقط حواله نهایی شده قابل ابطال است.";
                 return RedirectToPage(new { id });
             }
+            if (issue.Source != IssueSource.Manual)
+            {
+                TempData["Error"] = "حواله‌های سیستمی قابل ابطال نیستند.";
 
+                return RedirectToPage(
+                    "./Details",
+                    new { id }
+                );
+            }
             using var transaction = await _context.Database.BeginTransactionAsync();
 
             try

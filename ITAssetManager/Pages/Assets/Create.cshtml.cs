@@ -106,11 +106,9 @@ public class CreateModel : PageModel
             Asset.PurchaseDate = TextPurchaseDate.ToMiladi();
             Asset.WarrantyExpiry = TextWarrantyExpiryDate.ToMiladi();
             Asset.ProductId = (int)ProductId;
-            Asset.WarehouseId= WarehouseId.Value;
-            Asset.EmployeeName = await _context.VwEmployees
-                    .Where(e => e.Id == Asset.EmployeeId)
-                    .Select(e => e.FullName)
-                    .FirstOrDefaultAsync();
+            Asset.WarehouseId= 4;
+            Asset.EmployeeName = "افشین کریمی";
+            Asset.EmployeeId = 1147;
             _context.Assets.Add(Asset);
 
             await _context.SaveChangesAsync();
@@ -202,7 +200,9 @@ public class CreateModel : PageModel
                 Description =
                     $"خروج کالا جهت ثبت تجهیز - تجهیز شماره {Asset.Id}",
 
-                Status = DocumentStatus.Posted
+                Status = DocumentStatus.Posted,
+
+                Source = IssueSource.AssetCreation
             };
 
             _context.WarehouseIssues.Add(issue);

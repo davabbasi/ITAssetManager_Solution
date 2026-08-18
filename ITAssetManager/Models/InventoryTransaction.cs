@@ -10,10 +10,10 @@ namespace ITAssetManager.Models
         [Display(Name = "حواله")]
         Issue = 2,
 
-        [Display(Name = "انتقال به انبار")]
+        [Display(Name = "ورود به انبار")]
         TransferIn = 3,
 
-        [Display(Name = "انتقال از انبار")]
+        [Display(Name = "خروج از انبار")]
         TransferOut = 4,
 
         [Display(Name = " (افزایش)اصلاح موجودی")]
@@ -43,7 +43,7 @@ namespace ITAssetManager.Models
 
         public int? IssueItemId { get; set; }
         public int? TransferItemId { get; set; }
-        [Display(Name = "شرح تراکنش")]
+        [Display(Name = "علت تراکنش")]
         public string? Description { get; set; }
         [Display(Name = "تاریخ ایجاد")]
         public DateTime CreatedAt { get; set; }

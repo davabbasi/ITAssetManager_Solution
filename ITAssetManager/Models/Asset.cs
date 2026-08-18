@@ -4,11 +4,23 @@ namespace ITAssetManager.Models;
 
 public enum AssetStatus
 {
+    [Display(Name = "فعال")]
     Active = 1,
+
+    [Display(Name = "غیرفعال")]
     Faulty = 2,
+
+    [Display(Name = "در دست تعمیر")]
     UnderRepair = 3,
+
+    [Display(Name = "اسقاط")]
     Scrapped = 4,
-    InStorage = 5
+
+    [Display(Name = "در انبار تجهیزات")]
+    InStorage = 5,
+
+    [Display(Name = "ضایعات")]
+    Waste = 6
 }
 
 public class Asset
@@ -72,6 +84,8 @@ public class Asset
     //فقط برای اسمبل
     public int? AssemblyNumber { get; set; }   // شماره شناسایی PC (فقط برای PCهای اسمبل‌شده)
     public bool IsAssembled { get; set; } = false; // آیا این Asset یک PC اسمبلیه؟
+
+    
 
     public ICollection<AssemblyComponent> AsComponentOf { get; set; } = new List<AssemblyComponent>(); // وقتی این قطعه توی یک PC استفاده شده
     public ICollection<AssemblyComponent> Components { get; set; } = new List<AssemblyComponent>();     // وقتی این خودش PC هست و قطعات داره
