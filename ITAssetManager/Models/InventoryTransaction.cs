@@ -10,10 +10,10 @@ namespace ITAssetManager.Models
         [Display(Name = "حواله")]
         Issue = 2,
 
-        [Display(Name = "ورود به انبار")]
+        [Display(Name = "انتقال بین انباری-ورود به")]
         TransferIn = 3,
 
-        [Display(Name = "خروج از انبار")]
+        [Display(Name = "انتقال بین انباری-خروج از")]
         TransferOut = 4,
 
         [Display(Name = " (افزایش)اصلاح موجودی")]

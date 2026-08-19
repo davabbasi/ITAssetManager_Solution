@@ -71,7 +71,7 @@ public class CreateModel : PageModel
         }
 
         // -----------------------------
-        // بررسی موجودی
+        // بررسی موجودی انبار کالای انتخاب شده
         // -----------------------------
 
         var stock = await _context.WarehouseStocks
@@ -89,50 +89,77 @@ public class CreateModel : PageModel
             return Page();
         }
 
+         
+
         // -----------------------------
         // شروع Transaction
         // -----------------------------
 
-        await using var transaction =
-            await _context.Database.BeginTransactionAsync();
-
+        await using var transaction =await _context.Database.BeginTransactionAsync();
         try
         {
+
+          
             // =====================================================
-            // 1. ایجاد تجهیز
+            // 1. پیدا کردن انبار تجهیزات
+            // =====================================================
+            var assetWarehouse = await _context.Warehouses
+                .Include(w=>w.Keeper)             
+               .FirstOrDefaultAsync(w => w.Type == WarehouseType.Asset);
+
+            if (assetWarehouse == null)
+            {
+                TempData["AssetWarehouseError"] =
+                    "انبار تجهیزات در سیستم تعریف نشده است.";
+                await transaction.RollbackAsync();
+                await LoadSelectListsAsync();
+                return Page();
+            }
+
+            // =====================================================
+            // 2.پیدا کردن کارمند متناظر با انباردار
+            // =====================================================
+
+            var keeperEmployee = await _context.VwEmployees
+                .FirstOrDefaultAsync(e =>
+                e.EmployeeCode == assetWarehouse.Keeper.PersonnelNumber);
+
+            if (keeperEmployee == null)
+            {
+                throw new Exception(
+                    "کارمند متناظر با انباردار پیدا نشد.");
+            }
+
+            // =====================================================
+            // 3. ایجاد تجهیز
             // =====================================================
 
             Asset.CreatedAt = DateTime.Now;
             Asset.PurchaseDate = TextPurchaseDate.ToMiladi();
             Asset.WarrantyExpiry = TextWarrantyExpiryDate.ToMiladi();
             Asset.ProductId = (int)ProductId;
-            Asset.WarehouseId= 4;
-            Asset.EmployeeName = "افشین کریمی";
-            Asset.EmployeeId = 1147;
+            Asset.WarehouseId= assetWarehouse.Id;
+            Asset.EmployeeName = assetWarehouse.Keeper.FullName;
+            Asset.EmployeeId = keeperEmployee.Id;
             _context.Assets.Add(Asset);
-
             await _context.SaveChangesAsync();
 
 
             // =====================================================
-            // 2. ثبت تخصیص اولیه تجهیز
+            // 4. ثبت تخصیص اولیه تجهیز
             // =====================================================
 
-            if (Asset.EmployeeId.HasValue ||
-                Asset.DepartmentId.HasValue)
+            if (Asset.EmployeeId.HasValue ||Asset.DepartmentId.HasValue)
             {
                 var assignment = new AssetAssignment
                 {
                     AssetId = Asset.Id,
-
                     ToEmployeeId = Asset.EmployeeId,
+                    ToEmployeeName = Asset.EmployeeName,
                     ToDepartmentId = Asset.DepartmentId,
                     ToLocation = Asset.Location,
-
                     AssignedAt = DateTime.Now,
-
                     Reason = "ثبت اولیه تجهیز",
-
                     AssignedBy = User.Identity?.Name
                 };
 
@@ -141,7 +168,7 @@ public class CreateModel : PageModel
 
 
             // =====================================================
-            // 3. ثبت مشخصات فنی تجهیز
+            // 5. ثبت مشخصات فنی تجهیز
             // =====================================================
 
             if (SpecValues.Any())
@@ -165,125 +192,122 @@ public class CreateModel : PageModel
             }
 
 
-            // =====================================================
-            // 4. تولید شماره حواله
-            // =====================================================
+            // ================================
+            // 6.ایجاد انتقال
+            // ================================
 
-            var maxIssueNumber =
-                await _context.WarehouseIssues
-                    .Select(x => (int?)x.IssueNumber)
-                    .MaxAsync() ?? 0;
-
-            var issueNumber = maxIssueNumber + 1;
-
-
-            // =====================================================
-            // 5. ایجاد حواله خروج
-            // =====================================================
-
-            var issue = new WarehouseIssue
+            var transfer = new WarehouseTransfer
             {
-                IssueNumber = issueNumber,
-
-                IssueDate = DateTime.Now,
-
-                WarehouseId = WarehouseId.Value,
-
-                EmployeeId = Asset.EmployeeId,
-
-                EmployeeName = Asset.EmployeeName,
-
-                CreatedBy = User.Identity?.Name ?? "سیستم",
-
-                CreatedAt = DateTime.Now,
-
-                Description =
-                    $"خروج کالا جهت ثبت تجهیز - تجهیز شماره {Asset.Id}",
-
+                SourceWarehouseId = (int)WarehouseId,
+                DestinationWarehouseId = assetWarehouse.Id,
+                TransferDate = DateTime.Now,
+                TransferNumber = (await _context.WarehouseTransfers
+                    .Select(x => (int?)x.TransferNumber)
+                    .MaxAsync() ?? 0) + 1,
                 Status = DocumentStatus.Posted,
-
-                Source = IssueSource.AssetCreation
+                Description =
+                $"انتقال جهت ایجاد اولیه تجهیز «{Asset.Name}»",
+                CreatedBy = User.Identity?.Name ?? "سیستم",
+                CreatedAt = DateTime.Now
             };
+            _context.WarehouseTransfers.Add(transfer);
 
-            _context.WarehouseIssues.Add(issue);
-
-            await _context.SaveChangesAsync();
-
-
-            // =====================================================
-            // 6. ایجاد آیتم حواله
-            // =====================================================
-
-            var issueItem = new WarehouseIssueItem
+            // ================================
+            //  7.ایجاد قلم انتقال
+            // ================================
+            var transferItem = new WarehouseTransferItem
             {
-                IssueId = issue.Id,
-
+                WarehouseTransfer = transfer,
                 RowNumber = 1,
-
-                ProductId = ProductId.Value,
-
-                Quantity = 1
+                ProductId = Asset.ProductId,
+                Quantity = 1,
+                Description = $"ایجاد تجهیز «{Asset.Name}»"
             };
+            _context.WarehouseTransferItems.Add(transferItem);
 
-            _context.WarehouseIssueItems.Add(issueItem);
-
-            await _context.SaveChangesAsync();
-
-
-            // =====================================================
-            // 7. کاهش موجودی انبار
-            // =====================================================
+            // ================================
+            // 8.کاهش موجودی انبار فعلی
+            // ================================
 
             stock.Quantity -= 1;
             stock.UpdatedAt = DateTime.Now;
 
+            // ================================
+            // 9.افزایش موجودی انبار تجهیزات
+            // ================================
 
-            // =====================================================
-            // 8. ثبت تراکنش انبار
-            // =====================================================
+            var assetStock = await _context.WarehouseStocks
+            .FirstOrDefaultAsync(x =>
+                x.WarehouseId == assetWarehouse.Id &&
+                x.ProductId == Asset.ProductId);
 
-            var inventoryTransaction = new InventoryTransaction
+            if (assetStock == null)
             {
-                WarehouseId = WarehouseId.Value,
+                assetStock = new WarehouseStock
+                {
+                    WarehouseId = assetWarehouse.Id,
+                    ProductId = Asset.ProductId,
+                    Quantity = 1,
+                    UpdatedAt = DateTime.Now
+                };
 
-                ProductId = ProductId.Value,
-
-                Quantity = 1,
-
-                Type = InventoryTransactionType.Issue,
-
-                TransactionDate = issue.IssueDate,
-
-                IssueItemId = issueItem.Id,
-
-                Description =
-                    $"حواله شماره {issue.IssueNumber} بابت ثبت تجهیز شماره {Asset.Id}",
-
-                CreatedAt = DateTime.Now,
-
-                CreatedBy = User.Identity?.Name ?? "سیستم"
-            };
-
-            _context.InventoryTransactions.Add(inventoryTransaction);
+                _context.WarehouseStocks.Add(assetStock);
+            }
+            else
+            {
+                assetStock.Quantity += 1;
+                assetStock.UpdatedAt = DateTime.Now;
+            }
 
 
-            // =====================================================
-            // 9. ذخیره نهایی
-            // =====================================================
+            // ================================
+            // 10.ذخیره انتقال
+            // ================================      
 
             await _context.SaveChangesAsync();
 
+            // ================================
+            // 11.ثبت تراکنش خروج از انبار کالا
+            // ================================          
+            var transferOutTransaction = new InventoryTransaction
+            {
+                WarehouseId = (int)WarehouseId,
+                ProductId = (int)ProductId,
+                Quantity = -1,
+                Type = InventoryTransactionType.TransferOut,
+                TransactionDate = DateTime.Now,
+                TransferItemId = transferItem.Id,
+                Description = $"انتقال جهت ایجاد اولیه تجهیز «{Asset.Name}»",
+                CreatedAt = DateTime.Now,
+                CreatedBy = User.Identity?.Name ?? "سیستم"
+            };
+            _context.InventoryTransactions.Add(transferOutTransaction);
+
+            // ================================
+            //  12.ثبت تراکنش ورود به انبار تجهیزات
+            // ================================
+            var transferInTransaction = new InventoryTransaction
+            {
+                WarehouseId = assetWarehouse.Id,
+                ProductId = (int)ProductId,
+                Quantity = 1,
+                Type = InventoryTransactionType.TransferIn,
+                TransactionDate = DateTime.Now,
+                TransferItemId = transferItem.Id,
+                Description = $"ورود به انبار تجهیزات تجهیز «{Asset.Name}»",
+                CreatedAt = DateTime.Now,
+                CreatedBy = User.Identity?.Name ?? "سیستم"
+            };
+            _context.InventoryTransactions.Add(transferInTransaction);
+            await _context.SaveChangesAsync();
 
             // =====================================================
-            // 10. تأیید Transaction
+            // 13. تأیید Transaction
             // =====================================================
 
             await transaction.CommitAsync();
-
-
-            TempData["Success"] =
-                $"تجهیز با موفقیت ثبت شد. حواله شماره {issue.IssueNumber} نیز ایجاد گردید.";
-
+            TempData["AssetCreateSuccess"] =
+                $"تجهیز با موفقیت ثبت شد. انتقال شماره {transfer.TransferNumber} نیز ایجاد گردید.";
             return RedirectToPage(
                 "/Assets/Details",
                 new { id = Asset.Id });
@@ -304,7 +328,7 @@ public class CreateModel : PageModel
     private async Task LoadSelectListsAsync()
     {
         WarehouseList = new SelectList(
-            await _context.Warehouses
+            await _context.Warehouses.Where(w=>w.IsITWarehouse==true&&w.Type==WarehouseType.Main)
                 .OrderBy(w => w.WarehouseName)
                 .ToListAsync(),
             "Id",

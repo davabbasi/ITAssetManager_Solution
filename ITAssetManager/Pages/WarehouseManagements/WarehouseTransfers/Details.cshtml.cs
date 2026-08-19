@@ -161,7 +161,7 @@ namespace ITAssetManager.Pages.WarehouseManagements.WarehouseTransfers
                         {
                             WarehouseId =transfer.SourceWarehouseId,
                             ProductId = item.ProductId,
-                            Quantity = item.Quantity,
+                            Quantity = -item.Quantity,
                             Type =InventoryTransactionType.TransferOut,
                             TransactionDate = transfer.TransferDate,
                             CreatedAt = DateTime.Now,

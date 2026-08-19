@@ -93,7 +93,7 @@ namespace ITAssetManager.Pages.WarehouseManagements.Receipts
             var maxReceiptNumber = await _context.WarehouseReceipts.Select(r => (int?)r.ReceiptNumber).MaxAsync() ?? 0;
             ReceiptNumber = maxReceiptNumber + 1;
             WarehouseList = new SelectList(
-                await _context.Warehouses
+                await _context.Warehouses.Where(w=>w.Type==WarehouseType.Main&&w.IsITWarehouse==true)
                     .OrderBy(x => x.WarehouseName)
                     .ToListAsync(),
                 "Id",

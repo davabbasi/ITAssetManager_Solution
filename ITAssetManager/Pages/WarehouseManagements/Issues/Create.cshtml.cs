@@ -154,7 +154,7 @@ namespace ITAssetManager.Pages.WarehouseManagements.Issues
               .ToListAsync(), "Id", "Name");
 
             WarehouseList = new SelectList(
-                await _context.Warehouses
+                await _context.Warehouses.Where(w=>w.IsITWarehouse==true&&w.Type==WarehouseType.Main)
                     .OrderBy(x => x.WarehouseName)
                     .ToListAsync(),
                 "Id",

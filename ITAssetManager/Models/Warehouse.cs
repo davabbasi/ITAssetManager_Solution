@@ -12,7 +12,10 @@ namespace ITAssetManager.Models
         Scrap = 2,
 
         [Display(Name = "ضایعات")]
-        Waste = 3
+        Waste = 3,
+
+        [Display(Name = "تجهیزات")]
+        Asset = 4
     }
     public class Warehouse
     {

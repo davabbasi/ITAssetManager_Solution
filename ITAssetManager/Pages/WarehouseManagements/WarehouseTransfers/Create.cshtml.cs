@@ -199,7 +199,7 @@ namespace ITAssetManager.Pages.WarehouseManagements.WarehouseTransfers
 
 
             WarehouseList = new SelectList(
-                await _context.Warehouses
+                await _context.Warehouses.Where(w=>w.IsITWarehouse&&w.Type==WarehouseType.Main)
                     .OrderBy(x => x.WarehouseName)
                     .ToListAsync(),
                 "Id",

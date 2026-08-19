@@ -37,7 +37,7 @@ namespace ITAssetManager.Pages.WarehouseManagements.WarehouseStocks
             if(WarehouseId.HasValue)
                 query= query.Where(x=>x.WarehouseId==WarehouseId);
 
-            WarehouseStock = await query.ToListAsync();
+            WarehouseStock = await query.OrderBy(w=>w.WarehouseId).ToListAsync();
         }
     }
 }

@@ -15,5 +15,8 @@ namespace ITAssetManager.Models
         [MaxLength(11, ErrorMessage = "{0} نمیتواند بیشتر از {1} باشد")]
         public string? PersonnelNumber { get; set; }
         public ICollection<Warehouse> Warehouses { get; set; } = new List<Warehouse>();
+
+
+       
     }
 }

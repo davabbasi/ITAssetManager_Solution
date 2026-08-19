@@ -45,17 +45,19 @@
         <thead>
             <tr>
                 <th>
-                    @Html.DisplayNameFor(model => model.WarehouseStock[0].Quantity)
-                </th>
-                <th>
-                    @Html.DisplayNameFor(model => model.WarehouseStock[0].UpdatedAt)
-                </th>
-                <th>
                     @Html.DisplayNameFor(model => model.WarehouseStock[0].Warehouse)
                 </th>
                 <th>
                     @Html.DisplayNameFor(model => model.WarehouseStock[0].Product)
                 </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.WarehouseStock[0].Quantity)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.WarehouseStock[0].UpdatedAt)
+                </th>
+               
+              
             </tr>
         </thead>
         <tbody>
@@ -63,18 +65,20 @@
             {
                 <tr>
                     <td>
+                        @Html.DisplayFor(modelItem => item.Warehouse.WarehouseName)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Product.ProductName)
+                    </td>
+                    <td>
                         @Html.DisplayFor(modelItem => item.Quantity)
                     </td>
                     <td>
                         @item.UpdatedAt.ToShamsi()
 
                     </td>
-                    <td>
-                        @Html.DisplayFor(modelItem => item.Warehouse.WarehouseName)
-                    </td>
-                    <td>
-                        @Html.DisplayFor(modelItem => item.Product.ProductName)
-                    </td>
+                    
+                   
 
                 </tr>
             }
