@@ -14,80 +14,124 @@
             <input type="hidden" asp-for="NextAssemblyNumber" />
 
             <div class="row g-3 mb-4">
+
+                <div class="col-md-3">
+                    <label class="form-label">شماره اسمبل</label>
+                    <input value="@Model.NextAssemblyNumber"
+                           class="form-control"
+                           readonly />
+                </div>
+
                 <div class="col-md-3">
                     <label class="form-label">تاریخ اسمبل</label>
-                    <input asp-for="AssembleDate" type="date" class="form-control" />
+                    <input asp-for="AssembleDate"
+                           type="date"
+                           class="form-control" />
                 </div>
 
+                <div class="col-md-3">
+                    <label class="form-label">
+                        شماره اموال <span class="text-danger">*</span>
+                    </label>
 
-                <select id="componentCategorySelect" class="form-select form-select-sm">
-                    <option value="">انتخاب تجهیز...</option>
-                    @foreach (var cat in Model.InstalledCategories)
-                    {
-                        <option value="@cat.Id">@cat.Name</option>
-                    }
-                </select>
+                    <input asp-for="PropertyTag"
+                           class="form-control"
+                           placeholder="AM-2026-XXX" />
 
-                @* <div class="col-md-3">
-                    <label class="form-label">شماره اموال <span class="text-danger">*</span></label>
-                    <input asp-for="PropertyTag" class="form-control" placeholder="AM-2024-XXX" />
+                    <span asp-validation-for="PropertyTag"
+                          class="text-danger small"></span>
                 </div>
+
                 <div class="col-md-3">
                     <label class="form-label">مدل دستگاه</label>
-                    <input asp-for="DeviceModel" class="form-control" placeholder="مثلاً: PC اداری مدل A" />
+
+                    <input asp-for="DeviceModel"
+                           class="form-control"
+                           placeholder="مثلاً Dell OptiPlex" />
                 </div>
-                <div class="col-md-3">
+
+                <div class="col-md-6">
                     <label class="form-label">نام سیستم</label>
-                    <input asp-for="AssetName" class="form-control" placeholder="مثلاً: کامپیوتر اداری ۱" />
-                </div> *@
 
+                    <input asp-for="AssetName"
+                           class="form-control"
+                           placeholder="مثلاً PC واحد مالی" />
+                </div>
 
-                <div class="col-12">
+                <div class="col-md-6">
                     <label class="form-label">توضیحات</label>
-                    <textarea asp-for="Description" class="form-control" rows="2"></textarea>
+
+                    <input asp-for="Description"
+                           class="form-control"
+                           placeholder="توضیحات..." />
                 </div>
-                <div class="col-md-6">
-                    <label class="form-label">واحد تحویل‌گیرنده</label>
-                    <select asp-for="DepartmentId" asp-items="Model.DepartmentList"
-                            id="departmentSelect" class="form-select">
-                        <option value="">بدون واحد</option>
-                    </select>
-                </div>
-                <div class="col-md-6">
-                    <label class="form-label">تحویل‌گیرنده (کارمند)</label>
-                    <select asp-for="EmployeeId" asp-items="Model.EmployeeList"
-                            id="employeeSelect" class="form-select">
-                        <option value="">بدون کارمند</option>
-                    </select>
-                </div>
+
             </div>
 
             <!-- جستجوی قطعات -->
             <h6 class="text-muted mb-3 border-bottom pb-2">
-                <i class="bi bi-search me-1"></i>افزودن قطعه به سیستم
+                <i class="bi bi-search me-1"></i>
+                افزودن قطعه به سیستم
             </h6>
+
             <div class="row g-2 mb-3 align-items-end">
+
                 <div class="col-md-4">
-                    <label class="form-label small">دسته‌بندی قطعه</label>
-                    <select id="componentCategorySelect" class="form-select form-select-sm">
-                        <option value="">انتخاب دسته‌بندی...</option>
+                    <label class="form-label small">
+                        دسته‌بندی قطعه
+                    </label>
+
+                    <select id="componentCategorySelect"
+                            class="form-select form-select-sm">
+
+                        <option value="">
+                            انتخاب دسته‌بندی...
+                        </option>
+
                         @foreach (var cat in Model.InstalledCategories)
                         {
-                            <option value="@cat.Id">@cat.Name</option>
+                            <option value="@cat.Id">
+                                @cat.Name
+                            </option>
                         }
+
                     </select>
                 </div>
+
+
                 <div class="col-md-6">
-                    <label class="form-label small">قطعه آزاد (اسمبل‌نشده)</label>
-                    <select id="freeComponentSelect" class="form-select form-select-sm" disabled>
-                        <option value="">ابتدا دسته‌بندی را انتخاب کنید</option>
+
+                    <label class="form-label small">
+                        قطعه آزاد
+                    </label>
+
+                    <select id="freeComponentSelect"
+                            class="form-select form-select-sm"
+                            disabled>
+
+                        <option value="">
+                            ابتدا دسته‌بندی را انتخاب کنید
+                        </option>
+
                     </select>
+
                 </div>
+
+
                 <div class="col-md-2">
-                    <button type="button" id="addComponentBtn" class="btn btn-success btn-sm w-100" disabled>
-                        <i class="bi bi-plus-lg me-1"></i>افزودن
+
+                    <button type="button"
+                            id="addComponentBtn"
+                            class="btn btn-success btn-sm w-100"
+                            disabled>
+
+                        <i class="bi bi-plus-lg me-1"></i>
+                        افزودن
+
                     </button>
+
                 </div>
+
             </div>
 
             <!-- جدول قطعات انتخاب‌شده -->

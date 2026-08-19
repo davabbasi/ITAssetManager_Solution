@@ -29,7 +29,7 @@ public class Asset
 
     // کالا
     [Display(Name = "کالا")]
-    public int ProductId { get; set; }
+    public int? ProductId { get; set; }
     public Product? Product { get; set; }
 
     // تامین از انبار

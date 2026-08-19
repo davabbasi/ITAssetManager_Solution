@@ -239,7 +239,7 @@ public class DetailsModel : PageModel
             {
                 WarehouseTransfer = transfer,
                 RowNumber = 1,
-                ProductId = asset.ProductId,
+                ProductId = (int)asset.ProductId,
                 Quantity = 1,
                 Description =$"اسقاط تجهیز «{asset.Name}»"
             };
@@ -266,7 +266,7 @@ public class DetailsModel : PageModel
                 scrapStock = new WarehouseStock
                 {
                     WarehouseId = scrapWarehouse.Id,
-                    ProductId = asset.ProductId,
+                    ProductId = (int)asset.ProductId,
                     Quantity = 1,
                     UpdatedAt = DateTime.Now
                 };
@@ -292,7 +292,7 @@ public class DetailsModel : PageModel
             var transferOutTransaction = new InventoryTransaction
             {
                 WarehouseId = sourceWarehouse.Id,
-                ProductId = asset.ProductId,
+                ProductId = (int)asset.ProductId,
                 Quantity = 1,
                 Type = InventoryTransactionType.TransferOut,
                 TransactionDate = DateTime.Now,
@@ -309,7 +309,7 @@ public class DetailsModel : PageModel
             var transferInTransaction = new InventoryTransaction
             {
                 WarehouseId = scrapWarehouse.Id,
-                ProductId = asset.ProductId,
+                ProductId = (int)asset.ProductId,
                 Quantity = 1,
                 Type = InventoryTransactionType.TransferIn,
                 TransactionDate = DateTime.Now,

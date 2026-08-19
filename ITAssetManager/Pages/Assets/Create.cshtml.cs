@@ -219,7 +219,7 @@ public class CreateModel : PageModel
             {
                 WarehouseTransfer = transfer,
                 RowNumber = 1,
-                ProductId = Asset.ProductId,
+                ProductId = (int)Asset.ProductId,
                 Quantity = 1,
                 Description = $"ایجاد تجهیز «{Asset.Name}»"
             };
@@ -246,7 +246,7 @@ public class CreateModel : PageModel
                 assetStock = new WarehouseStock
                 {
                     WarehouseId = assetWarehouse.Id,
-                    ProductId = Asset.ProductId,
+                    ProductId = (int)Asset.ProductId,
                     Quantity = 1,
                     UpdatedAt = DateTime.Now
                 };

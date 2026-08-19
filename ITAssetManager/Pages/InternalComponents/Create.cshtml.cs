@@ -3,7 +3,6 @@ using ITAssetManager.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 
 namespace ITAssetManager.Pages.Assembly;
@@ -12,137 +11,339 @@ namespace ITAssetManager.Pages.Assembly;
 public class CreateModel : PageModel
 {
     private readonly ApplicationDbContext _context;
-    public CreateModel(ApplicationDbContext context) => _context = context;
+
+    public CreateModel(ApplicationDbContext context)
+    {
+        _context = context;
+    }
+
+    // -----------------------------
+    // اطلاعات اسمبل
+    // -----------------------------
 
     public int NextAssemblyNumber { get; set; }
+
+    [BindProperty]
+    public DateTime AssembleDate { get; set; } = DateTime.Today;
+
+    [BindProperty]
+    public string PropertyTag { get; set; } = string.Empty;
+
+    [BindProperty]
+    public string? DeviceModel { get; set; }
+
+    [BindProperty]
+    public string? AssetName { get; set; }
+
+    [BindProperty]
+    public string? Description { get; set; }
+
+    // قطعات انتخاب شده
+    [BindProperty]
+    public List<int> ComponentIds { get; set; } = new();
+
+    // دسته‌بندی‌های قطعات
     public List<Category> InstalledCategories { get; set; } = new();
 
-    [BindProperty] public DateTime AssembleDate { get; set; } = DateTime.Today;
-    [BindProperty] public string PropertyTag { get; set; } = string.Empty;
-    [BindProperty] public string? DeviceModel { get; set; }
-    [BindProperty] public string? AssetName { get; set; }
-    [BindProperty] public string? Description { get; set; }
-    [BindProperty] public List<int> ComponentIds { get; set; } = new();
-    [BindProperty] public int? DepartmentId { get; set; }
-    [BindProperty] public int? EmployeeId { get; set; }
-    public SelectList DepartmentList { get; set; } = null!;
-    public SelectList EmployeeList { get; set; } = null!;
+
+    // -----------------------------
+    // GET
+    // -----------------------------
 
     public async Task OnGetAsync()
     {
         await LoadAsync();
     }
 
+
+    // -----------------------------
+    // POST
+    // -----------------------------
+
     public async Task<IActionResult> OnPostAsync()
     {
-        if (string.IsNullOrWhiteSpace(PropertyTag) || ComponentIds == null || !ComponentIds.Any())
+        // --------------------------------
+        // 1. اعتبارسنجی اولیه فرم
+        // --------------------------------
+
+        if (string.IsNullOrWhiteSpace(PropertyTag))
         {
-            ModelState.AddModelError("", "شماره اموال و حداقل یک قطعه الزامی است.");
+            ModelState.AddModelError(
+                nameof(PropertyTag),
+                "شماره اموال الزامی است."
+            );
+        }
+
+        if (ComponentIds == null || !ComponentIds.Any())
+        {
+            ModelState.AddModelError(
+                "",
+                "حداقل یک قطعه برای اسمبل باید انتخاب شود."
+            );
+        }
+
+        if (!ModelState.IsValid)
+        {
             await LoadAsync();
             return Page();
         }
 
-        // دسته‌بندی "کامپیوتر رومیزی"
+
+        // --------------------------------
+        // 2. پیدا کردن دسته‌بندی PC
+        // --------------------------------
+
         var pcCategory = await _context.Categories
             .FirstOrDefaultAsync(c => c.Name == "کامپیوتر رومیزی");
+
         if (pcCategory == null)
         {
-            ModelState.AddModelError("", "دسته‌بندی «کامپیوتر رومیزی» در سیستم یافت نشد.");
+            ModelState.AddModelError(
+                "",
+                "دسته‌بندی «کامپیوتر رومیزی» در سیستم یافت نشد."
+            );
+
             await LoadAsync();
             return Page();
         }
 
-        // شماره اسمبل بعدی
-        var lastNumber = await _context.Assets
+
+        // --------------------------------
+        // 3. حذف آیتم‌های تکراری
+        // --------------------------------
+
+        var componentIds = ComponentIds
+            .Distinct()
+            .ToList();
+
+
+        // --------------------------------
+        // 4. پیدا کردن قطعات انتخاب شده
+        // --------------------------------
+
+        var components = await _context.Assets
+            .Where(a => componentIds.Contains(a.Id))
+            .ToListAsync();
+
+
+        // --------------------------------
+        // 5. بررسی تعداد قطعات
+        // --------------------------------
+
+        if (components.Count != componentIds.Count)
+        {
+            ModelState.AddModelError(
+                "",
+                "یکی از تجهیزات انتخاب‌شده دیگر وجود ندارد."
+            );
+
+            await LoadAsync();
+            return Page();
+        }
+
+
+        // --------------------------------
+        // 6. بررسی آزاد بودن قطعات
+        // --------------------------------
+
+        var busyComponents = await _context.AssemblyComponents
+            .Where(ac =>
+                componentIds.Contains(ac.ComponentAssetId) &&
+                ac.RemovedAt == null)
+            .Select(ac => ac.ComponentAssetId)
+            .ToListAsync();
+
+        if (busyComponents.Any())
+        {
+            ModelState.AddModelError(
+                "",
+                "یکی از قطعات انتخاب‌شده قبلاً در یک اسمبل دیگر استفاده شده است."
+            );
+
+            await LoadAsync();
+            return Page();
+        }
+
+
+        // --------------------------------
+        // 7. بررسی وضعیت قطعات
+        // --------------------------------
+
+        var invalidComponents = components
+            .Where(a => a.Status != AssetStatus.InStorage)
+            .ToList();
+
+        if (invalidComponents.Any())
+        {
+            ModelState.AddModelError(
+                "",
+                "فقط تجهیزاتی که در انبار تجهیزات هستند می‌توانند در اسمبل استفاده شوند."
+            );
+
+            await LoadAsync();
+            return Page();
+        }
+
+
+        // --------------------------------
+        // 8. تعیین شماره اسمبل
+        // --------------------------------
+
+        var lastAssemblyNumber = await _context.Assets
             .Where(a => a.IsAssembled)
             .MaxAsync(a => (int?)a.AssemblyNumber) ?? 0;
 
-        // ساخت Asset برای خود PC
-        //var pcAsset = new Asset
-        //{
-        //    Name = string.IsNullOrWhiteSpace(AssetName) ? $"PC اسمبل‌شده #{lastNumber + 1}" : AssetName,
-        //    Model = DeviceModel,
-        //    PropertyTag = PropertyTag,
-        //    CategoryId = pcCategory.Id,
-        //    Status = AssetStatus.Active,
-        //    Notes = Description,
-        //    IsAssembled = true,
-        //    AssemblyNumber = lastNumber + 1,
-        //    CreatedAt = AssembleDate,
-        //    DepartmentId = DepartmentId,
-        //    EmployeeId = EmployeeId
-        //};
-        //_context.Assets.Add(pcAsset);
+        var assemblyNumber = lastAssemblyNumber + 1;
 
-        //await _context.SaveChangesAsync();
 
-        // پر کردن نام‌های واحد و کارمند (چون از View می‌خونیم، FK نداریم)
-        if (DepartmentId.HasValue)
-        {
-            var dept = await _context.VwDepartments.FindAsync(DepartmentId);
-            //pcAsset.DepartmentName = dept?.Name;
-        }
-        if (EmployeeId.HasValue)
-        {
-            var emp = await _context.VwEmployees.FindAsync(EmployeeId);
-           // pcAsset.EmployeeName = emp?.FullName;
-        }
-        await _context.SaveChangesAsync();
+        // --------------------------------
+        // 9. شروع Transaction
+        // --------------------------------
 
-        // اتصال قطعات انتخاب‌شده
-        foreach (var compId in ComponentIds.Distinct())
+        await using var transaction =
+            await _context.Database.BeginTransactionAsync();
+
+        try
         {
-            _context.AssemblyComponents.Add(new AssemblyComponent
+            // --------------------------------
+            // 10. ایجاد Asset برای PC اسمبل شده
+            // --------------------------------
+
+            var pcAsset = new Asset
             {
-                //PcAssetId = pcAsset.Id,
-                ComponentAssetId = compId,
-                InstalledAt = DateTime.Now,
-                InstalledBy = User.Identity?.Name
-            });
-        }
-        await _context.SaveChangesAsync();
+                Name = string.IsNullOrWhiteSpace(AssetName)
+                    ? $"PC اسمبل‌شده #{assemblyNumber}"
+                    : AssetName,
 
-        // ثبت رکورد جابجایی اولیه (مثل بقیه تجهیزات)
-        if (DepartmentId.HasValue || EmployeeId.HasValue)
-        {
-            _context.AssetAssignments.Add(new AssetAssignment
-            {
-                //AssetId = pcAsset.Id,
-                ToEmployeeId = EmployeeId,
-                //ToEmployeeName = pcAsset.EmployeeName,
-                ToDepartmentId = DepartmentId,
-                //ToDepartmentName = pcAsset.DepartmentName,
-                AssignedAt = DateTime.Now,
-                Reason = "اسمبل اولیه سیستم",
-                AssignedBy = User.Identity?.Name
-            });
+                Model = DeviceModel,
+
+                PropertyTag = PropertyTag,
+
+                CategoryId = pcCategory.Id,
+
+                Status = AssetStatus.InStorage,
+
+                StatusNote = "سیستم اسمبل‌شده و آماده تحویل",
+
+                Notes = Description,
+
+                IsAssembled = true,
+
+                AssemblyNumber = assemblyNumber,
+
+                CreatedAt = AssembleDate,
+
+            };
+
+            _context.Assets.Add(pcAsset);
+
             await _context.SaveChangesAsync();
+
+
+            // --------------------------------
+            // 11. اتصال قطعات به PC
+            // --------------------------------
+
+            var rowNumber = 1;
+
+            foreach (var component in components)
+            {
+                _context.AssemblyComponents.Add(
+                    new AssemblyComponent
+                    {
+                        PcAssetId = pcAsset.Id,
+
+                        ComponentAssetId = component.Id,
+
+                        InstalledAt = DateTime.Now,
+
+                        InstalledBy = User.Identity?.Name,
+
+                        // اگر در مدل AssemblyComponent داری
+                        // RowNumber = rowNumber++
+                    });
+            }
+
+
+            // --------------------------------
+            // 12. تغییر وضعیت قطعات
+            // --------------------------------
+
+            foreach (var component in components)
+            {
+                component.Status = AssetStatus.Active;
+
+                component.UpdatedAt = DateTime.Now;
+            }
+
+
+            // --------------------------------
+            // 13. ذخیره نهایی
+            // --------------------------------
+
+            await _context.SaveChangesAsync();
+
+
+            // --------------------------------
+            // 14. ثبت Transaction
+            // --------------------------------
+
+            await transaction.CommitAsync();
+
+
+            // --------------------------------
+            // 15. پیام موفقیت
+            // --------------------------------
+
+            TempData["Success"] =
+                $"سیستم شماره {assemblyNumber} با موفقیت اسمبل شد.";
+
+
+            return RedirectToPage(
+                "/Assets/Details",
+                new { id = pcAsset.Id }
+            );
         }
+        catch (Exception)
+        {
+            await transaction.RollbackAsync();
 
-        //TempData["Success"] = $"سیستم #{pcAsset.AssemblyNumber} با موفقیت اسمبل شد.";
-        //return RedirectToPage("/Assembly/Details", new { id = pcAsset.Id });
-        return RedirectToPage("/InternalComponents/Details");
+            ModelState.AddModelError(
+                "",
+                "در هنگام ایجاد اسمبل خطایی رخ داد. هیچ تغییری ثبت نشد."
+            );
 
+            await LoadAsync();
+
+            return Page();
+        }
     }
+
+
+    // -----------------------------
+    // Load Lists
+    // -----------------------------
 
     private async Task LoadAsync()
     {
+        // --------------------------------
+        // شماره اسمبل بعدی
+        // --------------------------------
+
         var lastNumber = await _context.Assets
             .Where(a => a.IsAssembled)
             .MaxAsync(a => (int?)a.AssemblyNumber) ?? 0;
+
         NextAssemblyNumber = lastNumber + 1;
 
-        // دسته‌بندی‌های نصبی
+
+        // --------------------------------
+        // دسته‌بندی قطعات
+        // --------------------------------
+
         InstalledCategories = await _context.Categories
             .Where(c => c.Type == AssetCategoryType.Installed)
             .OrderBy(c => c.Name)
             .ToListAsync();
-        DepartmentList = new SelectList(
-            await _context.VwDepartments.OrderBy(d => d.Name).ToListAsync(), "Id", "Name");
-        EmployeeList = new SelectList(
-            await _context.VwEmployees
-                .OrderBy(e => e.FullName)
-                .Select(e => new { e.Id, Name = e.FullName + " - " + e.DepartmentName })
-                .ToListAsync(), "Id", "Name");
     }
 }
