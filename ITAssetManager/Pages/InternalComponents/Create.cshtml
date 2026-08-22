@@ -10,6 +10,18 @@
         <span class="badge bg-primary ms-2">شماره: #@Model.NextAssemblyNumber</span>
     </div>
     <div class="card-body">
+        @if (!ViewData.ModelState.IsValid)
+        {
+            <div class="alert alert-danger">
+                <ul class="mb-0">
+                    @foreach (var error in ViewData.ModelState.Values
+                                    .SelectMany(v => v.Errors))
+                    {
+                        <li>@error.ErrorMessage</li>
+                    }
+                </ul>
+            </div>
+        }
         <form method="post">
             <input type="hidden" asp-for="NextAssemblyNumber" />
 
@@ -166,7 +178,7 @@
                 <button type="submit" class="btn btn-primary" id="submitBtn" disabled>
                     <i class="bi bi-check-lg me-1"></i>ثبت سیستم اسمبل‌شده
                 </button>
-                <a href="/Assembly" class="btn btn-outline-secondary">انصراف</a>
+                <a href="/InternalComponents" class="btn btn-outline-secondary">انصراف</a>
             </div>
         </form>
     </div>

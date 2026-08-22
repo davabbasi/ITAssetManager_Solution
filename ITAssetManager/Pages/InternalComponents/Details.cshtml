@@ -5,13 +5,18 @@
     ViewData["Title"] = "سیستم #" + Model.PcAsset.AssemblyNumber;
 }
 
-@if (TempData["Success"] != null)
+@if (TempData["AssemblySuccess"] != null)
 {
     <div class="alert alert-success alert-dismissible">
-        @TempData["Success"] <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        @TempData["AssemblySuccess"] <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
     </div>
 }
-
+@if (TempData["AssemblyError"] != null)
+{
+    <div class="alert alert-danger alert-dismissible">
+        @TempData["AssemblyError"] <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+}
 <div class="d-flex justify-content-between align-items-center mb-3">
     <div>
         <a href="/InternalComponents" class="text-muted text-decoration-none small">
@@ -29,6 +34,18 @@
 
 <div class="row g-3">
     <div class="col-md-8">
+        @if (!ViewData.ModelState.IsValid)
+        {
+            <div class="alert alert-danger">
+                <ul class="mb-0">
+                    @foreach (var error in ViewData.ModelState.Values
+                                    .SelectMany(v => v.Errors))
+                    {
+                        <li>@error.ErrorMessage</li>
+                    }
+                </ul>
+            </div>
+        }
         <!-- قطعات فعال -->
         <div class="card mb-3">
             <div class="card-header d-flex justify-content-between">
@@ -63,7 +80,7 @@
                                     <td>
                                         <form method="post" asp-page-handler="RemoveComponent"
                                               onsubmit="return confirm('این قطعه از سیستم خارج شود؟')">
-                                            <input type="hidden" name="componentId" value="@c.Id" />
+                                            <input type="hidden" name="assemblyComponentId" value="@c.Id" />
                                             <button type="submit" class="btn btn-xs btn-outline-danger">
                                                 <i class="bi bi-box-arrow-up me-1"></i>خارج‌کردن
                                             </button>

@@ -20,7 +20,10 @@ public enum AssetStatus
     InStorage = 5,
 
     [Display(Name = "ضایعات")]
-    Waste = 6
+    Waste = 6,
+
+    [Display(Name = "ضایعات")]
+    Installed = 6
 }
 
 public class Asset

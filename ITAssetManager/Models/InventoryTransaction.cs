@@ -23,7 +23,10 @@ namespace ITAssetManager.Models
         AdjustmentOut = 6,
 
         [Display(Name = " موجودی اولیه")]
-        OpeningBalance = 7
+        OpeningBalance = 7,
+
+        [Display(Name = "ورود محصول اسمبل‌شده")]
+        AssemblyIn = 8
     }
     public class InventoryTransaction
     {
@@ -53,5 +56,8 @@ namespace ITAssetManager.Models
         public Warehouse Warehouse { get; set; } = null!;
         [Display(Name = "نام کالا")]
         public Product Product { get; set; } = null!;
+
+        public int? AssetId { get; set; }
+        public Asset? Asset { get; set; }
     }
 }

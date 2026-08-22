@@ -34,7 +34,7 @@ public class FreeComponentsModel : PageModel
                 name = a.Name,
                 propertyTag = a.PropertyTag,
                 serialNumber = a.SerialNumber,
-                categoryName = a.Category!.Name
+                categoryName = a.Category!.Name,
             })
             .ToListAsync();
 

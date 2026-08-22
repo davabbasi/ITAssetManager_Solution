@@ -16,5 +16,7 @@ namespace ITAssetManager.Models
         public Product? Product { get; set; }
         public int ProductId { get; set; }
 
+        public string? Description { get; set; }
+
     }
 }

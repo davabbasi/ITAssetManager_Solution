@@ -16,6 +16,7 @@ namespace ITAssetManager.Models
         [ForeignKey(nameof(ProductId))]
         public Product? Product { get; set; }
         public int ProductId { get; set; }
+        public string? Description { get; set; }
 
     }
 }

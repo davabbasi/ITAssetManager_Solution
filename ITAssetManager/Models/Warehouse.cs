@@ -43,6 +43,9 @@ namespace ITAssetManager.Models
         [Display(Name = "انبار آی تی")]
         public bool IsITWarehouse { get; set; }
 
+        [Display(Name = "انبار تجهیزات آی تی")]
+        public bool IsAssetWarehouse { get; set; }
+
         public ICollection<WarehouseReceipt> Receipts { get; set; }= new List<WarehouseReceipt>();
         public ICollection<WarehouseIssue> OutgoingIssues { get; set; }= new List<WarehouseIssue>();
         public ICollection<WarehouseIssue> IncomingIssues { get; set; }= new List<WarehouseIssue>();

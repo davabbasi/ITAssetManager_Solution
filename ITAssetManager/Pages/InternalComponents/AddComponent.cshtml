@@ -11,6 +11,18 @@
                 <i class="bi bi-plus-circle me-2"></i>افزودن قطعه به سیستم #@Model.PcAsset.AssemblyNumber
             </div>
             <div class="card-body">
+                @if (!ViewData.ModelState.IsValid)
+                {
+                    <div class="alert alert-danger">
+                        <ul class="mb-0">
+                            @foreach (var error in ViewData.ModelState.Values
+                                                    .SelectMany(v => v.Errors))
+                            {
+                                <li>@error.ErrorMessage</li>
+                            }
+                        </ul>
+                    </div>
+                }
                 <form method="post">
                     <input type="hidden" name="pcId" value="@Model.PcAsset.Id" />
 
