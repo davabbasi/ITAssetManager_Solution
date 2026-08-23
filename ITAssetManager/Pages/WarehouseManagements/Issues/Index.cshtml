@@ -69,6 +69,11 @@
                 <th>
                     @Html.DisplayNameFor(model => model.WarehouseIssue[0].WarehouseId)
                 </th>
+
+                <th>
+                    @Html.DisplayNameFor(model => model.WarehouseIssue[0].Source)
+                </th>
+
                 <th>
                     @Html.DisplayNameFor(model => model.WarehouseIssue[0].EmployeeName)
                 </th>
@@ -100,7 +105,9 @@
                     <td>
                         @Html.DisplayFor(modelItem => item.Warehouse.WarehouseName)
                     </td>
-
+                    <td>
+                        @item.Source.GetDisplayName()
+                    </td>
                     <td>
                         @Html.DisplayFor(modelItem => item.EmployeeName)
                     </td>

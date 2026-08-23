@@ -171,22 +171,26 @@
 
 @if (Model.WarehouseReceipt.Status == DocumentStatus.Posted)
 {
-    <form method="post"
-          asp-page-handler="Cancel"
-          asp-route-id="@Model.WarehouseReceipt.Id"
-          class="d-inline">
-        <br />
-        <button type="submit"
-                class="btn btn-danger"
-                onclick="return confirm('آیا از ابطال این رسید اطمینان دارید؟');">
+    @if (Model.WarehouseReceipt.ReceiptSource==ReceiptSource.Manual)
+    {
+        <form method="post"
+              asp-page-handler="Cancel"
+              asp-route-id="@Model.WarehouseReceipt.Id"
+              class="d-inline">
+            <br />
+            <button type="submit"
+                    class="btn btn-danger"
+                    onclick="return confirm('آیا از ابطال این رسید اطمینان دارید؟');">
 
-            <i class="bi bi-x-circle"></i>
-            ابطال رسید
+                <i class="bi bi-x-circle"></i>
+                ابطال رسید
 
-        </button>
-        <br />
+            </button>
+            <br />
 
-    </form>
+        </form>
+    }
+    
 }
 <br />
 <div>

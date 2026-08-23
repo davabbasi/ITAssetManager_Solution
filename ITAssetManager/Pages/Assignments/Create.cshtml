@@ -29,10 +29,14 @@
                 }
 
                 <form method="post">
-                    <input type="hidden" asp-for="Assignment.AssetId" />
-                    <input type="hidden" asp-for="Assignment.FromEmployeeId" />
-                    <input type="hidden" asp-for="Assignment.FromDepartmentId" />
-                    <input type="hidden" asp-for="Assignment.FromLocation" />
+                    @if (Model.Asset != null)
+                    {
+                        <input type="hidden" asp-for="Assignment.AssetId" />
+                        <input type="hidden" asp-for="Assignment.FromEmployeeId" />
+                        <input type="hidden" asp-for="Assignment.FromDepartmentId" />
+                        <input type="hidden" asp-for="Assignment.FromLocation" />
+                    }
+
 
                     @if (Model.Asset == null)
                     {

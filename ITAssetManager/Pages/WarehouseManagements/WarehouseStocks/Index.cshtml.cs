@@ -29,7 +29,7 @@ namespace ITAssetManager.Pages.WarehouseManagements.WarehouseStocks
         {
             WarehouseList = await _context.Warehouses.Include(r => r.Keeper).ToListAsync();
 
-            var query =  _context.WarehouseStocks
+            var query =  _context.WarehouseStocks.Where(s=>s.Quantity>0)
                 .Include(w => w.Product)
                 .Include(w => w.Warehouse).AsQueryable();
             if(!string.IsNullOrEmpty(ProductName))

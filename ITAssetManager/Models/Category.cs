@@ -1,4 +1,6 @@
-﻿namespace ITAssetManager.Models;
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace ITAssetManager.Models;
 
 public class Category
 {
@@ -14,7 +16,12 @@ public class Category
 
 public enum AssetCategoryType
 {
-    Tagged = 1,       // کالای مستقل
-    Installed = 2,    // قطعات نصبی
+    [Display(Name = " مستقل")]
+    Tagged = 1,
+
+    [Display(Name = " اسمبلی")]
+    Installed = 2,
+
+    [Display(Name = " مصرفی")]
     Consumable = 3    // مواد مصرفی
 }

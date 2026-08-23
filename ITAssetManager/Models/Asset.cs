@@ -22,8 +22,13 @@ public enum AssetStatus
     [Display(Name = "ضایعات")]
     Waste = 6,
 
-    [Display(Name = "ضایعات")]
-    Installed = 6
+    [Display(Name = "اسمبل شده")]
+    Installed = 7,
+
+    [Display(Name = "تخصیص یافته")]
+    Assigned = 8
+
+
 }
 
 public class Asset

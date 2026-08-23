@@ -35,7 +35,6 @@ namespace ITAssetManager.Pages.WarehouseManagements.Receipts
             return Page();
         }
 
-
         public async Task<IActionResult> OnPostAsync()
         {
             if (!ModelState.IsValid)
@@ -84,10 +83,6 @@ namespace ITAssetManager.Pages.WarehouseManagements.Receipts
                 id = WarehouseReceipt.Id
             });
         }
-
-
-        
-
         private async Task LoadLists()
         {
             var maxReceiptNumber = await _context.WarehouseReceipts.Select(r => (int?)r.ReceiptNumber).MaxAsync() ?? 0;

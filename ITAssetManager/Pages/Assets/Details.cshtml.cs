@@ -23,6 +23,8 @@ public class DetailsModel : PageModel
     public WarehouseTransferItem TransferItem { get; set; } = new();
     public List<MaintenanceLog> MaintenanceLogs { get; set; } = new();
     public List<AssemblyComponent> InstalledList { get; set; }
+    public List<AssemblyComponent> ActiveComponents { get; set; } = new();
+
     public async Task<IActionResult> OnGetAsync(int id)
     {
         var asset = await _context.Assets
@@ -31,12 +33,21 @@ public class DetailsModel : PageModel
             .ThenInclude(sv => sv.Specification)
             .Include(a => a.SpecValues)
             .ThenInclude(sv => sv.SpecValue)
+            .Include(a=>a.Components)
+            .ThenInclude(a=>a.ComponentAsset)
             .FirstOrDefaultAsync(a => a.Id == id);
 
         if (asset == null) return NotFound();
         Asset = asset;
 
+        var components = await _context.AssemblyComponents
+           .Include(c => c.ComponentAsset)
+               .ThenInclude(a => a!.Category)
+           .Where(c => c.PcAssetId == id)
+           .OrderByDescending(c => c.InstalledAt)
+           .ToListAsync();
 
+        ActiveComponents = components.Where(c => c.RemovedAt == null).ToList();
 
 
         InstalledIn = await _context.AssemblyComponents
@@ -73,7 +84,7 @@ public class DetailsModel : PageModel
         var asset = await _context.Assets
             .Include(a => a.Warehouse)
             .ThenInclude(w => w.Keeper)
-            .Include(a => a.Product)
+            .Include(a => a.Product).Include(a => a.Category).Include(a=>a.Components)
             .FirstOrDefaultAsync(a => a.Id == id);
 
         if (asset == null)
@@ -83,14 +94,20 @@ public class DetailsModel : PageModel
         // 2. بررسی وضعیت تجهیز
         // ================================
 
-        if (asset.Status != AssetStatus.Active)
+        if (asset.Status == AssetStatus.Faulty|| asset.Status == AssetStatus.Scrapped || asset.Status == AssetStatus.Waste)
         {
             TempData["AssetScrapError"] =
                 "فقط تجهیزات فعال قابلیت اسقاط شدن را دارند.";
 
             return RedirectToPage(new { id });
         }
+        if (asset.Components.Count>0)
+        {
+            TempData["AssetScrapError"] =
+                "به علت وجود تجهیزات داخلی امکان اسقاط وجود ندارد ابتدا تجهیزات داخلی را خارج کنید سپس اقدام به اسقاط نمایید.";
 
+            return RedirectToPage(new { id });
+        }
 
         // ============================================================
         // 3. شروع Transaction
@@ -228,7 +245,8 @@ public class DetailsModel : PageModel
                 Description =
                 $"انتقال جهت اسقاط تجهیز «{asset.Name}»",
                 CreatedBy =User.Identity?.Name ?? "سیستم",
-                CreatedAt = DateTime.Now
+                CreatedAt = DateTime.Now,
+                TransferSource= TransferSource.Scrap,
             };
             _context.WarehouseTransfers.Add(transfer);
 
@@ -293,7 +311,7 @@ public class DetailsModel : PageModel
             {
                 WarehouseId = sourceWarehouse.Id,
                 ProductId = (int)asset.ProductId,
-                Quantity = 1,
+                Quantity = -1,
                 Type = InventoryTransactionType.TransferOut,
                 TransactionDate = DateTime.Now,
                 TransferItemId = transferItem.Id,

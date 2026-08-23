@@ -82,6 +82,7 @@
                             <th>برچسب اموال</th>
                             <th>نام / مدل</th>
                             <th>دسته</th>
+                            <th>نوع تجهیز</th>
                             <th>سریال</th>
                             <th>بخش / کاربر</th>
                             <th>وضعیت</th>
@@ -112,7 +113,11 @@
                                     </a>
                                    
                                 </td>
+
                                 <td>@(asset.Category.Name??"-")</td>
+
+                                <td>@(asset.Category.Type.GetDisplayName() ?? "-")</td>
+
                               
                                 <td><small class="text-muted">@(asset.SerialNumber ?? "-")</small></td>
                                 <td>
@@ -136,9 +141,12 @@
                                         {
                                             AssetStatus.Active => ("badge-active", "فعال"),
                                             AssetStatus.Faulty => ("badge-faulty", "معیوب"),
-                                            AssetStatus.UnderRepair => ("badge-repair", "در تعمیر"),
+                                            AssetStatus.UnderRepair => ("badge-repair", "دردست تعمیر"),
                                             AssetStatus.Scrapped => ("badge-scrapped", "اسقاط"),
-                                            _ => ("badge-storage", "انبار")
+                                            AssetStatus.Assigned => ("badge-assigned", "تخصیص یافته"),
+                                            AssetStatus.Installed => ("badge-assigned", "اسمبل شده"),
+
+                                            _ => ("badge-storage", "در انبار تجهیزات")
                                         };
                                     }
                                     <span class="badge @bc">@lbl</span>

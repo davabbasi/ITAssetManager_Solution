@@ -45,12 +45,12 @@
             <i class="bi bi-pencil me-1"></i>ویرایش
         </a>
 
-          @if(Model.Asset.Category.Type!=AssetCategoryType.Installed)
+         @*  @if(Model.Asset.Category.Type!=AssetCategoryType.Installed)
                 {
                     <a href="/Assignments/Create?assetId=@Model.Asset.Id" class="btn btn-primary btn-sm">
             <i class="bi bi-arrow-left-right me-1"></i>ثبت جابجایی
         </a>
-                }
+                } *@
        
     </div>
 </div>
@@ -148,7 +148,7 @@
         <div class="card mb-3">
             <div class="card-header d-flex justify-content-between">
                 <span><i class="bi bi-arrow-left-right me-2"></i>تاریخچه جابجایی‌ها</span>
-                @if(Model.Asset.Category.Type!=AssetCategoryType.Installed)
+                @if(Model.Asset.Category.Type==AssetCategoryType.Tagged)
                 {
                     <a href="/Assignments/Create?assetId=@Model.Asset.Id" class="btn btn-sm btn-outline-primary">
                     <i class="bi bi-plus"></i> جابجایی جدید
@@ -305,7 +305,10 @@
                         AssetStatus.Faulty => ("text-danger", "bi-x-circle-fill", "معیوب"),
                         AssetStatus.UnderRepair => ("text-warning", "bi-tools", "در تعمیر"),
                         AssetStatus.Scrapped => ("text-secondary", "bi-trash3-fill", "اسقاط"),
-                        _ => ("text-info", "bi-archive-fill", "در انبار")
+                        AssetStatus.Assigned=> ("text-success", "bi-file-person", "تخصیص یافته"),
+                        AssetStatus.Installed=> ("text-success", "bi-pc-display", "اسمبل شده"),
+
+                        _ => ("text-info", "bi-archive-fill", "در انبار"),
                     };
                 }
                 <i class="bi @statusIcon @statusClass" style="font-size:2.5rem;"></i>
@@ -348,7 +351,54 @@
                 }
             </div>
         </div>
+          <!-- قطعات داخلی -->
+           @if (Model.Asset.Category.Type==AssetCategoryType.Tagged)
+        {
+            <div class="card mb-3">
+            <div class="card-header">
+                <i class="bi bi-puzzle"></i>
+                تجهیزات داخلی
+                </div>
+            <div class="card-body">
+                <div class="d-flex align-items-center gap-2 mb-2">
+                        <div>
+                            <small class="text-muted">@(Model.ActiveComponents.Count ==0 ? "تجهیزات داخلی  ندارد " :"") </small>
+                        </div>
+                    </div>
+                    @if (Model.ActiveComponents.Count > 0)
+                    {
+                        <table class="table table-sm mb-0">
+                        <thead>
+                            <tr>
+                                <th>نام قطعه</th>
+                                <th>تاریخ نصب</th><th>
+                        </thead>
+                        <tbody>
+                            @foreach (var c in Model.ActiveComponents)
+                            {
+                                <tr>
+                                   
+                                    <td>
+                                        <a href="/Assets/Details/@c.ComponentAssetId" class="text-decoration-none">
+                                            @c.ComponentAsset?.Name
+                                        </a>
 
+                                    </td>
+                                  
+                                    <td>
+                                        <small>@c.InstalledAt.ToShamsi()</small>
+                                    </td>
+                                    
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+
+                        
+                    }
+            </div>
+        </div>
+        }
         <!-- اطلاعات مالی -->
         @if (Model.Asset.PurchasePrice.HasValue)
         {

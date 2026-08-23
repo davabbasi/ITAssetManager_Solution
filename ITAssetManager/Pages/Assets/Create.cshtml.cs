@@ -141,6 +141,9 @@ public class CreateModel : PageModel
             Asset.WarehouseId= assetWarehouse.Id;
             Asset.EmployeeName = assetWarehouse.Keeper.FullName;
             Asset.EmployeeId = keeperEmployee.Id;
+            Asset.Status = AssetStatus.InStorage;
+            Asset.StatusNote = "در انبار تجهیزات";
+
             _context.Assets.Add(Asset);
             await _context.SaveChangesAsync();
 
@@ -208,7 +211,9 @@ public class CreateModel : PageModel
                 Description =
                 $"انتقال جهت ایجاد اولیه تجهیز «{Asset.Name}»",
                 CreatedBy = User.Identity?.Name ?? "سیستم",
-                CreatedAt = DateTime.Now
+                CreatedAt = DateTime.Now,
+                TransferSource= TransferSource.AssetCreation
+
             };
             _context.WarehouseTransfers.Add(transfer);
 

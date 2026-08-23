@@ -4,6 +4,18 @@ using Microsoft.AspNetCore.Http.HttpResults;
 
 namespace ITAssetManager.Models
 {
+
+    public enum ReceiptSource
+    {
+        [Display(Name = "رسید دریافت از خرید")]
+        Manual = 1,
+
+        [Display(Name = "ایجاد تجهیز")]
+        AssetCreation = 2,
+
+        [Display(Name = "برگشت از اسمبل")]
+        FromAssembly = 3
+    }
     public class WarehouseReceipt
     {
         public int Id { get; set; }
@@ -30,5 +42,7 @@ namespace ITAssetManager.Models
 
         public int WarehouseId { get; set; }
 
+        [Display(Name = "علت رسید")]
+        public ReceiptSource ReceiptSource { get; set; } = ReceiptSource.Manual;
     }
 }

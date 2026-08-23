@@ -46,7 +46,7 @@ namespace ITAssetManager.Models
         [Display(Name = "وضعیت")]
         public DocumentStatus Status { get; set; } = DocumentStatus.Draft;
 
-        [Display(Name = "منبع حواله")]
+        [Display(Name = "علت حواله")]
         public IssueSource Source { get; set; } = IssueSource.Manual;
 
         public ICollection<WarehouseIssueItem> Items { get; set; } = new List<WarehouseIssueItem>();

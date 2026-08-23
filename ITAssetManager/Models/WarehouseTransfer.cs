@@ -2,6 +2,21 @@
 
 namespace ITAssetManager.Models
 {
+    public enum TransferSource
+    {
+        [Display(Name = "انتقال دستی")]
+        Manual = 1,
+
+        [Display(Name = "ایجاد تجهیز")]
+        AssetCreation = 2,
+
+        [Display(Name = "اسقاط")]
+        Scrap = 3,
+
+        [Display(Name = "ضایعات")]
+        Waste = 4,
+
+    }
     public enum DocumentStatus
     {
         [Display(Name = "پیش‌ نویس")]
@@ -44,6 +59,9 @@ namespace ITAssetManager.Models
 
         [Display(Name = "تاریخ ایجاد")]
         public DateTime CreatedAt { get; set; }
+
+        [Display(Name = "نوع انتقال ")]
+        public TransferSource TransferSource { get; set; } = TransferSource.Manual;
 
         public ICollection<WarehouseTransferItem> Items { get; set; }
             = new List<WarehouseTransferItem>();

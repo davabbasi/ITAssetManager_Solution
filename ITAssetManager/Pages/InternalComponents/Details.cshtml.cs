@@ -192,7 +192,9 @@ public class DetailsModel : PageModel
                 WarehouseId = assetWarehouse.Id,
 
                 Description =
-                    $"برگشت قطعه از اسمبل #{pc.AssemblyNumber}"
+                    $"برگشت قطعه از اسمبل #{pc.AssemblyNumber}",
+
+                Status=DocumentStatus.Posted
             };
 
             _context.WarehouseReceipts.Add(receipt);

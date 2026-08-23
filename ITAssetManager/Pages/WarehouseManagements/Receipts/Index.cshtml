@@ -74,7 +74,9 @@
                 <th>
                     @Html.DisplayNameFor(model => model.WarehouseReceipt[0].WarehouseId)
                 </th>
-
+                <th>
+                    @Html.DisplayNameFor(model => model.WarehouseReceipt[0].ReceiptSource)
+                </th>
                 <th>
                     @Html.DisplayNameFor(model => model.WarehouseReceipt[0].ReferenceNumber)
                 </th>
@@ -104,7 +106,9 @@
                     <td>
                         @Html.DisplayFor(modelItem => item.Warehouse.WarehouseName)
                     </td>
-
+                    <td>
+                        @item.ReceiptSource.GetDisplayName()
+                    </td>
                     <td>
                         @Html.DisplayFor(modelItem => item.ReferenceNumber)
                     </td>

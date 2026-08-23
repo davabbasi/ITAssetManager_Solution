@@ -170,22 +170,26 @@
 
     @if (Model.WarehouseTransfer.Status == DocumentStatus.Posted)
     {
-        <form method="post"
-              asp-page-handler="Cancel"
-              asp-route-id="@Model.WarehouseTransfer.Id"
-              class="d-inline">
-            <br />
-            <button type="submit"
-                    class="btn btn-danger"
-                    onclick="return confirm('آیا از ابطال این انتقال اطمینان دارید؟');">
+        @if (Model.WarehouseTransfer.TransferSource == TransferSource.Manual)
+        {
+            <form method="post"
+                  asp-page-handler="Cancel"
+                  asp-route-id="@Model.WarehouseTransfer.Id"
+                  class="d-inline">
+                <br />
+                <button type="submit"
+                        class="btn btn-danger"
+                        onclick="return confirm('آیا از ابطال این انتقال اطمینان دارید؟');">
 
-                <i class="bi bi-x-circle"></i>
-                ابطال انتقال 
+                    <i class="bi bi-x-circle"></i>
+                    ابطال انتقال
 
-            </button>
-            <br />
+                </button>
+                <br />
 
-        </form>
+            </form>
+        }
+       
     }
     <br />
     <div>

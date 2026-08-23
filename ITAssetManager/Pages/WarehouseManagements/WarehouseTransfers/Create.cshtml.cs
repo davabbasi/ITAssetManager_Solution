@@ -115,6 +115,7 @@ namespace ITAssetManager.Pages.WarehouseManagements.WarehouseTransfers
                 WarehouseTransfer.CreatedAt = DateTime.Now;
                 WarehouseTransfer.CreatedBy =User.FindFirstValue(ClaimTypes.Name)!;
                 WarehouseTransfer.Status = DocumentStatus.Draft;
+                WarehouseTransfer.TransferSource = TransferSource.Manual;
                 _context.WarehouseTransfers.Add(WarehouseTransfer);
                 await _context.SaveChangesAsync();
 

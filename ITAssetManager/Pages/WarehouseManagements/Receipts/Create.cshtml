@@ -100,38 +100,21 @@
             }
         ];
         
-        document.getElementById('selectWarehouse')
-          .addEventListener('change', async function () {
-            const Id = this.value;
-            console.log(Id);
-           await fetch(`/WarehouseManagements/Receipts/Create?handler=SetKeeper&id=${Id}`);
-          });
-        
         
         let rowIndex = 0;
         document.getElementById("btnAddItem").addEventListener("click",addRow);
 
-        function addRow()
-        {
-        const tbody=document.getElementById("itemsBody");
-        const row=document.createElement("tr");
-        row.innerHTML=
+        function addRow(){
+         const tbody=document.getElementById("itemsBody");
+         const row=document.createElement("tr");
+         row.innerHTML=
         `<td>${rowIndex+1} </td>
-                <td>
+
+        <td>
 
         <select class="form-select" name="Items[${rowIndex}].ProductId">
-         <option value="">انتخاب کالا...</option>
-        ${
-        products.map(x=>`
-
-        <option value="${x.id}">
-
-        ${x.name}
-
-        </option>
-
-        `).join("")
-        }
+          <option value="">انتخاب کالا...</option>
+          ${products.map(x=>`<option value="${x.id}"> ${x.name} </option>`).join("")}
 
         </select>
 
@@ -139,24 +122,10 @@
 
         <td>
 
-        <input
-        type="number"
-        min="1"
-        value="1"
-        class="form-control"
-        name="Items[${rowIndex}].Quantity"/>
-
+        <input type="number" min="1" value="1" class="form-control" name="Items[${rowIndex}].Quantity"/>
+        </td>
         <td>
-
-        <button
-        type="button"
-        class="btn btn-danger btn-sm"
-        onclick="removeRow(this)">
-
-        ❌
-
-        </button>
-
+          <button type="button" class="btn btn-danger btn-sm" onclick="removeRow(this)"> ❌ </button>
         </td>
         
         `;

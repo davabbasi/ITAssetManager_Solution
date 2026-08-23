@@ -215,6 +215,8 @@
         .badge-repair { background-color: #fef3c7; color: #d97706; }
         .badge-scrapped { background-color: #f1f5f9; color: #64748b; }
         .badge-storage { background-color: #dbeafe; color: #2563eb; }
+        .badge-assigned {background-color: #dcfce7;color: #16a34a;}
+        .badge-assigned {background-color: #dcfce7;color: #16a34a;}
 
         /* Table */
         .table { font-size: 0.875rem; }
@@ -354,29 +356,21 @@
                     </div>
                     <div class="sidebar-group-items">
                         <a href="/Assets" class="nav-link-item @(Context.Request.Path.StartsWithSegments("/Assets") ? "active" : "")">
-                            <i class="bi bi-cpu"></i> لیست کلیه تجهیزات 
+                            <i class="bi bi-cpu"></i>  لیست تجهیزات 
                         </a>
                         <a href="/InternalComponents" class="nav-link-item @(Context.Request.Path.StartsWithSegments("/InternalComponents") ? "active" : "")">
-                            <i class="bi bi-pc-display"></i> اسمبل قطعات
+                            <i class="bi bi-pc-display"></i> اسمبل سیستم
                         </a>
-                       
-                    </div>
-                </div>
-                <!-- ردیابی -->
-                <div class="sidebar-group">
-                    <div class="sidebar-group-header" onclick="toggleGroup(this)">
-                        <span><i class="bi bi-geo-alt me-1"></i>ردیابی تجهیزات</span>
-                        <i class="bi bi-chevron-down chevron"></i>
-                    </div>
-                    <div class="sidebar-group-items">
                         <a href="/Assignments" class="nav-link-item @(Context.Request.Path.StartsWithSegments("/Assignments") ? "active" : "")">
-                            <i class="bi bi-arrow-left-right"></i> جابجایی‌ها
+                            <i class="bi bi-arrow-left-right"></i> جابجایی تجهیزات
                         </a>
                         <a href="/Maintenance" class="nav-link-item @(Context.Request.Path.StartsWithSegments("/Maintenance") ? "active" : "")">
                             <i class="bi bi-tools"></i> تعمیرات
                         </a>
+                       
                     </div>
                 </div>
+               
              
                 <!-- خرید تدارکات -->
                 <div class="sidebar-group">

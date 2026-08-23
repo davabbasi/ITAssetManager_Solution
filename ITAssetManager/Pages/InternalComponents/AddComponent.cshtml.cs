@@ -252,8 +252,10 @@ public class AddComponentModel : PageModel
 
                 Status = DocumentStatus.Posted,
 
-                Description =
-                    $"خروج قطعه جهت افزودن به اسمبل #{pc.AssemblyNumber}"
+                Description =$"خروج قطعه جهت افزودن به اسمبل #{pc.AssemblyNumber}",
+
+                Source=IssueSource.Assembly
+
             };
 
             _context.WarehouseIssues.Add(issue);

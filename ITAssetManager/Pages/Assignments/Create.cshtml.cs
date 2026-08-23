@@ -46,7 +46,7 @@ public class CreateModel : PageModel
         ModelState.Remove("Assignment.ToEmployee");
         ModelState.Remove("Assignment.FromDepartment");
         ModelState.Remove("Assignment.ToDepartment");
-
+      
         if (!ModelState.IsValid)
         {
             if (Assignment.AssetId > 0)
@@ -114,7 +114,7 @@ public class CreateModel : PageModel
     private async Task LoadSelectListsAsync()
     {
         AssetList = new SelectList(
-            await _context.Assets.Where(a => a.Status != AssetStatus.Scrapped)
+            await _context.Assets.Include(a=>a.Category).Where(a => a.Status == AssetStatus.InStorage&&a.IsAssembled==false&&a.Category.Type==AssetCategoryType.Tagged)
                 .OrderBy(a => a.Name)
                 .Select(a => new { a.Id, Name = a.Name + (a.PropertyTag != null ? " (" + a.PropertyTag + ")" : "") })
                 .ToListAsync(), "Id", "Name");
