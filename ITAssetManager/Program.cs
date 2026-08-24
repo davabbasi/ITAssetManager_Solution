@@ -1,5 +1,6 @@
 using ITAssetManager.Data;
 using ITAssetManager.Services;
+using ITAssetManager.Services.Pdf;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
@@ -44,6 +45,9 @@ builder.Services.AddAuthorization(options =>
     options.AddPolicy("RequireAdminRole", policy => policy.RequireRole("Admin"));
 });
 
+QuestPDF.Settings.License = QuestPDF.Infrastructure.LicenseType.Community;
+
+
 builder.Services.AddRazorPages(options =>
 {
     options.Conventions.AuthorizeFolder("/Assets");
@@ -58,6 +62,7 @@ builder.Services.AddRazorPages(options =>
 });
 
 builder.Services.AddScoped<InventoryService>();
+builder.Services.AddScoped<AssetPdfService>();
 
 var app = builder.Build();
 

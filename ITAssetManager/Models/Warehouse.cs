@@ -5,7 +5,7 @@ namespace ITAssetManager.Models
 {
     public enum WarehouseType
     {
-        [Display(Name = "عادی")]
+        [Display(Name = "انبار کالا")]
         Main = 1,
 
         [Display(Name = "اسقاط")]

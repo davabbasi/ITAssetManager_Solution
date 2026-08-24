@@ -55,6 +55,16 @@
                 <a href="/Assets" class="btn btn-outline-secondary btn-sm">
                     <i class="bi bi-x"></i>
                 </a>
+                <a asp-page-handler="Pdf"
+                   asp-route-search="@Model.Search"
+                   asp-route-categoryId="@Model.CategoryId"
+                   asp-route-status="@Model.Status"
+                   asp-route-departmentId="@Model.DepartmentId"
+                   class="btn btn-danger">
+
+                    <i class="bi bi-file-earmark-pdf"></i>
+                    خروجی PDF
+                </a>
             </div>
         </form>
     </div>

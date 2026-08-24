@@ -1,5 +1,6 @@
 ﻿using ITAssetManager.Data;
 using ITAssetManager.Models;
+using ITAssetManager.Services.Pdf;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -11,7 +12,13 @@ namespace ITAssetManager.Pages.Assets;
 public class IndexModel : PageModel
 {
     private readonly ApplicationDbContext _context;
-    public IndexModel(ApplicationDbContext context) => _context = context;
+    private readonly AssetPdfService _assetPdfService;
+
+    public IndexModel(ApplicationDbContext context,AssetPdfService assetPdfService)
+    {
+        _context = context;
+        _assetPdfService = assetPdfService;
+    }
 
     public List<Asset> Assets { get; set; } = new();
     public List<Category> Categories { get; set; } = new();
@@ -23,6 +30,34 @@ public class IndexModel : PageModel
     [BindProperty(SupportsGet = true)] public int? Status { get; set; }
     [BindProperty(SupportsGet = true)] public int? DepartmentId { get; set; }
 
+
+    private IQueryable<Asset> BuildQuery()
+    {
+        var query = _context.Assets
+            .Include(a => a.Category)
+            .AsQueryable();
+
+        if (!string.IsNullOrEmpty(Search))
+        {
+            query = query.Where(a =>
+                a.Name.Contains(Search) ||
+                (a.SerialNumber != null && a.SerialNumber.Contains(Search)) ||
+                (a.Barcode != null && a.Barcode.Contains(Search)) ||
+                (a.PropertyTag != null && a.PropertyTag.Contains(Search)) ||
+                (a.Model != null && a.Model.Contains(Search)));
+        }
+
+        if (CategoryId.HasValue)
+            query = query.Where(a => a.CategoryId == CategoryId);
+
+        if (Status.HasValue)
+            query = query.Where(a => (int)a.Status == Status);
+
+        if (DepartmentId.HasValue)
+            query = query.Where(a => a.DepartmentId == DepartmentId);
+
+        return query;
+    }
     public async Task OnGetAsync()
     {
         Categories = await _context.Categories.OrderBy(c => c.Name).ToListAsync();
@@ -33,26 +68,8 @@ public class IndexModel : PageModel
             Name="انفورماتیک"
         };
         Departments.Add(vwDepartment);
-        var query = _context.Assets
-            .Include(a => a.Category)
-            .AsQueryable();
 
-        if (!string.IsNullOrEmpty(Search))
-            query = query.Where(a =>
-                a.Name.Contains(Search) ||
-                (a.SerialNumber != null && a.SerialNumber.Contains(Search)) ||
-                (a.Barcode != null && a.Barcode.Contains(Search)) ||
-                (a.PropertyTag != null && a.PropertyTag.Contains(Search)) ||
-                (a.Model != null && a.Model.Contains(Search)));
-
-        if (CategoryId.HasValue)
-            query = query.Where(a => a.CategoryId == CategoryId);
-
-        if (Status.HasValue)
-            query = query.Where(a => (int)a.Status == Status);
-
-        if (DepartmentId.HasValue)
-            query = query.Where(a => a.DepartmentId == DepartmentId);
+        var query = BuildQuery();
 
         TotalCount = await query.CountAsync();
         Assets = await query.OrderByDescending(a => a.CreatedAt).ToListAsync();
@@ -70,5 +87,22 @@ public class IndexModel : PageModel
             ? $"{x.PcAsset.Name} - {x.PcAsset.EmployeeName}"
             : $"{x.PcAsset.Name} - {x.PcAsset.DepartmentName}"
             );
+    }
+
+    public async Task<IActionResult> OnGetPdfAsync()
+    {
+
+        var query = BuildQuery();
+ 
+        var assets = await query
+            .OrderByDescending(a => a.CreatedAt)
+            .ToListAsync();
+
+        var pdf = _assetPdfService.Generate(assets);
+
+        return File(
+            pdf,
+            "application/pdf",
+            $"Assets-{DateTime.Now:yyyyMMdd-HHmm}.pdf");
     }
 }
