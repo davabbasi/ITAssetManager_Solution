@@ -30,21 +30,34 @@
                 </select>
             </div>
             <div class="col-md-2">
+              
                 <select name="status" class="form-select form-select-sm">
-                    <option value="">همه وضعیت‌ها</option>
-                    <option value="1" selected="@(Model.Status == 1)">فعال</option>
-                    <option value="2" selected="@(Model.Status == 2)">معیوب</option>
-                    <option value="3" selected="@(Model.Status == 3)">در تعمیر</option>
+                    <option value="">همه وضعیت‌ها</option>                 
+                    <option value="3" selected="@(Model.Status == 3)">در دست تعمیر</option>
                     <option value="4" selected="@(Model.Status == 4)">اسقاط</option>
-                    <option value="5" selected="@(Model.Status == 5)">انبار</option>
+                    <option value="5" selected="@(Model.Status == 5)">در انبار تجهیزات</option>
+                    <option value="6" selected="@(Model.Status == 6)">ضایعات</option>
+                    <option value="7" selected="@(Model.Status == 7)">اسمبل شده</option>
+                    <option value="8" selected="@(Model.Status == 8)">تخصیص یافته</option>
                 </select>
-            </div>
+                
+
+            </div>         
             <div class="col-md-2">
                 <select name="departmentId" class="form-select form-select-sm">
-                    <option value="">همه بخش‌ها</option>
+                    <option value="">همه واحد‌ها</option>
                     @foreach (var dept in Model.Departments)
                     {
                         <option value="@dept.Id" selected="@(Model.DepartmentId == dept.Id)">@dept.Name</option>
+                    }
+                </select>
+            </div>
+            <div class="col-md-2">
+                <select name="employeeId" class="form-select form-select-sm">
+                    <option value="">همه پرسنل</option>
+                    @foreach (var em in Model.Employees)
+                    {
+                        <option value="@em.Id" selected="@(Model.EmployeeId == em.Id)">@em.FullName</option>
                     }
                 </select>
             </div>
@@ -55,7 +68,7 @@
                 <a href="/Assets" class="btn btn-outline-secondary btn-sm">
                     <i class="bi bi-x"></i>
                 </a>
-                <a asp-page-handler="Pdf"
+              @*   <a asp-page-handler="Pdf"
                    asp-route-search="@Model.Search"
                    asp-route-categoryId="@Model.CategoryId"
                    asp-route-status="@Model.Status"
@@ -64,7 +77,19 @@
 
                     <i class="bi bi-file-earmark-pdf"></i>
                     خروجی PDF
-                </a>
+                </a> *@
+
+               @*  <a asp-page-handler="Print"
+                   asp-route-search="@Model.Search"
+                   asp-route-categoryId="@Model.CategoryId"
+                   asp-route-status="@Model.Status"
+                   asp-route-departmentId="@Model.DepartmentId"
+                   class="btn btn-danger">
+
+                    <i class="bi bi-file-earmark-print"></i>
+                    چاپ 
+                </a> *@
+
             </div>
         </form>
     </div>
@@ -89,31 +114,28 @@
                 <table class="table table-hover mb-0">
                     <thead>
                         <tr>
+                            <th>کد تجهیز </th>
                             <th>برچسب اموال</th>
                             <th>نام / مدل</th>
                             <th>دسته</th>
                             <th>نوع تجهیز</th>
-                            <th>سریال</th>
-                            <th>بخش / کاربر</th>
+                            <th>واحد</th>
+                            <th>پرسنل</th>
                             <th>وضعیت</th>
-                            <th>گارانتی</th>
-                            <th>محل نصب</th>
-                            <th></th>
+                            <th>اسمبل شده در</th>
+                            <th>مکان قرار گیری</th>
+
+                            <th>مشاهده</th>
                         </tr>
                     </thead>
                     <tbody>
                         @foreach (var asset in Model.Assets)
                         {
-                            var warrantyStatus = "";
-                            var warrantyLabel = "-";
-                            if (asset.WarrantyExpiry.HasValue)
-                            {
-                                var days = (asset.WarrantyExpiry.Value - DateTime.Today).Days;
-                                if (days < 0) { warrantyStatus = "text-danger"; warrantyLabel = "منقضی"; }
-                                else if (days <= 60) { warrantyStatus = "text-warning"; warrantyLabel = $"{days}روز"; }
-                                else { warrantyStatus = "text-success"; warrantyLabel = asset.WarrantyExpiry.Value.ToShamsi(); }
-                            }
+                           
                             <tr>
+                                <td>@(asset.Id)</td>
+                                
+
                                 <td class="fw-medium" style="font-size:0.82rem;">
                                     @(asset.PropertyTag ?? "-")
                                 </td>
@@ -129,20 +151,25 @@
                                 <td>@(asset.Category.Type.GetDisplayName() ?? "-")</td>
 
                               
-                                <td><small class="text-muted">@(asset.SerialNumber ?? "-")</small></td>
                                 <td>
-                                    @if (asset.EmployeeName != null)
+                                    @if (asset.DepartmentName != null)
                                     {
-                                        <small><i class="bi bi-person me-1"></i>@asset.EmployeeName</small>
-                                        <br /><small class="text-muted">@asset.DepartmentName</small>
-                                    }
-                                    else if (asset.DepartmentName != null)
-                                    {
-                                        <small><i class="bi bi-building me-1"></i>@asset.DepartmentName</small>
+                                        <small>@asset.DepartmentName</small>
                                     }
                                     else
                                     {
-                                        <small class="text-muted">تخصیص‌نیافته</small>
+                                        <small class="text-muted">‌-</small>
+                                    }
+                                </td>
+                                <td>
+                                    @if (asset.EmployeeName != null)
+                                    {
+                                        <small>@asset.EmployeeName</small>
+                                    }
+                                  
+                                    else
+                                    {
+                                        <small class="text-muted">-</small>
                                     }
                                 </td>
                                 <td>
@@ -154,14 +181,13 @@
                                             AssetStatus.UnderRepair => ("badge-repair", "دردست تعمیر"),
                                             AssetStatus.Scrapped => ("badge-scrapped", "اسقاط"),
                                             AssetStatus.Assigned => ("badge-assigned", "تخصیص یافته"),
-                                            AssetStatus.Installed => ("badge-assigned", "اسمبل شده"),
+                                            AssetStatus.Installed => ("badge-installed", "اسمبل شده"),
 
                                             _ => ("badge-storage", "در انبار تجهیزات")
                                         };
                                     }
                                     <span class="badge @bc">@lbl</span>
                                 </td>
-                                <td class="@warrantyStatus" style="font-size:0.8rem;">@warrantyLabel</td>
                                 <td>
                                   @if (Model.ComponentLocations.TryGetValue(asset.Id, out var location))
                                   {
@@ -169,6 +195,8 @@
                                           <i class="bi bi-pc-display me-1"></i>
                                           : @location
                                           </span>
+
+                                        
                                   }
                                   else if (asset.Category?.Type == AssetCategoryType.Installed)
                                   {
@@ -181,14 +209,13 @@
                                       <span class="text-muted small">-</span>
                                   }
                                 </td>
+                                <td>@(asset.Location?? "-")</td>
                               <td>
                                     <div class="d-flex gap-1">
                                         <a href="/Assets/Details/@asset.Id" class="btn btn-xs btn-outline-secondary" title="جزئیات">
                                             <i class="bi bi-eye"></i>
                                         </a>
-                                        <a href="/Assets/Edit/@asset.Id" class="btn btn-xs btn-outline-primary" title="ویرایش">
-                                            <i class="bi bi-pencil"></i>
-                                        </a>
+                                       
                                     </div>
                                </td>
                                 

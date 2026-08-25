@@ -18,19 +18,37 @@
                     <div class="row g-3 mb-3">
                         <div class="form-group">
                             <span class="text-danger">*</span>
+                            <label asp-for="Warehouse.WarehouseOwnerID" class="control-label"></label>
+                            <select asp-for="Warehouse.WarehouseOwnerID" asp-items="Model.OwnerList" class="form-select" aria-required="true">
+                                <option value="0">انتخاب کنید...</option>
+                            </select>
+                            <span asp-validation-for="Warehouse.WarehouseOwnerID" class="text-danger"></span>
+                        </div>
+                        <div class="form-group">
+                            <span class="text-danger">*</span>
+                            <label asp-for="Warehouse.Type" class="control-label"></label>
+                            <select asp-for="Warehouse.Type" asp-items="Model.WarehouseTypeList" class="form-select" aria-required="true">
+                                <option value="">انتخاب کنید...</option>
+                            </select>
+                            <span asp-validation-for="Warehouse.Type" class="text-danger"></span>
+                        </div>
+                        <div class="form-group">
+                            <span class="text-danger">*</span>
                             <label asp-for="Warehouse.WarehouseName" class="control-label"></label>
                             <input asp-for="Warehouse.WarehouseName" class="form-control" aria-required="true" />
                             <span asp-validation-for="Warehouse.WarehouseName" class="text-danger"></span>
                         </div>
 
                         <div class="form-group">
+                            <span class="text-danger">*</span>
                             <label asp-for="Warehouse.KeeperId" class="control-label"></label>
-                            <select asp-for="Warehouse.KeeperId" asp-items="Model.KeeperList" class="form-select">
+                            <select asp-for="Warehouse.KeeperId" asp-items="Model.KeeperList" class="form-select" aria-required="true">
                                 <option value="0">انتخاب کنید...</option>
                             </select>
                             <span asp-validation-for="Warehouse.KeeperId" class="text-danger"></span>
                         </div>
 
+                       
                         <div class="form-group">
                             <label asp-for="Warehouse.Description" class="control-label"></label>
                             <input asp-for="Warehouse.Description" class="form-control" />

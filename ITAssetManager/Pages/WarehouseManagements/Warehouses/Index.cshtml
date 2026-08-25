@@ -49,6 +49,9 @@
                     <thead>
                         <tr>
                             <th>
+                                @Html.DisplayNameFor(model => model.Warehouse[0].WarehouseOwnerID)
+                            </th>
+                            <th>
                                 @Html.DisplayNameFor(model => model.Warehouse[0].Type)
                             </th>
                             <th>
@@ -67,6 +70,9 @@
                         @foreach (var item in Model.Warehouse)
                         {
                             <tr>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.WarehouseOwner)
+                                </td>
                                 <td>
                                     @item.Type.GetDisplayName()
                                 </td>

@@ -1,3 +1,4 @@
+using ITAssetManager.Convertor;
 using ITAssetManager.Data;
 using ITAssetManager.Migrations;
 using ITAssetManager.Models;
@@ -5,6 +6,7 @@ using ITAssetManager.Models.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 
 namespace ITAssetManager.Pages.Admin;
@@ -21,10 +23,12 @@ public class CategoriesModel : PageModel
 
     [BindProperty(SupportsGet = true)]
     public CategoryEditViewModel Input { get; set; } =new();
-   
+    public SelectList CategoryType { get; set; }
 
     public async Task OnGetAsync()
     {
+
+        CategoryType = ConvertEnumToSelect.ToSelectList<AssetCategoryType>();
         Categories = await _context.Categories
             .Include(c => c.Assets)
             .OrderBy(c => c.Name)

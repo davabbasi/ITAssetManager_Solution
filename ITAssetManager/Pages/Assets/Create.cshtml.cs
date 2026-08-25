@@ -15,8 +15,8 @@ public class CreateModel : PageModel
     private readonly ApplicationDbContext _context;
     public CreateModel(ApplicationDbContext context) => _context = context;
     [BindProperty] public Asset Asset { get; set; } = new();
-    [BindProperty] public string TextPurchaseDate { get; set; }
-    [BindProperty] public string TextWarrantyExpiryDate { get; set; }
+    [BindProperty] public string? TextPurchaseDate { get; set; }
+    [BindProperty] public string? TextWarrantyExpiryDate { get; set; }
     public SelectList CategoryList { get; set; } = null!;
     public SelectList DepartmentList { get; set; } = null!;
     public SelectList EmployeeList { get; set; } = null!;
@@ -143,7 +143,9 @@ public class CreateModel : PageModel
             Asset.EmployeeId = keeperEmployee.Id;
             Asset.Status = AssetStatus.InStorage;
             Asset.StatusNote = "در انبار تجهیزات";
-
+            Asset.DepartmentId = assetWarehouse.WarehouseOwnerID;
+            Asset.DepartmentName = assetWarehouse.WarehouseOwner;
+            Asset.Location = assetWarehouse.WarehouseName;
             _context.Assets.Add(Asset);
             await _context.SaveChangesAsync();
 
@@ -417,6 +419,22 @@ public class CreateModel : PageModel
             return NotFound();
 
         return Content(productName, "text/plain; charset=utf-8");
+    }
+
+    public async Task<IActionResult> OnGetProductCategoryAsync(int productId)
+    {
+        var categoryId = await _context.Products
+            .Where(p => p.Id == productId)
+            .Select(p => p.CategoryId)
+            .FirstOrDefaultAsync();
+
+        if (categoryId == 0)
+            return NotFound();
+
+        return new JsonResult(new
+        {
+            categoryId
+        });
     }
 
 }

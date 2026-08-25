@@ -1,9 +1,12 @@
-﻿using ITAssetManager.Data;
+﻿using System.Threading.Tasks;
+using ITAssetManager.Convertor;
+using ITAssetManager.Data;
 using ITAssetManager.Models;
 using ITAssetManager.Services.Pdf;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 
 namespace ITAssetManager.Pages.Assets;
@@ -23,14 +26,17 @@ public class IndexModel : PageModel
     public List<Asset> Assets { get; set; } = new();
     public List<Category> Categories { get; set; } = new();
     public List<VwDepartment> Departments { get; set; } = new();
+    public List<VwEmployee> Employees { get; set; } = new();
+
     public int TotalCount { get; set; }
     public Dictionary<int, string> ComponentLocations { get; set; } = new();
     [BindProperty(SupportsGet = true)] public string? Search { get; set; }
     [BindProperty(SupportsGet = true)] public int? CategoryId { get; set; }
     [BindProperty(SupportsGet = true)] public int? Status { get; set; }
     [BindProperty(SupportsGet = true)] public int? DepartmentId { get; set; }
+    [BindProperty(SupportsGet = true)] public int? EmployeeId { get; set; }
 
-
+    public SelectList StatusSelect { get; set; } = null!;
     private IQueryable<Asset> BuildQuery()
     {
         var query = _context.Assets
@@ -56,12 +62,18 @@ public class IndexModel : PageModel
         if (DepartmentId.HasValue)
             query = query.Where(a => a.DepartmentId == DepartmentId);
 
-        return query;
+        if (EmployeeId.HasValue)
+            query = query.Where(a => a.EmployeeId == EmployeeId);
+
+        return query.OrderBy(a=>a.Id);
     }
     public async Task OnGetAsync()
     {
+        StatusSelect = ConvertEnumToSelect.ToSelectList<AssetStatus>();
         Categories = await _context.Categories.OrderBy(c => c.Name).ToListAsync();
         Departments = await _context.VwDepartments.OrderBy(d => d.Name).ToListAsync();
+        Employees=await _context.VwEmployees.OrderBy(e=>e.FullName).ToListAsync();
+
         VwDepartment vwDepartment = new()
         {
             Id = 1,
@@ -72,7 +84,7 @@ public class IndexModel : PageModel
         var query = BuildQuery();
 
         TotalCount = await query.CountAsync();
-        Assets = await query.OrderByDescending(a => a.CreatedAt).ToListAsync();
+        Assets = await query.OrderBy(a => a.Id).ToListAsync();
 
         var assemblyComponents = await _context.AssemblyComponents
             .Include(x => x.PcAsset)
@@ -83,12 +95,10 @@ public class IndexModel : PageModel
             .Where(x => x.PcAsset != null)
             .ToDictionary(
             x => x.ComponentAssetId,
-            x => x.PcAsset.EmployeeName != null
-            ? $"{x.PcAsset.Name} - {x.PcAsset.EmployeeName}"
-            : $"{x.PcAsset.Name} - {x.PcAsset.DepartmentName}"
+            x => x.PcAsset.EmployeeName != null? $"{x.PcAsset.Name} - {x.PcAsset.EmployeeName}"
+            :$"{x.PcAsset.Name} - {x.PcAsset.DepartmentName}"
             );
     }
-
     public async Task<IActionResult> OnGetPdfAsync()
     {
 
@@ -105,4 +115,9 @@ public class IndexModel : PageModel
             "application/pdf",
             $"Assets-{DateTime.Now:yyyyMMdd-HHmm}.pdf");
     }
+    public IActionResult OnGetPrintAsync()
+    {
+        return RedirectToPage("PrintPreview");
+    }
+
 }

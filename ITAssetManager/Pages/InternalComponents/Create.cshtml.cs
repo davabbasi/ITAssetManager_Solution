@@ -456,9 +456,13 @@ public class CreateModel : PageModel
 
             foreach (var component in components)
             {
-                component.Status = AssetStatus.Active;
-
+                component.Status = AssetStatus.Installed;
                 component.WarehouseId = assetWarehouse.Id;
+                component.DepartmentId = null;
+                component.DepartmentName = null;
+                component.EmployeeId = null;
+                component.EmployeeName = null;
+                component.Location = null;
             }
 
 

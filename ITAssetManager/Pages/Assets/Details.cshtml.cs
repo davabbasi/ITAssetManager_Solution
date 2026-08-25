@@ -44,7 +44,7 @@ public class DetailsModel : PageModel
            .Include(c => c.ComponentAsset)
                .ThenInclude(a => a!.Category)
            .Where(c => c.PcAssetId == id)
-           .OrderByDescending(c => c.InstalledAt)
+           .OrderBy(c => c.Id)
            .ToListAsync();
 
         ActiveComponents = components.Where(c => c.RemovedAt == null).ToList();

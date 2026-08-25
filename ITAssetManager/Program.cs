@@ -3,6 +3,8 @@ using ITAssetManager.Services;
 using ITAssetManager.Services.Pdf;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Stimulsoft.Report;
+using Stimulsoft.Report.Web;
 
 var builder = WebApplication.CreateBuilder(args);
 

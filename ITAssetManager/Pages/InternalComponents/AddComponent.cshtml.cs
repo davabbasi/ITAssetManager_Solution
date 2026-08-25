@@ -217,8 +217,12 @@ public class AddComponentModel : PageModel
             // =================================================
 
             component.Status = AssetStatus.Installed;
-
             component.WarehouseId = assetWarehouse.Id;
+            component.DepartmentId = null;
+            component.DepartmentName = null;
+            component.EmployeeId = null;
+            component.EmployeeName = null;
+            component.Location = null;
 
 
             // =================================================

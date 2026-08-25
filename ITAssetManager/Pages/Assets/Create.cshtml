@@ -49,11 +49,13 @@
                         </div>
 
                         <!-- انتخاب دسته بندی -->
-                        <div class="col-md-6">
+
+                        <div class="col-md-6" >
                             <label class="form-label">دسته‌بندی <span class="text-danger">*</span></label>
-                            <select id="categorySelect" asp-for="Asset.CategoryId" asp-items="Model.CategoryList" class="form-select">
+                            <select id="categorySelect" asp-for="Asset.CategoryId" asp-items="Model.CategoryList" class="form-select" disabled>
                                 <option value="">انتخاب کنید...</option>
                             </select>
+                            <input type="hidden" asp-for="Asset.CategoryId" />
                         </div>
 
                         <div class="col-md-6">
@@ -98,7 +100,8 @@
                             <label class="form-label">مدل</label>
                             <input asp-for="Asset.Model" class="form-control" placeholder="مدل دستگاه" />
                         </div>
-                        <div class="col-md-4">
+
+                      @*   <div class="col-md-4">
                             <label class="form-label">وضعیت</label>
                             <select asp-for="Asset.Status" class="form-select">
                                 <option value="1">فعال</option>
@@ -106,7 +109,8 @@
                                 <option value="3">در تعمیر</option>
                                 <option value="5">در انبار</option>
                             </select>
-                        </div>
+                        </div> *@
+
                     </div>
                     <br />
                     <!-- بخش پنجم: مشخصات و توضیحات -->
@@ -144,14 +148,11 @@
                     <div class="row g-3 mb-3">
                         <div class="col-md-4">
                             <label class="form-label">تاریخ خرید</label>
-
                             <input asp-for="TextPurchaseDate" type="text"
                                    id="purchaseDate"
                                    class="persian-date form-control"
                                    autocomplete="off"
-                                   placeholder="انتخاب تاریخ" />
-
-                          
+                                   placeholder="انتخاب تاریخ" />                         
                         </div>
                         <div class="col-md-4">
                             <label class="form-label">انقضا گارانتی</label>
@@ -193,28 +194,86 @@
     </div>
 </div>
 
-
 @section Scripts {
     <script>
-        document.getElementById('categorySelect')
-        .addEventListener('change', async function () {
-            const categoryId = this.value;
-            if (!categoryId) {
-                document.getElementById('specs-container').innerHTML =
-                    '<div class="text-muted">دسته‌بندی را انتخاب کنید</div>';
-                return;
-            }
-            const response = await fetch(
-                `/Assets/Create?handler=Specs&categoryId=${categoryId}`
-            );
-            const html = await response.text();
-            document.getElementById('specs-container').innerHTML = html;
-        });
+
+        // =====================================================
+        // عناصر فرم
+        // =====================================================
 
         const warehouseSelect = document.getElementById('warehouseSelect');
         const productSelect = document.getElementById('productSelect');
+        const categorySelect = document.getElementById('categorySelect');
+
         const stockInfo = document.getElementById('stockInfo');
         const assetName = document.getElementById('assetName');
+
+        const specsContainer =
+            document.getElementById('specs-container');
+
+
+        // =====================================================
+        // تابع نمایش مشخصات فنی بر اساس دسته‌بندی
+        // =====================================================
+
+        async function loadSpecs(categoryId) {
+
+            if (!categoryId) {
+
+                specsContainer.innerHTML =
+                    '<div class="text-muted">دسته‌بندی را انتخاب کنید</div>';
+
+                return;
+            }
+
+            specsContainer.innerHTML =
+                '<div class="text-muted">در حال بارگذاری مشخصات...</div>';
+
+            try {
+
+                const response = await fetch(
+                    `/Assets/Create?handler=Specs&categoryId=${categoryId}`
+                );
+
+                if (!response.ok) {
+                    throw new Error('خطا در دریافت مشخصات فنی');
+                }
+
+                const html = await response.text();
+
+                specsContainer.innerHTML = html;
+
+            }
+            catch (error) {
+
+                console.error(error);
+
+                specsContainer.innerHTML =
+                    '<div class="text-danger">خطا در دریافت مشخصات فنی</div>';
+            }
+        }
+
+
+        // =====================================================
+        // تغییر دستی دسته‌بندی
+        // =====================================================
+
+        categorySelect.addEventListener('change', function () {
+
+            const categoryId = this.value;
+
+            // مقدار hidden
+            document.getElementById('Asset_CategoryId').value =
+                categoryId;
+
+            // دریافت مشخصات فنی
+            loadSpecs(categoryId);
+        });
+
+
+        // =====================================================
+        // انتخاب انبار
+        // =====================================================
 
         warehouseSelect.addEventListener('change', async function () {
 
@@ -227,6 +286,9 @@
 
             stockInfo.innerHTML = '';
 
+            assetName.value = '';
+
+            // اگر انبار انتخاب نشده
             if (!warehouseId) {
 
                 productSelect.innerHTML =
@@ -250,6 +312,7 @@
                 productSelect.innerHTML =
                     '<option value="">انتخاب کالا...</option>';
 
+                // اگر کالایی وجود نداشت
                 if (products.length === 0) {
 
                     productSelect.innerHTML =
@@ -258,16 +321,19 @@
                     return;
                 }
 
+                // اضافه کردن کالاها
                 products.forEach(product => {
 
-                    const option = document.createElement('option');
+                    const option =
+                        document.createElement('option');
 
                     option.value = product.id;
 
                     option.textContent =
                         `${product.name} - موجودی: ${product.quantity}`;
 
-                    option.dataset.quantity = product.quantity;
+                    option.dataset.quantity =
+                        product.quantity;
 
                     productSelect.appendChild(option);
                 });
@@ -277,50 +343,148 @@
             }
             catch (error) {
 
+                console.error(error);
+
                 productSelect.innerHTML =
                     '<option value="">خطا در دریافت کالاها</option>';
-
-                console.error(error);
             }
         });
 
-        productSelect.addEventListener('change',async function () {
+
+        // =====================================================
+        // انتخاب کالا
+        // =====================================================
+
+        productSelect.addEventListener('change', async function () {
+
             const productId = this.value;
 
-            // اگر کالایی انتخاب نشده
-            if (!productId) {
-            stockInfo.innerHTML = '';
-            document.getElementById('assetName').value = '';
-            return;}
-            // نمایش موجودی
-            const selectedOption = this.options[this.selectedIndex];
-            const quantity = selectedOption.dataset.quantity;
-            stockInfo.innerHTML =`موجودی فعلی: <strong>${quantity}</strong> عدد`;
 
+            // -------------------------------------------------
+            // اگر کالا انتخاب نشده
+            // -------------------------------------------------
+
+            if (!productId) {
+
+                stockInfo.innerHTML = '';
+
+                assetName.value = '';
+
+                categorySelect.value = '';
+
+                document.getElementById('Asset_CategoryId').value = '';
+
+                specsContainer.innerHTML =
+                    '<div class="text-muted">دسته‌بندی را انتخاب کنید</div>';
+
+                return;
+            }
+
+
+            // -------------------------------------------------
+            // نمایش موجودی
+            // -------------------------------------------------
+
+            const selectedOption =
+                this.options[this.selectedIndex];
+
+            const quantity =
+                selectedOption.dataset.quantity;
+
+            stockInfo.innerHTML =
+                `موجودی فعلی: <strong>${quantity}</strong> عدد`;
+
+
+            // -------------------------------------------------
             // دریافت نام کالا
+            // -------------------------------------------------
+
             try {
+
                 const response = await fetch(
-                `/Assets/Create?handler=ProductName&productId=${productId}`
+                    `/Assets/Create?handler=ProductName&productId=${productId}`
                 );
 
-            if (!response.ok) {
-                throw new Error('خطا در دریافت نام کالا');
+                if (!response.ok) {
+                    throw new Error('خطا در دریافت نام کالا');
+                }
+
+                const productName =
+                    await response.text();
+
+                assetName.value = productName;
+
             }
-
-            const productName = await response.text();
-
-            // پر کردن فیلد نام تجهیز
-            document.getElementById('assetName').value = productName;
-            } 
             catch (error) {
+
                 console.error(error);
-                document.getElementById('assetName').value = '';
+
+                assetName.value = '';
             }
-            });
+
+
+            // -------------------------------------------------
+            // دریافت دسته‌بندی کالا
+            // -------------------------------------------------
+
+            try {
+
+                const response = await fetch(
+                    `/Assets/Create?handler=ProductCategory&productId=${productId}`
+                );
+
+                if (!response.ok) {
+                    throw new Error('خطا در دریافت دسته‌بندی کالا');
+                }
+
+                const data =
+                    await response.json();
+
+
+                // دسته‌بندی را در Select قرار بده
+                categorySelect.value =
+                    data.categoryId;
+
+
+                // چون Select disabled است،
+                // مقدار واقعی فرم را در hidden قرار بده
+                document.getElementById('Asset_CategoryId').value =
+                    data.categoryId;
+
+
+                // -------------------------------------------------
+                // دریافت مشخصات فنی دسته‌بندی
+                // -------------------------------------------------
+
+                await loadSpecs(data.categoryId);
+
+            }
+            catch (error) {
+
+                console.error(error);
+
+                categorySelect.value = '';
+
+                document.getElementById('Asset_CategoryId').value = '';
+
+                specsContainer.innerHTML =
+                    '<div class="text-muted">دسته‌بندی یافت نشد</div>';
+            }
+
+        });
+
+
+        // =====================================================
+        // TomSelect فروشنده
+        // =====================================================
 
         new TomSelect('#vendorSelect', {
+
             placeholder: 'جستجو در فروشندگان...',
+
             allowEmptyOption: true
+
         });
+
     </script>
 }

@@ -1,0 +1,22 @@
+﻿@page
+@using Stimulsoft.Report.Mvc
+@model ITAssetManager.Pages.Assets.PrintPreviewModel
+
+
+@{
+    ViewData["Title"] = "طراحی گزارش";
+}
+
+<div style="width: 100%; height: 100vh;">
+
+    @Html.StiNetCoreDesigner(new StiNetCoreDesignerOptions
+    {
+        Actions =
+        {
+            GetReport = "GetReport",
+        SaveReport = "SaveReport",
+        DesignerEvent = "DesignerEvent"
+        }
+    })
+
+</div>

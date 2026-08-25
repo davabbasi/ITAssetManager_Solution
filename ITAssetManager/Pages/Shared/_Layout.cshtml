@@ -215,8 +215,16 @@
         .badge-repair { background-color: #fef3c7; color: #d97706; }
         .badge-scrapped { background-color: #f1f5f9; color: #64748b; }
         .badge-storage { background-color: #dbeafe; color: #2563eb; }
-        .badge-assigned {background-color: #dcfce7;color: #16a34a;}
-        .badge-assigned {background-color: #dcfce7;color: #16a34a;}
+
+        .badge-assigned {
+            background-color: #2563eb;
+            color: white;
+        }
+
+        .badge-installed {
+            background-color: #dcfce7;
+            color: #16a34a;
+        }
 
         /* Table */
         .table { font-size: 0.875rem; }
@@ -322,6 +330,17 @@
                         <i class="bi bi-chevron-down chevron"></i>
                     </div>
                     <div class="sidebar-group-items">
+
+                        <a href="/Admin/Categories" class="nav-link-item">
+                            <i class="bi bi-folder2-open"></i> دسته‌بندی‌ کالا
+                        </a>
+                        <a href="/Admin/SpecificationIndex" class="nav-link-item @(Context.Request.Path.StartsWithSegments("/Admin/SpecificationIndex") ? "active" : "")">
+                            <i class="bi bi-list-check"></i> مشخصات فنی
+                        </a>
+                        <a href="/Admin/SpecificationAssign" class="nav-link-item @(Context.Request.Path.StartsWithSegments("/Admin/SpecificationAssign") ? "active" : "")">
+                            <i class="bi bi-link-45deg"></i>انتساب مشخصات فنی
+                        </a>
+
                         <a href="/WarehouseManagements/Products" class="nav-link-item @(Context.Request.Path.StartsWithSegments("/WarehouseManagements/Products") ? "active" : "")">
                             <i class="bi  bi-box-seam"></i>  کالا
                         </a>
@@ -379,9 +398,11 @@
                         <i class="bi bi-chevron-down chevron"></i>
                     </div>
                     <div class="sidebar-group-items">
-                        <a href="/PurchaseRequests" class="nav-link-item @(Context.Request.Path.StartsWithSegments("/PurchaseRequests") ? "active" : "")">
+
+                     @*    <a href="/PurchaseRequests" class="nav-link-item @(Context.Request.Path.StartsWithSegments("/PurchaseRequests") ? "active" : "")">
                             <i class="bi bi-cart3"></i> درخواست‌های خرید(راهکاران)
-                        </a>
+                        </a> *@
+
                         <div class="sidebar-group-items">
                             <a href="/Vendors" class="nav-link-item @(Context.Request.Path.StartsWithSegments("/Vendors") ? "active" : "")">
                                 <i class="bi bi-shop"></i> فروشندگان
@@ -396,9 +417,11 @@
                         <i class="bi bi-chevron-down chevron"></i>
                     </div>
                     <div class="sidebar-group-items">
-                        <a href="/Reports/ByDepartment" class="nav-link-item">
+
+                      @*   <a href="/Reports/ByDepartment" class="nav-link-item">
                             <i class="bi bi-building"></i> گزارش بخش‌ها
-                        </a>
+                        </a> *@
+
                         <a href="/Reports/Warranty" class="nav-link-item">
                             <i class="bi bi-shield"></i> گارانتی
                         </a>
@@ -419,7 +442,8 @@
                             <a href="/Admin/Users" class="nav-link-item">
                                 <i class="bi bi-people"></i> کاربران
                             </a>
-                            <a href="/Admin/Categories" class="nav-link-item">
+
+                           @*  <a href="/Admin/Categories" class="nav-link-item">
                                 <i class="bi bi-tags"></i> دسته‌بندی‌ها
                             </a>
                             <a href="/Admin/SpecificationIndex" class="nav-link-item @(Context.Request.Path.StartsWithSegments("/Admin/SpecificationIndex") ? "active" : "")">
@@ -427,7 +451,7 @@
                             </a>
                             <a href="/Admin/SpecificationAssign" class="nav-link-item @(Context.Request.Path.StartsWithSegments("/Admin/SpecificationAssign") ? "active" : "")">
                                 <i class="bi bi-sliders"></i>انتساب مشخصات فنی به دسته بندی
-                            </a>
+                            </a> *@
 
                             @* <a href="/Admin/ViewEmployees" class="nav-link-item">
                                 <i class="bi bi-person-badge"></i> پرسنل
