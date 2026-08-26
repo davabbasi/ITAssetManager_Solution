@@ -27,7 +27,6 @@ public class IndexModel : PageModel
     public List<Category> Categories { get; set; } = new();
     public List<VwDepartment> Departments { get; set; } = new();
     public List<VwEmployee> Employees { get; set; } = new();
-
     public int TotalCount { get; set; }
     public Dictionary<int, string> ComponentLocations { get; set; } = new();
     [BindProperty(SupportsGet = true)] public string? Search { get; set; }
@@ -101,14 +100,23 @@ public class IndexModel : PageModel
     }
     public async Task<IActionResult> OnGetPdfAsync()
     {
-
         var query = BuildQuery();
- 
-        var assets = await query
-            .OrderByDescending(a => a.CreatedAt)
-            .ToListAsync();
 
-        var pdf = _assetPdfService.Generate(assets);
+        var assemblyComponents = await _context.AssemblyComponents
+          .Include(x => x.PcAsset)
+          .Where(x => x.RemovedAt == null)
+          .ToListAsync();
+        ComponentLocations = assemblyComponents
+            .Where(x => x.PcAsset != null)
+            .ToDictionary(
+            x => x.ComponentAssetId,
+            x => x.PcAsset.EmployeeName != null ? $"{x.PcAsset.Name} - {x.PcAsset.EmployeeName}"
+            : $"{x.PcAsset.Name} - {x.PcAsset.DepartmentName}"
+            );
+ 
+        var assets = await query.ToListAsync();
+
+        var pdf = _assetPdfService.Generate(assets, ComponentLocations);
 
         return File(
             pdf,

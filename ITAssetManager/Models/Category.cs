@@ -19,7 +19,7 @@ public enum AssetCategoryType
     [Display(Name = " مستقل")]
     Tagged = 1,
 
-    [Display(Name = " اسمبلی")]
+    [Display(Name = " قطعه")]
     Installed = 2,
 
     [Display(Name = " مصرفی")]

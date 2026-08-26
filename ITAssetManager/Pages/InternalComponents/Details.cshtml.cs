@@ -96,7 +96,7 @@ public class DetailsModel : PageModel
         // 4. پیدا کردن انبار تجهیزات
         // =========================================================
 
-        var assetWarehouse = await _context.Warehouses
+        var assetWarehouse = await _context.Warehouses.Include(a=>a.Keeper)
             .FirstOrDefaultAsync(w => w.IsAssetWarehouse);
 
         if (assetWarehouse == null)
@@ -160,16 +160,19 @@ public class DetailsModel : PageModel
             assemblyComponent.RemovedBy =User.Identity?.Name;
 
             assemblyComponent.Notes = $"خروج از اسمبل #{pc.AssemblyNumber} و بازگشت به انبار تجهیزات";
-
+            
 
             // =====================================================
             // 9. تغییر وضعیت قطعه
             // =====================================================
 
             component.Status = AssetStatus.InStorage;
-
+            component.Location = "انبار تجهیزات";
             component.WarehouseId = assetWarehouse.Id;
-
+            component.EmployeeId= assetWarehouse.Keeper.EmployeeId;
+            component.EmployeeName = assetWarehouse.Keeper.FullName;
+            component.DepartmentId= assetWarehouse.WarehouseOwnerID;
+            component.DepartmentName = assetWarehouse.WarehouseOwner;
 
             // =====================================================
             // 10. ایجاد رسید برگشت

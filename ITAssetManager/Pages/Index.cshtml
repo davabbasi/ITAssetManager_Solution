@@ -99,9 +99,11 @@
                                         {
                                             AssetStatus.Active => ("badge-active", "فعال"),
                                             AssetStatus.Faulty => ("badge-faulty", "معیوب"),
-                                            AssetStatus.UnderRepair => ("badge-repair", "در تعمیر"),
+                                            AssetStatus.UnderRepair => ("badge-repair", "دردست تعمیر"),
                                             AssetStatus.Scrapped => ("badge-scrapped", "اسقاط"),
-                                            _ => ("badge-storage", "انبار")
+                                            AssetStatus.Assigned => ("badge-assigned", "تخصیص یافته"),
+                                            AssetStatus.Installed => ("badge-installed", "اسمبل شده"),
+                                            _ => ("badge-storage", "در انبار تجهیزات")
                                         };
                                     }
                                     <span class="badge @badgeClass">@label</span>

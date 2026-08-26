@@ -193,46 +193,121 @@
         </div>
 
 
-          <!-- تاریخچه نصب ‌ها -->
-        <div class="card mb-3">
-            <div class="card-header d-flex justify-content-between">
-                <span><i class="bi bi-arrow-left-right me-2"></i>تاریخچه نصب ها</span>              
+         <!-- تاریخچه اسمبل‌ها -->
+<div class="card mb-3">
+    <div class="card-header d-flex justify-content-between">
+        <span>
+            <i class="bi bi-pc-display me-2"></i>
+            تاریخچه اسمبل‌ها
+        </span>
+    </div>
+
+    <div class="card-body p-0">
+
+        @if (!Model.InstalledList.Any())
+        {
+            <p class="text-muted text-center py-3">
+                سابقه اسمبلی ثبت نشده
+            </p>
+        }
+        else
+        {
+            <div class="table-responsive">
+                <table class="table table-sm mb-0 align-middle">
+
+                    <thead>
+                        <tr>
+                            <th>سیستم</th>
+                            <th>تاریخ اسمبل</th>
+                            <th>تاریخ خروج</th>
+                            <th>وضعیت</th>
+                            <th>ثبت‌کننده</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+
+                        @foreach (var a in Model.InstalledList)
+                        {
+                            <tr>
+
+                                <!-- سیستم -->
+                                <td>
+                                    @if (a.PcAsset != null)
+                                    {
+                                        <a href="/Assets/Details/@a.PcAsset.Id"
+                                           class="text-decoration-none fw-medium">
+
+                                            <i class="bi bi-pc-display me-1"></i>
+
+                                            @a.PcAsset.Name
+
+                                        </a>
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted">
+                                            بدون سیستم
+                                        </span>
+                                    }
+                                </td>
+
+                                <!-- تاریخ اسمبل -->
+                                <td>
+                                    <small>
+                                        @a.InstalledAt.ToShamsi()
+                                    </small>
+                                </td>
+
+                                <!-- تاریخ خروج -->
+                                <td>
+                                    @if (a.RemovedAt.HasValue)
+                                    {
+                                        <small>
+                                            @a.RemovedAt.Value.ToShamsi()
+                                        </small>
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted">
+                                            —
+                                        </span>
+                                    }
+                                </td>
+
+                                <!-- وضعیت -->
+                                <td>
+                                    @if (a.RemovedAt.HasValue)
+                                    {
+                                        <span class="badge bg-secondary">
+                                            خارج شده
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-success">
+                                            نصب فعلی
+                                        </span>
+                                    }
+                                </td>
+
+                                <!-- ثبت‌کننده -->
+                                <td>
+                                    <small class="text-muted">
+                                        @a.InstalledBy
+                                    </small>
+                                </td>
+
+                            </tr>
+                        }
+
+                    </tbody>
+                </table>
             </div>
-            <div class="card-body p-0">
-                @if (!Model.InstalledList.Any())
-                {
-                    <p class="text-muted text-center py-3">نصبی ثبت نشده</p>
-                }
-                else
-                {
-                    <div class="table-responsive">
-                        <table class="table table-sm mb-0">
-                            <thead>
-                                <tr>
-                                    <th>تاریخ</th>
-                                    <th>از سیستم</th>
-                                    <th></th>
-                                    <th>به سیستم </th>
-                                    <th>ثبت‌کننده</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach (var a in Model.InstalledList)
-                                {
-                                    <tr>
-                                        <td><small>@a.InstalledAt.ToShamsi()</small></td> 
-                                        <td><small>@(a.FromAsset?.Name ?? "-")</small></td>
-                                        <td><i class="bi bi-arrow-left text-muted"></i></td>
-                                        <td><small class="fw-medium">@(a.PcAsset?.Name ?? "بدون سیستم")</small></td>
-                                        <td><small class="text-muted">@a.InstalledBy</small></td>
-                                    </tr>
-                                }
-                            </tbody>
-                        </table>
-                    </div>
-                }
-            </div>
-        </div>
+        }
+
+    </div>
+</div>
 
      
         <!-- تاریخچه تعمیرات -->

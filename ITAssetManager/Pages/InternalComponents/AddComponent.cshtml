@@ -76,7 +76,11 @@
                         return;
                     }
                     sel.innerHTML = '<option value="">انتخاب قطعه...</option>' +
-                        items.map(i => `<option value="${i.id}">${i.name} ${i.propertyTag ? '(' + i.propertyTag + ')' : ''}</option>`).join('');
+                        items.map(i => 
+                            `<option value="${i.id}">
+                                    کد قطعه  ${i.id}  : ${i.name}
+                  
+                          </option>`).join('-');
                     sel.disabled = false;
                 });
         });

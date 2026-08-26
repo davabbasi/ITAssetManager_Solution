@@ -140,9 +140,9 @@ public class CreateModel : PageModel
             Asset.ProductId = (int)ProductId;
             Asset.WarehouseId= assetWarehouse.Id;
             Asset.EmployeeName = assetWarehouse.Keeper.FullName;
-            Asset.EmployeeId = keeperEmployee.Id;
+            Asset.EmployeeId = assetWarehouse.Keeper.EmployeeId;
             Asset.Status = AssetStatus.InStorage;
-            Asset.StatusNote = "در انبار تجهیزات";
+            Asset.StatusNote = "انبار تجهیزات";
             Asset.DepartmentId = assetWarehouse.WarehouseOwnerID;
             Asset.DepartmentName = assetWarehouse.WarehouseOwner;
             Asset.Location = assetWarehouse.WarehouseName;

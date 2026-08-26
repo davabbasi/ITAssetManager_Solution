@@ -8,9 +8,15 @@ namespace ITAssetManager.Pages.Account;
 public class LoginModel : PageModel
 {
     private readonly SignInManager<IdentityUser> _signInManager;
-    public LoginModel(SignInManager<IdentityUser> signInManager) => _signInManager = signInManager;
-
-    [BindProperty] public string Email { get; set; } = string.Empty;
+    private readonly UserManager<IdentityUser> _userManager;
+    public LoginModel(
+        SignInManager<IdentityUser> signInManager,
+        UserManager<IdentityUser> userManager)
+    {
+        _signInManager = signInManager;
+        _userManager = userManager;
+    }
+    [BindProperty] public string UserName { get; set; } = string.Empty;
     [BindProperty] public string Password { get; set; } = string.Empty;
     [BindProperty] public bool RememberMe { get; set; }
     public string? ErrorMessage { get; set; }
@@ -22,17 +28,23 @@ public class LoginModel : PageModel
 
     public async Task<IActionResult> OnPostAsync(string? returnUrl = null)
     {
-        if (string.IsNullOrEmpty(Email) || string.IsNullOrEmpty(Password))
+        if (string.IsNullOrEmpty(UserName) || string.IsNullOrEmpty(Password))
         {
-            ErrorMessage = "ایمیل و رمز عبور را وارد کنید.";
+            ErrorMessage = "نام کاربری و رمز عبور را وارد کنید.";
+            return Page();
+        }
+        var user = await _userManager.FindByNameAsync(UserName);
+        if (user == null)
+        {
+            ErrorMessage = "این نام کاربری در سیستم وجود ندارد.";
             return Page();
         }
 
-        var result = await _signInManager.PasswordSignInAsync(Email, Password, RememberMe, lockoutOnFailure: false);
+        var result = await _signInManager.PasswordSignInAsync(UserName, Password, RememberMe, lockoutOnFailure: false);
         if (result.Succeeded)
             return LocalRedirect(returnUrl ?? "/");
 
-        ErrorMessage = "ایمیل یا رمز عبور نادرست است.";
+        ErrorMessage = "نام کاربری یا رمز عبور نادرست است.";
         return Page();
     }
 }

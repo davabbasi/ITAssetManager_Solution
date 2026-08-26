@@ -23,26 +23,26 @@ public class UsersModel : PageModel
 
     public async Task OnGetAsync()
     {
-        Users = await _userManager.Users.OrderBy(u => u.Email).ToListAsync();
+        Users = await _userManager.Users.OrderBy(u => u.UserName).ToListAsync();
         foreach (var user in Users)
             UserRoles[user.Id] = (await _userManager.GetRolesAsync(user)).ToList();
     }
 
-    public async Task<IActionResult> OnPostCreateUserAsync(string email, string password, string role)
+    public async Task<IActionResult> OnPostCreateUserAsync(string userName, string password, string role)
     {
-        if (string.IsNullOrEmpty(email) || string.IsNullOrEmpty(password))
+        if (string.IsNullOrEmpty(userName) || string.IsNullOrEmpty(password))
         {
-            TempData["Error"] = "ایمیل و رمز عبور الزامی است.";
+            TempData["Error"] = "نام کاربری و رمز عبور الزامی است.";
             return RedirectToPage();
         }
 
-        var user = new IdentityUser { UserName = email, Email = email, EmailConfirmed = true };
+        var user = new IdentityUser { UserName = userName, EmailConfirmed = true };
         var result = await _userManager.CreateAsync(user, password);
 
         if (result.Succeeded)
         {
             await _userManager.AddToRoleAsync(user, role ?? "User");
-            TempData["Success"] = $"کاربر {email} با موفقیت ایجاد شد.";
+            TempData["Success"] = $"کاربر {userName} با موفقیت ایجاد شد.";
         }
         else
         {
@@ -86,7 +86,7 @@ public class UsersModel : PageModel
     {
         if (string.IsNullOrEmpty(newPassword) || newPassword.Length < 6)
         {
-            TempData["Error"] = "رمز عبور باید حداقل ۶ کاراکتر باشد.";
+            TempData["Error"] = "رمز عبور باید حداقل 4 کاراکتر باشد.";
             return RedirectToPage();
         }
 

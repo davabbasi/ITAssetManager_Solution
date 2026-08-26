@@ -63,12 +63,14 @@
                 {
                     <table class="table table-sm mb-0">
                         <thead>
-                            <tr><th>دسته‌بندی</th><th>نام قطعه</th><th>برچسب اموال</th><th>تاریخ نصب</th><th></th></tr>
+                            <tr><th>‌کد قطعه</th><th>دسته‌بندی</th><th>نام قطعه</th><th>برچسب اموال</th><th>تاریخ نصب</th><th></th></tr>
                         </thead>
                         <tbody>
                             @foreach (var c in Model.ActiveComponents)
                             {
                                 <tr>
+                                    <td><small>@c.ComponentAsset?.Id</small></td>
+
                                     <td><small>@c.ComponentAsset?.Category?.Name</small></td>
                                     <td>
                                         <a href="/Assets/Details/@c.ComponentAssetId" class="text-decoration-none">
@@ -102,12 +104,14 @@
                 <div class="card-body p-0">
                     <table class="table table-sm mb-0">
                         <thead>
-                            <tr><th>قطعه</th><th>تاریخ نصب</th><th>تاریخ خروج</th><th>توسط</th></tr>
+                            <tr><th>کد قطعه</th><th>قطعه</th><th>تاریخ نصب</th><th>تاریخ خروج</th><th>توسط</th></tr>
                         </thead>
                         <tbody>
                             @foreach (var c in Model.RemovedComponents)
                             {
                                 <tr class="text-muted">
+                                    <td><small>@c.ComponentAsset.Id</small></td>
+
                                     <td><small>@c.ComponentAsset?.Name</small></td>
                                     <td><small>@c.InstalledAt.ToShamsi()</small></td>
                                     <td><small>@c.RemovedAt?.ToShamsi()</small></td>
