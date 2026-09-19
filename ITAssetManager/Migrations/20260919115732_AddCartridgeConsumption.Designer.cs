@@ -4,6 +4,7 @@ using ITAssetManager.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace ITAssetManager.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260919115732_AddCartridgeConsumption")]
+    partial class AddCartridgeConsumption
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -281,16 +284,11 @@ namespace ITAssetManager.Migrations
                     b.Property<int>("Quantity")
                         .HasColumnType("int");
 
-                    b.Property<int?>("WarehouseIssueId")
-                        .HasColumnType("int");
-
                     b.HasKey("Id");
 
                     b.HasIndex("PrinterId");
 
                     b.HasIndex("ProductId");
-
-                    b.HasIndex("WarehouseIssueId");
 
                     b.ToTable("CartridgeConsumptions");
                 });
@@ -1395,16 +1393,9 @@ namespace ITAssetManager.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("ITAssetManager.Models.WarehouseIssue", "WarehouseIssue")
-                        .WithMany()
-                        .HasForeignKey("WarehouseIssueId")
-                        .OnDelete(DeleteBehavior.Restrict);
-
                     b.Navigation("Printer");
 
                     b.Navigation("Product");
-
-                    b.Navigation("WarehouseIssue");
                 });
 
             modelBuilder.Entity("ITAssetManager.Models.CategorySpecification", b =>

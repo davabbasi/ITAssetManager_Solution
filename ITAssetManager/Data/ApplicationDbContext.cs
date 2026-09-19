@@ -35,13 +35,30 @@ public class ApplicationDbContext : IdentityDbContext
     public DbSet<WarehouseTransferItem> WarehouseTransferItems { get; set; }
     public DbSet<InventoryTransaction> InventoryTransactions { get; set; }
 
+    public DbSet<CartridgeConsumption> CartridgeConsumptions { get; set; }
 
 
     protected override void OnModelCreating(ModelBuilder builder)
     {
         base.OnModelCreating(builder);
 
+        builder.Entity<CartridgeConsumption>()
+            .HasOne(x => x.WarehouseIssue)
+            .WithMany()
+            .HasForeignKey(x => x.WarehouseIssueId)
+            .OnDelete(DeleteBehavior.Restrict);
 
+        builder.Entity<CartridgeConsumption>()
+            .HasOne(x => x.Printer)
+            .WithMany()
+            .HasForeignKey(x => x.PrinterId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        builder.Entity<CartridgeConsumption>()
+            .HasOne(x => x.Product)
+            .WithMany()
+            .HasForeignKey(x => x.ProductId)
+            .OnDelete(DeleteBehavior.Restrict);
 
         // Seed: دسته‌بندی‌های پیش‌فرض
         builder.Entity<Category>().HasData(

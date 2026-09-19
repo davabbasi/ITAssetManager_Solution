@@ -13,7 +13,11 @@ namespace ITAssetManager.Models
         AssetCreation = 2,
 
         [Display(Name = "انجام اسمبل")]
-        Assembly = 3
+        Assembly = 3,
+
+        [Display(Name = "مصرف کارتریج")]
+        CartridgeConsumption = 4
+
     }
     public class WarehouseIssue
     {

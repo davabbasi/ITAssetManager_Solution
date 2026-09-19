@@ -33,7 +33,7 @@ public class IndexModel : PageModel
         WarrantyExpiringSoon = await assets.CountAsync(a =>
             a.WarrantyExpiry.HasValue && a.WarrantyExpiry.Value <= in60Days);
 
-        RecentAssets = await assets.OrderByDescending(a => a.CreatedAt).Take(8).ToListAsync();
+        RecentAssets = await assets.OrderByDescending(a => a.CreatedAt).Take(10).ToListAsync();
 
         ExpiringWarrantyAssets = await assets
             .Where(a => a.WarrantyExpiry.HasValue && a.WarrantyExpiry.Value <= in60Days)
