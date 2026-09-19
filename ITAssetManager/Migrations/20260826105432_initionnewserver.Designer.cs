@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace ITAssetManager.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20260808113554_removeKeeperFromReciept")]
-    partial class removeKeeperFromReciept
+    [Migration("20260826105432_initionnewserver")]
+    partial class initionnewserver
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -116,6 +116,9 @@ namespace ITAssetManager.Migrations
                     b.Property<string>("Notes")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int?>("ProductId")
+                        .HasColumnType("int");
+
                     b.Property<string>("PropertyTag")
                         .HasColumnType("nvarchar(max)");
 
@@ -140,6 +143,12 @@ namespace ITAssetManager.Migrations
                     b.Property<int?>("VendorId")
                         .HasColumnType("int");
 
+                    b.Property<int>("WarehouseId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("WarehouseIssueId")
+                        .HasColumnType("int");
+
                     b.Property<DateTime?>("WarrantyExpiry")
                         .HasColumnType("datetime2");
 
@@ -147,7 +156,13 @@ namespace ITAssetManager.Migrations
 
                     b.HasIndex("CategoryId");
 
+                    b.HasIndex("ProductId");
+
                     b.HasIndex("VendorId");
+
+                    b.HasIndex("WarehouseId");
+
+                    b.HasIndex("WarehouseIssueId");
 
                     b.ToTable("Assets");
                 });
@@ -373,6 +388,62 @@ namespace ITAssetManager.Migrations
                     b.HasIndex("SpecificationId");
 
                     b.ToTable("CategorySpecifications");
+                });
+
+            modelBuilder.Entity("ITAssetManager.Models.InventoryTransaction", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
+
+                    b.Property<int?>("AssetId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("IssueItemId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("ProductId")
+                        .HasColumnType("int");
+
+                    b.Property<decimal>("Quantity")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<int?>("ReceiptItemId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("TransactionDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int?>("TransferItemId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Type")
+                        .HasColumnType("int");
+
+                    b.Property<int>("WarehouseId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AssetId");
+
+                    b.HasIndex("ProductId");
+
+                    b.HasIndex("WarehouseId");
+
+                    b.ToTable("InventoryTransactions");
                 });
 
             modelBuilder.Entity("ITAssetManager.Models.MaintenanceLog", b =>
@@ -649,13 +720,31 @@ namespace ITAssetManager.Migrations
                         .HasMaxLength(400)
                         .HasColumnType("nvarchar(400)");
 
+                    b.Property<bool>("IsAssetWarehouse")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsITWarehouse")
+                        .HasColumnType("bit");
+
                     b.Property<int>("KeeperId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Type")
                         .HasColumnType("int");
 
                     b.Property<string>("WarehouseName")
                         .IsRequired()
                         .HasMaxLength(200)
                         .HasColumnType("nvarchar(200)");
+
+                    b.Property<string>("WarehouseOwner")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("WarehouseOwnerID")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("int");
 
                     b.HasKey("Id");
 
@@ -675,14 +764,17 @@ namespace ITAssetManager.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<int>("CreatedBy")
-                        .HasColumnType("int");
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("FromWarehouseId")
+                    b.Property<int?>("EmployeeId")
                         .HasColumnType("int");
+
+                    b.Property<string>("EmployeeName")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("IssueDate")
                         .HasColumnType("datetime2");
@@ -690,13 +782,23 @@ namespace ITAssetManager.Migrations
                     b.Property<int>("IssueNumber")
                         .HasColumnType("int");
 
-                    b.Property<bool>("Status")
-                        .HasColumnType("bit");
+                    b.Property<int>("Source")
+                        .HasColumnType("int");
 
-                    b.Property<int>("ToWarehouseId")
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
+
+                    b.Property<int>("WarehouseId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("WarehouseId1")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("WarehouseId");
+
+                    b.HasIndex("WarehouseId1");
 
                     b.ToTable("WarehouseIssues");
                 });
@@ -708,6 +810,9 @@ namespace ITAssetManager.Migrations
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Description")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("IssueId")
                         .HasColumnType("int");
@@ -737,6 +842,9 @@ namespace ITAssetManager.Migrations
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("EmployeeId")
+                        .HasColumnType("int");
 
                     b.Property<string>("FullName")
                         .IsRequired()
@@ -776,11 +884,14 @@ namespace ITAssetManager.Migrations
                     b.Property<int>("ReceiptNumber")
                         .HasColumnType("int");
 
+                    b.Property<int>("ReceiptSource")
+                        .HasColumnType("int");
+
                     b.Property<string>("ReferenceNumber")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<bool>("Status")
-                        .HasColumnType("bit");
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
 
                     b.Property<int>("WarehouseId")
                         .HasColumnType("int");
@@ -799,6 +910,9 @@ namespace ITAssetManager.Migrations
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Description")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("ProductId")
                         .HasColumnType("int");
@@ -819,6 +933,111 @@ namespace ITAssetManager.Migrations
                     b.HasIndex("ReceiptId");
 
                     b.ToTable("WarehouseReceiptItems");
+                });
+
+            modelBuilder.Entity("ITAssetManager.Models.WarehouseStock", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("ProductId")
+                        .HasColumnType("int");
+
+                    b.Property<decimal>("Quantity")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("WarehouseId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ProductId");
+
+                    b.HasIndex("WarehouseId");
+
+                    b.ToTable("WarehouseStocks");
+                });
+
+            modelBuilder.Entity("ITAssetManager.Models.WarehouseTransfer", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("DestinationWarehouseId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("SourceWarehouseId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("TransferDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("TransferNumber")
+                        .HasColumnType("int");
+
+                    b.Property<int>("TransferSource")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("DestinationWarehouseId");
+
+                    b.HasIndex("SourceWarehouseId");
+
+                    b.ToTable("WarehouseTransfers");
+                });
+
+            modelBuilder.Entity("ITAssetManager.Models.WarehouseTransferItem", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Description")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("ProductId")
+                        .HasColumnType("int");
+
+                    b.Property<decimal>("Quantity")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<int>("RowNumber")
+                        .HasColumnType("int");
+
+                    b.Property<int>("WarehouseTransferId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ProductId");
+
+                    b.HasIndex("WarehouseTransferId");
+
+                    b.ToTable("WarehouseTransferItems");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
@@ -1052,14 +1271,36 @@ namespace ITAssetManager.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
+                    b.HasOne("ITAssetManager.Models.Product", "Product")
+                        .WithMany()
+                        .HasForeignKey("ProductId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
                     b.HasOne("ITAssetManager.Models.Vendor", "Vendor")
                         .WithMany("Assets")
                         .HasForeignKey("VendorId")
                         .OnDelete(DeleteBehavior.NoAction);
 
+                    b.HasOne("ITAssetManager.Models.Warehouse", "Warehouse")
+                        .WithMany()
+                        .HasForeignKey("WarehouseId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("ITAssetManager.Models.WarehouseIssue", "WarehouseIssue")
+                        .WithMany()
+                        .HasForeignKey("WarehouseIssueId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
                     b.Navigation("Category");
 
+                    b.Navigation("Product");
+
                     b.Navigation("Vendor");
+
+                    b.Navigation("Warehouse");
+
+                    b.Navigation("WarehouseIssue");
                 });
 
             modelBuilder.Entity("ITAssetManager.Models.AssetAssignment", b =>
@@ -1119,6 +1360,31 @@ namespace ITAssetManager.Migrations
                     b.Navigation("Specification");
                 });
 
+            modelBuilder.Entity("ITAssetManager.Models.InventoryTransaction", b =>
+                {
+                    b.HasOne("ITAssetManager.Models.Asset", "Asset")
+                        .WithMany()
+                        .HasForeignKey("AssetId");
+
+                    b.HasOne("ITAssetManager.Models.Product", "Product")
+                        .WithMany()
+                        .HasForeignKey("ProductId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("ITAssetManager.Models.Warehouse", "Warehouse")
+                        .WithMany()
+                        .HasForeignKey("WarehouseId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Asset");
+
+                    b.Navigation("Product");
+
+                    b.Navigation("Warehouse");
+                });
+
             modelBuilder.Entity("ITAssetManager.Models.MaintenanceLog", b =>
                 {
                     b.HasOne("ITAssetManager.Models.Asset", "Asset")
@@ -1161,6 +1427,21 @@ namespace ITAssetManager.Migrations
                         .IsRequired();
 
                     b.Navigation("Keeper");
+                });
+
+            modelBuilder.Entity("ITAssetManager.Models.WarehouseIssue", b =>
+                {
+                    b.HasOne("ITAssetManager.Models.Warehouse", "Warehouse")
+                        .WithMany("OutgoingIssues")
+                        .HasForeignKey("WarehouseId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("ITAssetManager.Models.Warehouse", null)
+                        .WithMany("IncomingIssues")
+                        .HasForeignKey("WarehouseId1");
+
+                    b.Navigation("Warehouse");
                 });
 
             modelBuilder.Entity("ITAssetManager.Models.WarehouseIssueItem", b =>
@@ -1209,6 +1490,63 @@ namespace ITAssetManager.Migrations
                     b.Navigation("Product");
 
                     b.Navigation("Receipt");
+                });
+
+            modelBuilder.Entity("ITAssetManager.Models.WarehouseStock", b =>
+                {
+                    b.HasOne("ITAssetManager.Models.Product", "Product")
+                        .WithMany()
+                        .HasForeignKey("ProductId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("ITAssetManager.Models.Warehouse", "Warehouse")
+                        .WithMany()
+                        .HasForeignKey("WarehouseId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Product");
+
+                    b.Navigation("Warehouse");
+                });
+
+            modelBuilder.Entity("ITAssetManager.Models.WarehouseTransfer", b =>
+                {
+                    b.HasOne("ITAssetManager.Models.Warehouse", "DestinationWarehouse")
+                        .WithMany()
+                        .HasForeignKey("DestinationWarehouseId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("ITAssetManager.Models.Warehouse", "SourceWarehouse")
+                        .WithMany()
+                        .HasForeignKey("SourceWarehouseId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("DestinationWarehouse");
+
+                    b.Navigation("SourceWarehouse");
+                });
+
+            modelBuilder.Entity("ITAssetManager.Models.WarehouseTransferItem", b =>
+                {
+                    b.HasOne("ITAssetManager.Models.Product", "Product")
+                        .WithMany()
+                        .HasForeignKey("ProductId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("ITAssetManager.Models.WarehouseTransfer", "WarehouseTransfer")
+                        .WithMany("Items")
+                        .HasForeignKey("WarehouseTransferId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Product");
+
+                    b.Navigation("WarehouseTransfer");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -1312,6 +1650,10 @@ namespace ITAssetManager.Migrations
 
             modelBuilder.Entity("ITAssetManager.Models.Warehouse", b =>
                 {
+                    b.Navigation("IncomingIssues");
+
+                    b.Navigation("OutgoingIssues");
+
                     b.Navigation("Receipts");
                 });
 
@@ -1326,6 +1668,11 @@ namespace ITAssetManager.Migrations
                 });
 
             modelBuilder.Entity("ITAssetManager.Models.WarehouseReceipt", b =>
+                {
+                    b.Navigation("Items");
+                });
+
+            modelBuilder.Entity("ITAssetManager.Models.WarehouseTransfer", b =>
                 {
                     b.Navigation("Items");
                 });

@@ -98,10 +98,10 @@ using (var scope = app.Services.CreateScope())
     }
 
     // ایجاد کاربر Admin پیش‌فرض
-    var adminEmail = "admin@itasset.local";
-    if (await userManager.FindByEmailAsync(adminEmail) == null)
+    var adminUserName = "admin";
+    if (await userManager.FindByNameAsync(adminUserName) == null)
     {
-        var admin = new IdentityUser { UserName = adminEmail, Email = adminEmail, EmailConfirmed = true };
+        var admin = new IdentityUser { UserName = adminUserName, Email = "admin@itasset.local", EmailConfirmed = true };
         await userManager.CreateAsync(admin, "Admin@123");
         await userManager.AddToRoleAsync(admin, "Admin");
     }

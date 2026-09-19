@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace ITAssetManager.Migrations
 {
     /// <inheritdoc />
-    public partial class Init : Migration
+    public partial class initionnewserver : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -60,7 +60,8 @@ namespace ITAssetManager.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Type = table.Column<int>(type: "int", nullable: true)
+                    Type = table.Column<int>(type: "int", nullable: true),
+                    HasInternalComponent = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -102,6 +103,21 @@ namespace ITAssetManager.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Vendors", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "WarehouseKeepers",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    FullName = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false),
+                    PersonnelNumber = table.Column<string>(type: "nvarchar(11)", maxLength: 11, nullable: true),
+                    EmployeeId = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_WarehouseKeepers", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -211,6 +227,28 @@ namespace ITAssetManager.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Products",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    ProductName = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false),
+                    ProductDescription = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Model = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: true),
+                    CategoryId = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Products", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Products_Categories_CategoryId",
+                        column: x => x.CategoryId,
+                        principalTable: "Categories",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "CategorySpecifications",
                 columns: table => new
                 {
@@ -227,7 +265,7 @@ namespace ITAssetManager.Migrations
                         column: x => x.CategoryId,
                         principalTable: "Categories",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
                         name: "FK_CategorySpecifications_Specifications_SpecificationId",
                         column: x => x.SpecificationId,
@@ -258,11 +296,162 @@ namespace ITAssetManager.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Warehouses",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    WarehouseName = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false),
+                    WarehouseOwnerID = table.Column<int>(type: "int", maxLength: 200, nullable: false),
+                    WarehouseOwner = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Description = table.Column<string>(type: "nvarchar(400)", maxLength: 400, nullable: true),
+                    KeeperId = table.Column<int>(type: "int", nullable: false),
+                    Type = table.Column<int>(type: "int", nullable: false),
+                    IsITWarehouse = table.Column<bool>(type: "bit", nullable: false),
+                    IsAssetWarehouse = table.Column<bool>(type: "bit", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Warehouses", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Warehouses_WarehouseKeepers_KeeperId",
+                        column: x => x.KeeperId,
+                        principalTable: "WarehouseKeepers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "WarehouseIssues",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    IssueNumber = table.Column<int>(type: "int", nullable: false),
+                    IssueDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    CreatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    EmployeeId = table.Column<int>(type: "int", nullable: true),
+                    EmployeeName = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Status = table.Column<int>(type: "int", nullable: false),
+                    Source = table.Column<int>(type: "int", nullable: false),
+                    WarehouseId = table.Column<int>(type: "int", nullable: false),
+                    WarehouseId1 = table.Column<int>(type: "int", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_WarehouseIssues", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_WarehouseIssues_Warehouses_WarehouseId",
+                        column: x => x.WarehouseId,
+                        principalTable: "Warehouses",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_WarehouseIssues_Warehouses_WarehouseId1",
+                        column: x => x.WarehouseId1,
+                        principalTable: "Warehouses",
+                        principalColumn: "Id");
+                });
+
+            migrationBuilder.CreateTable(
+                name: "WarehouseReceipts",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    ReceiptNumber = table.Column<int>(type: "int", nullable: false),
+                    ReceiptDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    ReferenceNumber = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    CreatedBy = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Status = table.Column<int>(type: "int", nullable: false),
+                    WarehouseId = table.Column<int>(type: "int", nullable: false),
+                    ReceiptSource = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_WarehouseReceipts", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_WarehouseReceipts_Warehouses_WarehouseId",
+                        column: x => x.WarehouseId,
+                        principalTable: "Warehouses",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "WarehouseStocks",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    WarehouseId = table.Column<int>(type: "int", nullable: false),
+                    ProductId = table.Column<int>(type: "int", nullable: false),
+                    Quantity = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_WarehouseStocks", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_WarehouseStocks_Products_ProductId",
+                        column: x => x.ProductId,
+                        principalTable: "Products",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_WarehouseStocks_Warehouses_WarehouseId",
+                        column: x => x.WarehouseId,
+                        principalTable: "Warehouses",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "WarehouseTransfers",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    TransferNumber = table.Column<int>(type: "int", nullable: false),
+                    SourceWarehouseId = table.Column<int>(type: "int", nullable: false),
+                    DestinationWarehouseId = table.Column<int>(type: "int", nullable: false),
+                    TransferDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    Status = table.Column<int>(type: "int", nullable: false),
+                    Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    CreatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    TransferSource = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_WarehouseTransfers", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_WarehouseTransfers_Warehouses_DestinationWarehouseId",
+                        column: x => x.DestinationWarehouseId,
+                        principalTable: "Warehouses",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_WarehouseTransfers_Warehouses_SourceWarehouseId",
+                        column: x => x.SourceWarehouseId,
+                        principalTable: "Warehouses",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Assets",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
+                    ProductId = table.Column<int>(type: "int", nullable: true),
+                    WarehouseId = table.Column<int>(type: "int", nullable: false),
+                    WarehouseIssueId = table.Column<int>(type: "int", nullable: true),
                     Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Model = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     SerialNumber = table.Column<string>(type: "nvarchar(max)", nullable: true),
@@ -296,10 +485,115 @@ namespace ITAssetManager.Migrations
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
+                        name: "FK_Assets_Products_ProductId",
+                        column: x => x.ProductId,
+                        principalTable: "Products",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
                         name: "FK_Assets_Vendors_VendorId",
                         column: x => x.VendorId,
                         principalTable: "Vendors",
                         principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_Assets_WarehouseIssues_WarehouseIssueId",
+                        column: x => x.WarehouseIssueId,
+                        principalTable: "WarehouseIssues",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_Assets_Warehouses_WarehouseId",
+                        column: x => x.WarehouseId,
+                        principalTable: "Warehouses",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "WarehouseIssueItems",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    RowNumber = table.Column<int>(type: "int", nullable: false),
+                    Quantity = table.Column<int>(type: "int", nullable: false),
+                    IssueId = table.Column<int>(type: "int", nullable: false),
+                    ProductId = table.Column<int>(type: "int", nullable: false),
+                    Description = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_WarehouseIssueItems", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_WarehouseIssueItems_Products_ProductId",
+                        column: x => x.ProductId,
+                        principalTable: "Products",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_WarehouseIssueItems_WarehouseIssues_IssueId",
+                        column: x => x.IssueId,
+                        principalTable: "WarehouseIssues",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "WarehouseReceiptItems",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    RowNumber = table.Column<int>(type: "int", nullable: false),
+                    Quantity = table.Column<int>(type: "int", nullable: false),
+                    ReceiptId = table.Column<int>(type: "int", nullable: true),
+                    ProductId = table.Column<int>(type: "int", nullable: false),
+                    Description = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_WarehouseReceiptItems", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_WarehouseReceiptItems_Products_ProductId",
+                        column: x => x.ProductId,
+                        principalTable: "Products",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_WarehouseReceiptItems_WarehouseReceipts_ReceiptId",
+                        column: x => x.ReceiptId,
+                        principalTable: "WarehouseReceipts",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "WarehouseTransferItems",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    WarehouseTransferId = table.Column<int>(type: "int", nullable: false),
+                    RowNumber = table.Column<int>(type: "int", nullable: false),
+                    ProductId = table.Column<int>(type: "int", nullable: false),
+                    Quantity = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    Description = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_WarehouseTransferItems", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_WarehouseTransferItems_Products_ProductId",
+                        column: x => x.ProductId,
+                        principalTable: "Products",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_WarehouseTransferItems_WarehouseTransfers_WarehouseTransferId",
+                        column: x => x.WarehouseTransferId,
+                        principalTable: "WarehouseTransfers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -308,6 +602,7 @@ namespace ITAssetManager.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
+                    FromAssetId = table.Column<int>(type: "int", nullable: true),
                     PcAssetId = table.Column<int>(type: "int", nullable: false),
                     ComponentAssetId = table.Column<int>(type: "int", nullable: false),
                     InstalledAt = table.Column<DateTime>(type: "datetime2", nullable: false),
@@ -322,6 +617,11 @@ namespace ITAssetManager.Migrations
                     table.ForeignKey(
                         name: "FK_AssemblyComponents_Assets_ComponentAssetId",
                         column: x => x.ComponentAssetId,
+                        principalTable: "Assets",
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_AssemblyComponents_Assets_FromAssetId",
+                        column: x => x.FromAssetId,
                         principalTable: "Assets",
                         principalColumn: "Id");
                     table.ForeignKey(
@@ -396,6 +696,47 @@ namespace ITAssetManager.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "InventoryTransactions",
+                columns: table => new
+                {
+                    Id = table.Column<long>(type: "bigint", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    WarehouseId = table.Column<int>(type: "int", nullable: false),
+                    ProductId = table.Column<int>(type: "int", nullable: false),
+                    Quantity = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    Type = table.Column<int>(type: "int", nullable: false),
+                    TransactionDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    ReceiptItemId = table.Column<int>(type: "int", nullable: true),
+                    IssueItemId = table.Column<int>(type: "int", nullable: true),
+                    TransferItemId = table.Column<int>(type: "int", nullable: true),
+                    Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    CreatedBy = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    AssetId = table.Column<int>(type: "int", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_InventoryTransactions", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_InventoryTransactions_Assets_AssetId",
+                        column: x => x.AssetId,
+                        principalTable: "Assets",
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_InventoryTransactions_Products_ProductId",
+                        column: x => x.ProductId,
+                        principalTable: "Products",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_InventoryTransactions_Warehouses_WarehouseId",
+                        column: x => x.WarehouseId,
+                        principalTable: "Warehouses",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "MaintenanceLogs",
                 columns: table => new
                 {
@@ -426,21 +767,21 @@ namespace ITAssetManager.Migrations
 
             migrationBuilder.InsertData(
                 table: "Categories",
-                columns: new[] { "Id", "Description", "Name", "Type" },
+                columns: new[] { "Id", "Description", "HasInternalComponent", "Name", "Type" },
                 values: new object[,]
                 {
-                    { 1, null, "لپ‌تاپ", 1 },
-                    { 2, null, "کامپیوتر رومیزی", 1 },
-                    { 3, null, "مانیتور", 1 },
-                    { 4, null, "پرینتر", 1 },
-                    { 5, null, "ماوس", 1 },
-                    { 6, null, "کیبورد", 1 },
-                    { 7, null, "سوئیچ شبکه", 1 },
-                    { 8, null, "روتر", 1 },
-                    { 9, null, "سرور", 1 },
-                    { 10, null, "UPS", 1 },
-                    { 11, null, "هدست", 1 },
-                    { 12, null, "سایر", 1 }
+                    { 1, null, false, "لپ‌تاپ", 1 },
+                    { 2, null, false, "کامپیوتر رومیزی", 1 },
+                    { 3, null, false, "مانیتور", 1 },
+                    { 4, null, false, "پرینتر", 1 },
+                    { 5, null, false, "ماوس", 1 },
+                    { 6, null, false, "کیبورد", 1 },
+                    { 7, null, false, "سوئیچ شبکه", 1 },
+                    { 8, null, false, "روتر", 1 },
+                    { 9, null, false, "سرور", 1 },
+                    { 10, null, false, "UPS", 1 },
+                    { 11, null, false, "هدست", 1 },
+                    { 12, null, false, "سایر", 1 }
                 });
 
             migrationBuilder.CreateIndex(
@@ -488,6 +829,11 @@ namespace ITAssetManager.Migrations
                 column: "ComponentAssetId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_AssemblyComponents_FromAssetId",
+                table: "AssemblyComponents",
+                column: "FromAssetId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_AssemblyComponents_PcAssetId",
                 table: "AssemblyComponents",
                 column: "PcAssetId");
@@ -503,9 +849,24 @@ namespace ITAssetManager.Migrations
                 column: "CategoryId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Assets_ProductId",
+                table: "Assets",
+                column: "ProductId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Assets_VendorId",
                 table: "Assets",
                 column: "VendorId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Assets_WarehouseId",
+                table: "Assets",
+                column: "WarehouseId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Assets_WarehouseIssueId",
+                table: "Assets",
+                column: "WarehouseIssueId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_AssetSpecValues_AssetId",
@@ -533,14 +894,104 @@ namespace ITAssetManager.Migrations
                 column: "SpecificationId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_InventoryTransactions_AssetId",
+                table: "InventoryTransactions",
+                column: "AssetId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_InventoryTransactions_ProductId",
+                table: "InventoryTransactions",
+                column: "ProductId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_InventoryTransactions_WarehouseId",
+                table: "InventoryTransactions",
+                column: "WarehouseId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_MaintenanceLogs_AssetId",
                 table: "MaintenanceLogs",
                 column: "AssetId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Products_CategoryId",
+                table: "Products",
+                column: "CategoryId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_SpecValues_SpecificationId",
                 table: "SpecValues",
                 column: "SpecificationId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_WarehouseIssueItems_IssueId",
+                table: "WarehouseIssueItems",
+                column: "IssueId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_WarehouseIssueItems_ProductId",
+                table: "WarehouseIssueItems",
+                column: "ProductId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_WarehouseIssues_WarehouseId",
+                table: "WarehouseIssues",
+                column: "WarehouseId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_WarehouseIssues_WarehouseId1",
+                table: "WarehouseIssues",
+                column: "WarehouseId1");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_WarehouseReceiptItems_ProductId",
+                table: "WarehouseReceiptItems",
+                column: "ProductId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_WarehouseReceiptItems_ReceiptId",
+                table: "WarehouseReceiptItems",
+                column: "ReceiptId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_WarehouseReceipts_WarehouseId",
+                table: "WarehouseReceipts",
+                column: "WarehouseId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Warehouses_KeeperId",
+                table: "Warehouses",
+                column: "KeeperId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_WarehouseStocks_ProductId",
+                table: "WarehouseStocks",
+                column: "ProductId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_WarehouseStocks_WarehouseId",
+                table: "WarehouseStocks",
+                column: "WarehouseId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_WarehouseTransferItems_ProductId",
+                table: "WarehouseTransferItems",
+                column: "ProductId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_WarehouseTransferItems_WarehouseTransferId",
+                table: "WarehouseTransferItems",
+                column: "WarehouseTransferId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_WarehouseTransfers_DestinationWarehouseId",
+                table: "WarehouseTransfers",
+                column: "DestinationWarehouseId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_WarehouseTransfers_SourceWarehouseId",
+                table: "WarehouseTransfers",
+                column: "SourceWarehouseId");
         }
 
         /// <inheritdoc />
@@ -574,7 +1025,22 @@ namespace ITAssetManager.Migrations
                 name: "CategorySpecifications");
 
             migrationBuilder.DropTable(
+                name: "InventoryTransactions");
+
+            migrationBuilder.DropTable(
                 name: "MaintenanceLogs");
+
+            migrationBuilder.DropTable(
+                name: "WarehouseIssueItems");
+
+            migrationBuilder.DropTable(
+                name: "WarehouseReceiptItems");
+
+            migrationBuilder.DropTable(
+                name: "WarehouseStocks");
+
+            migrationBuilder.DropTable(
+                name: "WarehouseTransferItems");
 
             migrationBuilder.DropTable(
                 name: "AspNetRoles");
@@ -589,13 +1055,31 @@ namespace ITAssetManager.Migrations
                 name: "Assets");
 
             migrationBuilder.DropTable(
+                name: "WarehouseReceipts");
+
+            migrationBuilder.DropTable(
+                name: "WarehouseTransfers");
+
+            migrationBuilder.DropTable(
                 name: "Specifications");
+
+            migrationBuilder.DropTable(
+                name: "Products");
+
+            migrationBuilder.DropTable(
+                name: "Vendors");
+
+            migrationBuilder.DropTable(
+                name: "WarehouseIssues");
 
             migrationBuilder.DropTable(
                 name: "Categories");
 
             migrationBuilder.DropTable(
-                name: "Vendors");
+                name: "Warehouses");
+
+            migrationBuilder.DropTable(
+                name: "WarehouseKeepers");
         }
     }
 }

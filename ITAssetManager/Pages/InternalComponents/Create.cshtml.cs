@@ -232,13 +232,13 @@ public class CreateModel : PageModel
         // =========================================================
 
         var pcCategory = await _context.Categories
-            .FirstOrDefaultAsync(c => c.Name == "کامپیوتر رومیزی");
+            .FirstOrDefaultAsync(c => c.Id ==2);
 
         if (pcCategory == null)
         {
             ModelState.AddModelError(
                 "",
-                "دسته‌بندی «کامپیوتر رومیزی» در سیستم پیدا نشد.");
+                "دسته‌بندی جهت سیستم های اسمبل شده در سیستم پیدا نشد.");
 
             await LoadAsync();
             return Page();

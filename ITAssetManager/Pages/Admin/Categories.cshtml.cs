@@ -1,6 +1,5 @@
 using ITAssetManager.Convertor;
 using ITAssetManager.Data;
-using ITAssetManager.Migrations;
 using ITAssetManager.Models;
 using ITAssetManager.Models.ViewModels;
 using Microsoft.AspNetCore.Authorization;
