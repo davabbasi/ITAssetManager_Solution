@@ -34,13 +34,32 @@ public class ApplicationDbContext : IdentityDbContext
     public DbSet<WarehouseTransfer> WarehouseTransfers { get; set; }
     public DbSet<WarehouseTransferItem> WarehouseTransferItems { get; set; }
     public DbSet<InventoryTransaction> InventoryTransactions { get; set; }
-
     public DbSet<CartridgeConsumption> CartridgeConsumptions { get; set; }
+    public DbSet<BatteryConsumption> BatteryConsumptions { get; set; }
 
 
     protected override void OnModelCreating(ModelBuilder builder)
     {
         base.OnModelCreating(builder);
+
+        builder.Entity<BatteryConsumption>()
+           .HasOne(x => x.WarehouseIssue)
+           .WithMany()
+           .HasForeignKey(x => x.WarehouseIssueId)
+           .OnDelete(DeleteBehavior.Restrict);
+
+        builder.Entity<BatteryConsumption>()
+            .HasOne(x => x.UPS)
+            .WithMany()
+            .HasForeignKey(x => x.UPS_Id)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        builder.Entity<BatteryConsumption>()
+            .HasOne(x => x.Product)
+            .WithMany()
+            .HasForeignKey(x => x.ProductId)
+            .OnDelete(DeleteBehavior.Restrict);
+
 
         builder.Entity<CartridgeConsumption>()
             .HasOne(x => x.WarehouseIssue)

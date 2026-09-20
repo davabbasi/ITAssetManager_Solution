@@ -1,9 +1,7 @@
 ﻿@page
-@using ITAssetManager.Convertor
-@model ITAssetManager.Pages.Printers.IndexModel
+@model ITAssetManager.Pages.UPSes.IndexModel
 @{
 }
-
 
 <!-- Filters -->
 <div class="card mb-3">
@@ -65,7 +63,7 @@
 <!-- Results -->
 <div class="card">
 
-    
+
 
     <div class="card-body p-0">
         @if (!Model.Assets.Any())
@@ -109,7 +107,7 @@
                                     </a>
 
                                 </td>
-                            
+
 
                                 <td>
                                     @if (asset.DepartmentName != null)
@@ -170,12 +168,12 @@
                                 <td>@(asset.Location ?? "-")</td>
                                 <td>
                                     <div class="d-flex gap-1">
-                                       
-                                        <a asp-page="/Printers/Cartridge"
+
+                                        <a asp-page="/UPSes/Battery"
                                            asp-route-id="@asset.Id"
                                            class="btn btn-sm btn-outline-primary">
-                                            <i class="bi bi-printer me-1"></i>
-                                            مدیریت کارتریج
+                                            <i class="bi bi-battery-half me-1"></i>
+                                            مدیریت باتری ها
                                         </a>
 
                                     </div>
