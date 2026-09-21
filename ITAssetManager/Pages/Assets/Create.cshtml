@@ -41,23 +41,6 @@
                     <!-- بخش اول: اطلاعات اصلی -->
                     <h6 class=" text-muted mb-3 border-bottom pb-2 ">اطلاعات اصلی</h6>
                     <div class="row g-3 mb-3">
-
-                        <div class="col-md-6">
-                            <label class="form-label">نام تجهیز <span class="text-danger">*</span></label>
-                            <input id="assetName" asp-for="Asset.Name" class="form-control" placeholder="مثلاً: لپ‌تاپ دل اداری" />
-                            <span asp-validation-for="Asset.Name" class="text-danger small"></span>
-                        </div>
-
-                        <!-- انتخاب دسته بندی -->
-
-                        <div class="col-md-6" >
-                            <label class="form-label">دسته‌بندی <span class="text-danger">*</span></label>
-                            <select id="categorySelect" asp-for="Asset.CategoryId" asp-items="Model.CategoryList" class="form-select" disabled>
-                                <option value="">انتخاب کنید...</option>
-                            </select>
-                            <input type="hidden" asp-for="Asset.CategoryId" />
-                        </div>
-
                         <div class="col-md-6">
                             <label class="form-label">
                                 انبار <span class="text-danger">*</span>
@@ -95,28 +78,35 @@
                         </div>
 
 
-                      
-                        <div class="col-md-4">
-                            <label class="form-label">مدل</label>
-                            <input asp-for="Asset.Model" class="form-control" placeholder="مدل دستگاه" />
+                        <div class="col-md-6">
+                            <label class="form-label">نام تجهیز <span class="text-danger">*</span></label>
+                            <input id="assetName" asp-for="Asset.Name" class="form-control"   />
+                            <span asp-validation-for="Asset.Name" class="text-danger small"></span>
                         </div>
 
-                      @*   <div class="col-md-4">
-                            <label class="form-label">وضعیت</label>
-                            <select asp-for="Asset.Status" class="form-select">
-                                <option value="1">فعال</option>
-                                <option value="2">معیوب</option>
-                                <option value="3">در تعمیر</option>
-                                <option value="5">در انبار</option>
+                        <!-- انتخاب دسته بندی -->
+
+                        <div class="col-md-6" >
+                            <label class="form-label">دسته‌بندی <span class="text-danger">*</span></label>
+                            <select id="categorySelect" asp-for="Asset.CategoryId" asp-items="Model.CategoryList" class="form-select" disabled>
+                                <option value="">انتخاب کنید...</option>
                             </select>
-                        </div> *@
+                            <input type="hidden" asp-for="Asset.CategoryId" />
+                        </div>
+
+                       
+                        <div class="col-md-4">
+                            <label class="form-label">مدل</label>
+                            <input id="assetModel" asp-for="Asset.Model" class="form-control" placeholder="مدل دستگاه"  />
+                        </div>
+                     
 
                     </div>
                     <br />
                     <!-- بخش پنجم: مشخصات و توضیحات -->
                     <h6 class="text-muted mb-3 border-bottom pb-2">مشخصات فنی</h6>
                     <div id="specs-container">
-
+                     
                         <!-- محل نمایش مشخصات فنی  -->
 
                     </div>
@@ -125,20 +115,30 @@
                     <!-- بخش دوم: شناسه‌ها -->
                     <h6 class="text-muted mb-3 border-bottom pb-2">شناسه‌ها</h6>
                     <div class="row g-3 mb-3">
-                        <div class="col-md-4">
+                        <div class="col-md-4" id="propertyTagContainer">
                             <label class="form-label">
                                 <i class="bi bi-tag me-1"></i>برچسب اموال
                                 <span class="text-muted small">(واحد مالی)</span>
                             </label>
-                            <input asp-for="Asset.PropertyTag" class="form-control" placeholder="AM-2024-001" />
+
+                            <input asp-for="Asset.PropertyTag"
+                                   id="propertyTagInput"
+                                   class="form-control"
+                                    />
                         </div>
+
                         <div class="col-md-4">
                             <label class="form-label">سریال نامبر</label>
-                            <input asp-for="Asset.SerialNumber" class="form-control" placeholder="S/N" />
+                            <input asp-for="Asset.SerialNumber"
+                                   class="form-control"
+                                   placeholder="S/N" />
                         </div>
+
                         <div class="col-md-4">
                             <label class="form-label">بارکد</label>
-                            <input asp-for="Asset.Barcode" class="form-control" placeholder="بارکد" />
+                            <input asp-for="Asset.Barcode"
+                                   class="form-control"
+                                   placeholder="بارکد" />
                         </div>
                     </div>
                     <br />
@@ -207,9 +207,11 @@
 
         const stockInfo = document.getElementById('stockInfo');
         const assetName = document.getElementById('assetName');
+        const assetModel = document.getElementById('assetModel');
 
-        const specsContainer =
-            document.getElementById('specs-container');
+        const specsContainer =document.getElementById('specs-container');
+
+        const propertyTagInput =document.getElementById('propertyTagInput');
 
 
         // =====================================================
@@ -240,6 +242,7 @@
                 }
 
                 const html = await response.text();
+
 
                 specsContainer.innerHTML = html;
 
@@ -374,6 +377,8 @@
 
                 document.getElementById('Asset_CategoryId').value = '';
 
+                updatePropertyTagState(null);
+
                 specsContainer.innerHTML =
                     '<div class="text-muted">دسته‌بندی را انتخاب کنید</div>';
 
@@ -424,6 +429,32 @@
 
 
             // -------------------------------------------------
+            // دریافت مدل کالا
+            // -------------------------------------------------
+
+            try {
+
+                const response = await fetch(
+                    `/Assets/Create?handler=ProductModel&productId=${productId}`
+                );
+
+                if (!response.ok) {
+                    throw new Error('خطا در دریافت مدل کالا');
+                }
+
+                const productModel =
+                    await response.text();
+
+                assetModel.value = productModel;
+
+            }
+            catch (error) {
+
+                console.error(error);
+
+                assetModel.value = '';
+            }
+            // -------------------------------------------------
             // دریافت دسته‌بندی کالا
             // -------------------------------------------------
 
@@ -437,13 +468,24 @@
                     throw new Error('خطا در دریافت دسته‌بندی کالا');
                 }
 
-                const data =
-                    await response.json();
+                const data =await response.json();
 
 
-                // دسته‌بندی را در Select قرار بده
-                categorySelect.value =
-                    data.categoryId;
+        // دسته‌بندی را در Select قرار بده
+        categorySelect.value =data.categoryId;
+
+
+        // مقدار واقعی فرم
+        document.getElementById('Asset_CategoryId').value =
+            data.categoryId;
+
+
+        // فعال / غیرفعال کردن برچسب اموال
+        updatePropertyTagState(data.categoryType);
+
+
+        // دریافت مشخصات فنی دسته‌بندی
+        await loadSpecs(data.categoryId);
 
 
                 // چون Select disabled است،
@@ -452,11 +494,7 @@
                     data.categoryId;
 
 
-                // -------------------------------------------------
-                // دریافت مشخصات فنی دسته‌بندی
-                // -------------------------------------------------
-
-                await loadSpecs(data.categoryId);
+            
 
             }
             catch (error) {
@@ -472,8 +510,23 @@
             }
 
         });
+        
+        function updatePropertyTagState(categoryType) {
 
+            // Tagged = 1
+            // Installed = 2
+            // Consumable = 3
+            // Tagged_Installed = 4
 
+            const propertyTagEnabled =
+                categoryType === 1 || categoryType === 4;
+
+            propertyTagInput.disabled = !propertyTagEnabled;
+
+            if (!propertyTagEnabled) {
+                propertyTagInput.value = '';
+            }
+        }
         // =====================================================
         // TomSelect فروشنده
         // =====================================================

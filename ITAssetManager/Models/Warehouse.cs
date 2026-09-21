@@ -27,9 +27,8 @@ namespace ITAssetManager.Models
         public string WarehouseName { get; set; } = string.Empty;
 
         [Display(Name = "مالک انبار")]
-        [Required(ErrorMessage = "لطفا {0} را وارد نمایید")]
-        [MaxLength(200, ErrorMessage = "{0} نمیتواند بیشتر از {1} باشد")]
         public int? WarehouseOwnerID { get; set; }
+
         public string WarehouseOwner { get; set; } = string.Empty;     
 
         [Display(Name = "توضیحات")]

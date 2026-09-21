@@ -186,6 +186,8 @@ namespace ITAssetManager.Pages.Printers
 
                     Source = IssueSource.CartridgeConsumption,
 
+                    EmployeeName= Printer.EmployeeName,
+
                     Description =
                         $"مصرف کارتریج برای چاپگر «{Printer.Name}»"
                 };
@@ -344,7 +346,8 @@ namespace ITAssetManager.Pages.Printers
                     x.WarehouseId == warehouse.Id &&
                     x.Quantity > 0 &&
                     x.Product.Category != null &&
-                    x.Product.Category.Type == AssetCategoryType.Consumable)
+                    x.Product.Category.Type == AssetCategoryType.Consumable&&
+                    x.Product.CategoryId==31)
                 .Select(x => new CartridgeProductViewModel
                 {
                     ProductId = x.ProductId,

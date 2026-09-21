@@ -40,7 +40,9 @@ namespace ITAssetManager.Pages.Warehouses
                 await LoadLists();
                 return Page();
             }
-
+            var selectedOwner =await  _context.VwDepartments.Where(x => x.Id == Warehouse.WarehouseOwnerID).FirstOrDefaultAsync();
+            if (selectedOwner != null)
+                Warehouse.WarehouseOwner = selectedOwner.Name;
             _context.Warehouses.Add(Warehouse);
             await _context.SaveChangesAsync();
 

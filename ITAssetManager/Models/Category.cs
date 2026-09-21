@@ -25,7 +25,7 @@ public enum AssetCategoryType
     [Display(Name = " مصرفی")]
     Consumable = 3,    
 
-    [Display(Name = "مستقل/اسمبلی")]
+    [Display(Name = "مستقل/قطعه")]
     Tagged_Installed = 4  
 
 }

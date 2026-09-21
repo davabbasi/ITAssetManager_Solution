@@ -188,6 +188,8 @@ namespace ITAssetManager.Pages.UPSes
 
                     Source = IssueSource.CartridgeConsumption,
 
+                    EmployeeName = UPS.EmployeeName,
+
                     Description =
                         $"مصرف باتری برای یو پی اس «{UPS.Name}»"
                 };

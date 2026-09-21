@@ -12,16 +12,16 @@ namespace ITAssetManager.Models
         [MaxLength(200, ErrorMessage = "{0} نمیتواند بیشتر از {1} باشد")]
         public string? ProductName { get; set; }
 
-        [Display(Name = "شرح کالا")]
+        [Display(Name = "توضیحات")]
         public string? ProductDescription { get; set; }
 
         [Display(Name = "مدل")]
         [MaxLength(200, ErrorMessage = "{0} نمیتواند بیشتر از {1} باشد")]
         public string? Model { get; set; }
 
-        [Display(Name = "دسته بندی")]
         public Category? Category { get; set; }
 
+        [Display(Name = "دسته بندی")]
         [ForeignKey(nameof(Category))]
         public int CategoryId { get; set; }
 

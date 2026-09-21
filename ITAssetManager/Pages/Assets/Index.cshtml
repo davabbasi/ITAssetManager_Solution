@@ -119,7 +119,8 @@
                         <tr>
                             <th>کد تجهیز </th>
                             <th>برچسب اموال</th>
-                            <th>نام / مدل</th>
+                            <th>نام تجهیز</th>
+                            <th> مدل</th>
                             <th>دسته</th>
                             <th>نوع تجهیز</th>
                             <th>واحد</th>
@@ -146,6 +147,9 @@
                                         @asset.Name
                                     </a>
                                    
+                                </td>
+                                <td>
+                                    @asset.Model
                                 </td>
 
                                 <td>@(asset.Category.Name??"-")</td>

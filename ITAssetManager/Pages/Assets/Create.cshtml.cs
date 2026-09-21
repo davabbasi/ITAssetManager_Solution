@@ -33,6 +33,7 @@ public class CreateModel : PageModel
     }
         = new();
 
+    public int CatType;
     public async Task OnGetAsync()
     {
 
@@ -420,21 +421,38 @@ public class CreateModel : PageModel
 
         return Content(productName, "text/plain; charset=utf-8");
     }
-
-    public async Task<IActionResult> OnGetProductCategoryAsync(int productId)
+    public async Task<IActionResult> OnGetProductModelAsync(int productId)
     {
-        var categoryId = await _context.Products
+        var productModel = await _context.Products
             .Where(p => p.Id == productId)
-            .Select(p => p.CategoryId)
+            .Select(p => p.Model)
             .FirstOrDefaultAsync();
 
-        if (categoryId == 0)
+        if (productModel == null)
             return NotFound();
+
+        return Content(productModel, "text/plain; charset=utf-8");
+    }
+    public async Task<IActionResult> OnGetProductCategoryAsync(int productId)
+    {
+        var product = await _context.Products
+       .Include(x => x.Category)
+       .FirstOrDefaultAsync(x => x.Id == productId);
+
+        if (product == null || product.Category == null)
+            return new JsonResult(null);
 
         return new JsonResult(new
         {
-            categoryId
+            categoryId = product.Category.Id,
+            categoryType = (int)product.Category.Type
         });
     }
+    public async Task OnGetCategoryTypeAsync(int categoryId)
+    {
+        var cat = await _context.Categories.Where(c => c.Id == categoryId).FirstOrDefaultAsync();
+        CatType =Convert.ToInt32( cat.Type);
+    }
+
 
 }
