@@ -63,7 +63,14 @@
                 {
                     <table class="table table-sm mb-0">
                         <thead>
-                            <tr><th>‌کد قطعه</th><th>دسته‌بندی</th><th>نام قطعه</th><th>برچسب اموال</th><th>تاریخ نصب</th><th></th></tr>
+                            <tr><th>‌کد قطعه</th>
+                                <th>دسته‌بندی</th>
+                                <th>نام قطعه</th>
+                                <th>کد یونیک</th>
+
+                                <th>تاریخ نصب</th>
+                                <th></th>
+                            </tr>
                         </thead>
                         <tbody>
                             @foreach (var c in Model.ActiveComponents)
@@ -77,7 +84,8 @@
                                             @c.ComponentAsset?.Name
                                         </a>
                                     </td>
-                                    <td><small>@(c.ComponentAsset?.PropertyTag ?? "-")</small></td>
+                                    <td><small>@(c.ComponentAsset?.Barcode ?? "-")</small></td>
+
                                     <td><small>@c.InstalledAt.ToShamsi()</small></td>
                                     <td>
                                         <form method="post" asp-page-handler="RemoveComponent"

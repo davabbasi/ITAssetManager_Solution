@@ -282,7 +282,7 @@ public class CreateModel : PageModel
 
                 CategoryId = pcCategory.Id,
 
-                ProductId = 8,
+                ProductId = 12,
 
                 WarehouseId = assetWarehouse.Id,
 
@@ -578,7 +578,7 @@ public class CreateModel : PageModel
         // --------------------------------
 
         var lastNumber = await _context.Assets
-            .Where(a => a.IsAssembled)
+            .Where(a => a.AssemblyNumber>0)
             .MaxAsync(a => (int?)a.AssemblyNumber) ?? 0;
 
         NextAssemblyNumber = lastNumber + 1;

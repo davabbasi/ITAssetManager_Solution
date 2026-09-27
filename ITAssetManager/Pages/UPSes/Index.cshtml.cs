@@ -39,7 +39,7 @@ namespace ITAssetManager.Pages.UPSes
             };
             Departments.Add(vwDepartment);
             var query = BuildQuery();
-            Assets = await query.Where(x => x.CategoryId == 10).OrderBy(a => a.Id).ToListAsync();
+            Assets = await query.Where(x => x.CategoryId == 81).OrderBy(a => a.Id).ToListAsync();
             TotalCount = Assets.Count();
         }
 

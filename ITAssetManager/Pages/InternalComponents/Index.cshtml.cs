@@ -26,12 +26,7 @@ public class IndexModel : PageModel
 
     public async Task OnGetAsync()
     {
-        Items = await _context.Assets
-            .Include(a => a.Components)
-            .Where(a => a.IsAssembled)
-            .OrderByDescending(a => a.AssemblyNumber)
-            .ToListAsync();
-
+        int[] cat = [2,60, 78];
 
         Categories = await _context.Categories.Where(c=>c.HasInternalComponent==true&&c.Type==AssetCategoryType.Tagged).OrderBy(c => c.Name).ToListAsync();
         Departments = await _context.VwDepartments.OrderBy(d => d.Name).ToListAsync();
@@ -41,8 +36,11 @@ public class IndexModel : PageModel
             Name = "انفورماتیک"
         };
         Departments.Add(vwDepartment);
+
         var query = _context.Assets
-            .Include(a => a.Category)
+            .Include(a => a.Components).Include(a => a.Category)
+            .Where(a => cat.Contains(a.Category.Id))
+            .OrderByDescending(a => a.AssemblyNumber)
             .AsQueryable();
 
         if (!string.IsNullOrEmpty(Search))
@@ -63,7 +61,7 @@ public class IndexModel : PageModel
             query = query.Where(a => a.DepartmentId == DepartmentId);
 
         TotalCount = await query.CountAsync();
-        Assets = await query.Where(a=>a.Category.Type==AssetCategoryType.Tagged && a.Category.HasInternalComponent==true).OrderByDescending(a => a.CreatedAt).ToListAsync();
+        Assets = await query.ToListAsync();
 
         var assemblyComponents = await _context.AssemblyComponents
             .Include(x => x.PcAsset)

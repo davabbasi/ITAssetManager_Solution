@@ -41,21 +41,11 @@ namespace ITAssetManager.Pages.Printers
 
             var query = BuildQuery();
 
-           
-            Assets = await query.Where(x=>x.CategoryId==4).OrderBy(a => a.Id).ToListAsync();
+            int[] cat = { 77, 88, 89, 143 };
+            int[] status = { 1, 3, 5, 8 };
+            Assets = await query.Where(x =>cat.Contains(x.CategoryId) &&status.Contains((int)x.Status)).OrderBy(a => a.Id).ToListAsync();
             TotalCount = Assets.Count();
-            //var assemblyComponents = await _context.AssemblyComponents
-            //    .Include(x => x.PcAsset)
-            //    .Where(x => x.RemovedAt == null)
-            //    .ToListAsync();
-
-            //ComponentLocations = assemblyComponents
-            //    .Where(x => x.PcAsset != null)
-            //    .ToDictionary(
-            //    x => x.ComponentAssetId,
-            //    x => x.PcAsset.EmployeeName != null ? $"{x.PcAsset.Name} - {x.PcAsset.EmployeeName}"
-            //    : $"{x.PcAsset.Name} - {x.PcAsset.DepartmentName}"
-            //    );
+           
         }
 
         private IQueryable<Asset> BuildQuery()

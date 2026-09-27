@@ -34,7 +34,7 @@ public class AddComponentModel : PageModel
             .Include(a => a.Category)
             .FirstOrDefaultAsync(a =>
                 a.Id == pcId &&
-                a.IsAssembled &&
+               
                 a.Category != null &&
                 a.Category.HasInternalComponent);
 
