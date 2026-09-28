@@ -2,14 +2,16 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using ITAssetManager.Data;
+using ITAssetManager.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
-using ITAssetManager.Data;
-using ITAssetManager.Models;
 
 namespace ITAssetManager.Pages.WarehouseManagements.Keeper
 {
+    [Authorize(Policy = "RequireAdminRole")]
     public class DeleteModel : PageModel
     {
         private readonly ITAssetManager.Data.ApplicationDbContext _context;

@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using ITAssetManager.Convertor;
 using ITAssetManager.Data;
 using ITAssetManager.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -13,6 +14,8 @@ using Microsoft.EntityFrameworkCore;
 
 namespace ITAssetManager.Pages.WarehouseManagements.Receipts
 {
+    [Authorize(Policy = "RequireITRole")]
+
     public class CreateModel : PageModel
     {
         private readonly ITAssetManager.Data.ApplicationDbContext _context;      

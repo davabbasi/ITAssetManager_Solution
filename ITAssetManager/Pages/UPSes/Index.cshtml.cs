@@ -1,6 +1,7 @@
 ﻿using ITAssetManager.Convertor;
 using ITAssetManager.Data;
 using ITAssetManager.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -8,6 +9,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace ITAssetManager.Pages.UPSes
 {
+    [Authorize(Policy = "RequireITRole")]
     public class IndexModel : PageModel
     {
         private readonly ApplicationDbContext _context;

@@ -9,7 +9,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace ITAssetManager.Pages.Printers
 {
-    [Authorize]
+    [Authorize(Policy = "RequireITRole")]
     public class CartridgeModel : PageModel
     {
 

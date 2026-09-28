@@ -7,7 +7,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace ITAssetManager.Pages.API;
 
-[Authorize]
+[Authorize(Policy = "RequireITRole")]
 public class FreeComponentsModel : PageModel
 {
     private readonly ApplicationDbContext _context;

@@ -9,7 +9,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace ITAssetManager.Pages.Assets;
 
-[Authorize]
+[Authorize(Policy = "RequireITRole")]
 public class CreateModel : PageModel
 {
     private readonly ApplicationDbContext _context;

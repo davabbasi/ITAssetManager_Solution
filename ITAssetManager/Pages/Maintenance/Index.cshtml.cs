@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace ITAssetManager.Pages.Maintenance;
 
-[Authorize]
+[Authorize(Policy = "RequireITRole")]
 public class IndexModel : PageModel
 {
     private readonly ApplicationDbContext _context;

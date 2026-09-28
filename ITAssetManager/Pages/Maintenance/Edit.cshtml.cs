@@ -7,7 +7,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace ITAssetManager.Pages.Maintenance;
 
-[Authorize]
+[Authorize(Policy = "RequireITRole")]
 public class EditModel : PageModel
 {
     private readonly ApplicationDbContext _context;

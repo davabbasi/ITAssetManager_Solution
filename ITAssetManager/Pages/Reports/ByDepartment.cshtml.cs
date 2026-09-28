@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace ITAssetManager.Pages.Reports;
 
-[Authorize]
+[Authorize(Policy = "RequireITRole")]
 public class ByDepartmentModel : PageModel
 {
     private readonly ApplicationDbContext _context;

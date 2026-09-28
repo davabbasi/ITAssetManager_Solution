@@ -11,7 +11,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace ITAssetManager.Pages.Assets;
 
-[Authorize]
+[Authorize(Policy = "RequireITRole")]
 public class IndexModel : PageModel
 {
     private readonly ApplicationDbContext _context;

@@ -7,7 +7,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace ITAssetManager.Pages.Reports;
 
-[Authorize]
+[Authorize(Policy = "RequireITRole")]
 public class ComponentHistoryModel : PageModel
 {
     private readonly ApplicationDbContext _context;

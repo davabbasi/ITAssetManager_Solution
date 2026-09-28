@@ -11,7 +11,7 @@ using static ITAssetManager.Pages.Printers.CartridgeModel;
 
 namespace ITAssetManager.Pages.UPSes
 {
-    [Authorize]
+    [Authorize(Policy = "RequireITRole")]
 
     public class BatteryModel : PageModel
     {

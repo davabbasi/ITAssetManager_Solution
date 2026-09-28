@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace ITAssetManager.Pages.Assignments;
 
-[Authorize]
+[Authorize(Policy = "RequireITRole")]
 public class CreateModel : PageModel
 {
     private readonly ApplicationDbContext _context;

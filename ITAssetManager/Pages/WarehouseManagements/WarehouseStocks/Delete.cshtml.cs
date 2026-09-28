@@ -7,9 +7,11 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
 using ITAssetManager.Data;
 using ITAssetManager.Models;
+using Microsoft.AspNetCore.Authorization;
 
 namespace ITAssetManager.Pages.WarehouseManagements.WarehouseStocks
 {
+    [Authorize(Policy = "RequireAdminRole")]
     public class DeleteModel : PageModel
     {
         private readonly ITAssetManager.Data.ApplicationDbContext _context;

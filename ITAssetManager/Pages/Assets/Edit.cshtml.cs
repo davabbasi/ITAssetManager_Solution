@@ -9,7 +9,7 @@ using ITAssetManager.Convertor;
 using ITAssetManager.Models.DTOs;
 namespace ITAssetManager.Pages.Assets;
 
-[Authorize]
+[Authorize(Policy = "RequireITRole")]
 public class EditModel : PageModel
 {
     private readonly ApplicationDbContext _context;

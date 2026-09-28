@@ -7,7 +7,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace ITAssetManager.Pages.Vendors;
 
-[Authorize]
+[Authorize(Policy = "RequireITRole")]
 public class DetailsModel : PageModel
 {
     private readonly ApplicationDbContext _context;

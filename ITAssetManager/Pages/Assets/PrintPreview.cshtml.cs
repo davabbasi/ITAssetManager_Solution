@@ -13,7 +13,7 @@ using Stimulsoft.Report.Web;
 
 namespace ITAssetManager.Pages.Assets;
 
-[Authorize]
+[Authorize(Policy = "RequireITRole")]
 public class PrintPreviewModel : PageModel
 {
     public IActionResult OnPostGetReport()
