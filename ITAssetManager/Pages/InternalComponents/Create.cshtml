@@ -215,7 +215,19 @@
                         return;
                     }
                     componentSelect.innerHTML = '<option value="">انتخاب قطعه...</option>' +
-                        items.map(i => `<option value="${i.id}" data-name="${i.name}" data-tag="${i.propertyTag || ''}" data-serial="${i.serialNumber || ''}" data-cat="${i.categoryName}">${i.name} ${i.propertyTag ? '(' + i.propertyTag + ')' : ''}</option>`).join('');
+                            items.map(i => `<option
+                            value="${i.id}"
+                            data-name="${i.name}"
+                            data-tag="${i.propertyTag || ''}"
+                            data-serial="${i.serialNumber || ''}"
+                            data-cat="${i.categoryName}">
+                            ${i.id} - ${i.name}
+                            ${i.propertyTag ?
+                                '(' + i.propertyTag + ')' 
+                                : 
+                                ''
+                            }
+                            </option>`).join('');
                     componentSelect.disabled = false;
                 });
         });
