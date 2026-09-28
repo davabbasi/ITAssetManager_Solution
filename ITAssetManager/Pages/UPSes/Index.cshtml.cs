@@ -39,8 +39,12 @@ namespace ITAssetManager.Pages.UPSes
             };
             Departments.Add(vwDepartment);
             var query = BuildQuery();
-            Assets = await query.Where(x => x.CategoryId == 81).OrderBy(a => a.Id).ToListAsync();
+
+            int[] cat = { 81 };
+            int[] status = { 1, 3, 5, 8 };
+            Assets = await query.Where(x => cat.Contains(x.CategoryId) && status.Contains((int)x.Status)).OrderBy(a => a.Id).ToListAsync();
             TotalCount = Assets.Count();
+            
         }
 
         private IQueryable<Asset> BuildQuery()

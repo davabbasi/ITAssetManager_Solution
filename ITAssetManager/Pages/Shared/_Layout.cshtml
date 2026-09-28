@@ -324,97 +324,107 @@
                     </a>
                 </div>
                 <!--مدیریت کالا-->
-                <div class="sidebar-group">
-                    <div class="sidebar-group-header" onclick="toggleGroup(this)">
-                        <span><i class="bi bi-boxes me-1"></i>مدیریت انبار</span>
-                        <i class="bi bi-chevron-down chevron"></i>
-                    </div>
-                    <div class="sidebar-group-items">
-
-                        <a href="/Admin/Categories" class="nav-link-item">
-                            <i class="bi bi-folder2-open"></i> دسته‌بندی‌ کالا
-                        </a>
-                        <a href="/Admin/SpecificationIndex" class="nav-link-item @(Context.Request.Path.StartsWithSegments("/Admin/SpecificationIndex") ? "active" : "")">
-                            <i class="bi bi-list-check"></i> مشخصات فنی
-                        </a>
-                        <a href="/Admin/SpecificationAssign" class="nav-link-item @(Context.Request.Path.StartsWithSegments("/Admin/SpecificationAssign") ? "active" : "")">
-                            <i class="bi bi-link-45deg"></i>انتساب مشخصات فنی
-                        </a>
-
-                        <a href="/WarehouseManagements/Products" class="nav-link-item @(Context.Request.Path.StartsWithSegments("/WarehouseManagements/Products") ? "active" : "")">
-                            <i class="bi  bi-box-seam"></i>  کالا
-                        </a>
-                        <a href="/WarehouseManagements/Keepers" class="nav-link-item @(Context.Request.Path.StartsWithSegments("/WarehouseManagements/Keepers") ? "active" : "")">
-                            <i class="bi bi-people"></i> انباردار
-                        </a>
-                        <a href="/WarehouseManagements/Warehouses" class="nav-link-item @(Context.Request.Path.StartsWithSegments("/WarehouseManagements/Warehouses") ? "active" : "")">
-                            <i class="bi bi-building"></i> انبار
-                        </a>                      
-                        <a href="/WarehouseManagements/Receipts" class="nav-link-item @(Context.Request.Path.StartsWithSegments("/WarehouseManagements/Receipts") ? "active" : "")">
-                            <i class="bi bi-box-arrow-in-down"></i> رسید
-                        </a>                       
-                        <a href="/WarehouseManagements/Issues" class="nav-link-item @(Context.Request.Path.StartsWithSegments("/WarehouseManagements/Issues") ? "active" : "")">
-                            <i class="bi bi-box-arrow-up"></i> حواله
-                        </a>
-                        <a href="/WarehouseManagements/WarehouseTransfers" class="nav-link-item @(Context.Request.Path.StartsWithSegments("/WarehouseManagements/WarehouseTransfers") ? "active" : "")">
-                            <i class="bi bi-arrow-left-right"></i> انتقال بین انباری
-                        </a>
-                        <a href="/WarehouseManagements/WarehouseStocks" class="nav-link-item @(Context.Request.Path.StartsWithSegments("/WarehouseManagements/WarehouseStocks") ? "active" : "")">
-                            <i class="bi bi-bar-chart"></i> گزارش موجودی
-                        </a>
-                        <a href="/WarehouseManagements/InventoryTransactions" class="nav-link-item @(Context.Request.Path.StartsWithSegments("/WarehouseManagements/InventoryTransactions") ? "active" : "")">
-							<i class="bi bi-graph-up-arrow"></i> گزارش تراکنش های انبار 
-                        </a>
-                    </div>
-                </div>
-                <!-- تجهیزات -->
-                <div class="sidebar-group">
-                    <div class="sidebar-group-header" onclick="toggleGroup(this)">
-                        <span><i class="bi bi-cpu me-1"></i>مدیریت تجهیزات</span>
-                        <i class="bi bi-chevron-down chevron"></i>
-                    </div>
-                    <div class="sidebar-group-items">
-                        <a href="/Assets" class="nav-link-item @(Context.Request.Path.StartsWithSegments("/Assets") ? "active" : "")">
-                            <i class="bi bi-cpu"></i>  لیست تجهیزات 
-                        </a>
-                        <a href="/InternalComponents" class="nav-link-item @(Context.Request.Path.StartsWithSegments("/InternalComponents") ? "active" : "")">
-                            <i class="bi bi-pc-display"></i> اسمبل سیستم
-                        </a>
-                        <a href="/Assignments" class="nav-link-item @(Context.Request.Path.StartsWithSegments("/Assignments") ? "active" : "")">
-                            <i class="bi bi-arrow-left-right"></i> جابجایی تجهیزات
-                        </a>
-                        <a href="/Maintenance" class="nav-link-item @(Context.Request.Path.StartsWithSegments("/Maintenance") ? "active" : "")">
-                            <i class="bi bi-tools"></i> تعمیرات
-                        </a>
-                        <a href="/Printers" class="nav-link-item @(Context.Request.Path.StartsWithSegments("/Printers") ? "active" : "")">
-                            <i class="bi bi-printer"></i> مصرف تونر و کارتریج
-                        </a>
-                        <a href="/UPSes" class="nav-link-item @(Context.Request.Path.StartsWithSegments("/UPSes") ? "active" : "")">
-                            <i class="bi bi-lightning-charge "></i> مصرف باتری  UPS
-                        </a>
-                    </div>
-                </div>
-               
-             
-                <!-- خرید تدارکات -->
-                <div class="sidebar-group">
-                    <div class="sidebar-group-header" onclick="toggleGroup(this)">
-                        <span><i class="bi bi-cart3 me-1"></i>خرید تدارکات</span>
-                        <i class="bi bi-chevron-down chevron"></i>
-                    </div>
-                    <div class="sidebar-group-items">
-
-                     @*    <a href="/PurchaseRequests" class="nav-link-item @(Context.Request.Path.StartsWithSegments("/PurchaseRequests") ? "active" : "")">
-                            <i class="bi bi-cart3"></i> درخواست‌های خرید(راهکاران)
-                        </a> *@
-
+                @if (User.IsInRole("Admin") || User.IsInRole("ITUser"))
+                {
+                    <div class="sidebar-group">
+                        <div class="sidebar-group-header" onclick="toggleGroup(this)">
+                            <span><i class="bi bi-boxes me-1"></i>مدیریت انبار</span>
+                            <i class="bi bi-chevron-down chevron"></i>
+                        </div>
                         <div class="sidebar-group-items">
-                            <a href="/Vendors" class="nav-link-item @(Context.Request.Path.StartsWithSegments("/Vendors") ? "active" : "")">
-                                <i class="bi bi-shop"></i> فروشندگان
+
+                            <a href="/Admin/Categories" class="nav-link-item">
+                                <i class="bi bi-folder2-open"></i> دسته‌بندی‌ کالا
+                            </a>
+                            <a href="/Admin/SpecificationIndex" class="nav-link-item @(Context.Request.Path.StartsWithSegments("/Admin/SpecificationIndex") ? "active" : "")">
+                                <i class="bi bi-list-check"></i> مشخصات فنی
+                            </a>
+                            <a href="/Admin/SpecificationAssign" class="nav-link-item @(Context.Request.Path.StartsWithSegments("/Admin/SpecificationAssign") ? "active" : "")">
+                                <i class="bi bi-link-45deg"></i>انتساب مشخصات فنی
+                            </a>
+
+                            <a href="/WarehouseManagements/Products" class="nav-link-item @(Context.Request.Path.StartsWithSegments("/WarehouseManagements/Products") ? "active" : "")">
+                                <i class="bi  bi-box-seam"></i>  کالا
+                            </a>
+                            <a href="/WarehouseManagements/Keepers" class="nav-link-item @(Context.Request.Path.StartsWithSegments("/WarehouseManagements/Keepers") ? "active" : "")">
+                                <i class="bi bi-people"></i> انباردار
+                            </a>
+                            <a href="/WarehouseManagements/Warehouses" class="nav-link-item @(Context.Request.Path.StartsWithSegments("/WarehouseManagements/Warehouses") ? "active" : "")">
+                                <i class="bi bi-building"></i> انبار
+                            </a>
+                            <a href="/WarehouseManagements/Receipts" class="nav-link-item @(Context.Request.Path.StartsWithSegments("/WarehouseManagements/Receipts") ? "active" : "")">
+                                <i class="bi bi-box-arrow-in-down"></i> رسید
+                            </a>
+                            <a href="/WarehouseManagements/Issues" class="nav-link-item @(Context.Request.Path.StartsWithSegments("/WarehouseManagements/Issues") ? "active" : "")">
+                                <i class="bi bi-box-arrow-up"></i> حواله
+                            </a>
+                            <a href="/WarehouseManagements/WarehouseTransfers" class="nav-link-item @(Context.Request.Path.StartsWithSegments("/WarehouseManagements/WarehouseTransfers") ? "active" : "")">
+                                <i class="bi bi-arrow-left-right"></i> انتقال بین انباری
+                            </a>
+                            <a href="/WarehouseManagements/WarehouseStocks" class="nav-link-item @(Context.Request.Path.StartsWithSegments("/WarehouseManagements/WarehouseStocks") ? "active" : "")">
+                                <i class="bi bi-bar-chart"></i> گزارش موجودی
+                            </a>
+                            <a href="/WarehouseManagements/InventoryTransactions" class="nav-link-item @(Context.Request.Path.StartsWithSegments("/WarehouseManagements/InventoryTransactions") ? "active" : "")">
+                                <i class="bi bi-graph-up-arrow"></i> گزارش تراکنش های انبار
                             </a>
                         </div>
                     </div>
-                </div>
+                }
+
+                <!-- تجهیزات -->
+                @if (User.IsInRole("Admin") || User.IsInRole("ITUser"))
+                {
+                    <div class="sidebar-group">
+                        <div class="sidebar-group-header" onclick="toggleGroup(this)">
+                            <span><i class="bi bi-cpu me-1"></i>مدیریت تجهیزات</span>
+                            <i class="bi bi-chevron-down chevron"></i>
+                        </div>
+                        <div class="sidebar-group-items">
+                            <a href="/Assets" class="nav-link-item @(Context.Request.Path.StartsWithSegments("/Assets") ? "active" : "")">
+                                <i class="bi bi-cpu"></i>  لیست تجهیزات
+                            </a>
+                            <a href="/InternalComponents" class="nav-link-item @(Context.Request.Path.StartsWithSegments("/InternalComponents") ? "active" : "")">
+                                <i class="bi bi-pc-display"></i> اسمبل سیستم
+                            </a>
+                            <a href="/Assignments" class="nav-link-item @(Context.Request.Path.StartsWithSegments("/Assignments") ? "active" : "")">
+                                <i class="bi bi-arrow-left-right"></i> جابجایی تجهیزات
+                            </a>
+                            <a href="/Maintenance" class="nav-link-item @(Context.Request.Path.StartsWithSegments("/Maintenance") ? "active" : "")">
+                                <i class="bi bi-tools"></i> تعمیرات
+                            </a>
+                            <a href="/Printers" class="nav-link-item @(Context.Request.Path.StartsWithSegments("/Printers") ? "active" : "")">
+                                <i class="bi bi-printer"></i> مصرف تونر و کارتریج
+                            </a>
+                            <a href="/UPSes" class="nav-link-item @(Context.Request.Path.StartsWithSegments("/UPSes") ? "active" : "")">
+                                <i class="bi bi-lightning-charge "></i> مصرف باتری  UPS
+                            </a>
+                        </div>
+                    </div>
+                }
+                         
+                <!-- خرید تدارکات -->
+                @if (User.IsInRole("Admin"))
+                {
+                    <div class="sidebar-group">
+                        <div class="sidebar-group-header" onclick="toggleGroup(this)">
+                            <span><i class="bi bi-cart3 me-1"></i>خرید تدارکات</span>
+                            <i class="bi bi-chevron-down chevron"></i>
+                        </div>
+                        <div class="sidebar-group-items">
+
+                            @*    <a href="/PurchaseRequests" class="nav-link-item @(Context.Request.Path.StartsWithSegments("/PurchaseRequests") ? "active" : "")">
+                            <i class="bi bi-cart3"></i> درخواست‌های خرید(راهکاران)
+                        </a> *@
+
+                            <div class="sidebar-group-items">
+                                <a href="/Vendors" class="nav-link-item @(Context.Request.Path.StartsWithSegments("/Vendors") ? "active" : "")">
+                                    <i class="bi bi-shop"></i> فروشندگان
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                }
+                
                 <!-- گزارش‌ها -->
                 <div class="sidebar-group">
                     <div class="sidebar-group-header" onclick="toggleGroup(this)">

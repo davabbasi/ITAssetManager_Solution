@@ -28,13 +28,21 @@ public class IndexModel : PageModel
     public List<VwDepartment> Departments { get; set; } = new();
     public List<VwEmployee> Employees { get; set; } = new();
     public int TotalCount { get; set; }
+
+    public int PageSize { get; set; } = 12;
+
+    [BindProperty(SupportsGet = true)]
+    public int PageNumber { get; set; } = 1;
+
+    public int TotalPages { get; set; }
+
     public Dictionary<int, string> ComponentLocations { get; set; } = new();
     [BindProperty(SupportsGet = true)] public string? Search { get; set; }
     [BindProperty(SupportsGet = true)] public int? CategoryId { get; set; }
     [BindProperty(SupportsGet = true)] public int? Status { get; set; }
     [BindProperty(SupportsGet = true)] public int? DepartmentId { get; set; }
     [BindProperty(SupportsGet = true)] public int? EmployeeId { get; set; }
-
+  
     public SelectList StatusSelect { get; set; } = null!;
     private IQueryable<Asset> BuildQuery()
     {
@@ -79,11 +87,22 @@ public class IndexModel : PageModel
             Name="انفورماتیک"
         };
         Departments.Add(vwDepartment);
-
         var query = BuildQuery();
 
         TotalCount = await query.CountAsync();
-        Assets = await query.OrderBy(a => a.Id).ToListAsync();
+
+        TotalPages = (int)Math.Ceiling((double)TotalCount / PageSize);
+
+        if (PageNumber < 1)
+            PageNumber = 1;
+
+        if (TotalPages > 0 && PageNumber > TotalPages)
+            PageNumber = TotalPages;
+
+        Assets = await query
+            .Skip((PageNumber - 1) * PageSize)
+            .Take(PageSize)
+            .ToListAsync();
 
         var assemblyComponents = await _context.AssemblyComponents
             .Include(x => x.PcAsset)

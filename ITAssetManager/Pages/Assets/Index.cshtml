@@ -230,6 +230,63 @@
             </div>
         }
     </div>
+    <div class="d-flex justify-content-center align-items-center gap-2 mt-3">
+
+        <a asp-page="./Index"
+           asp-route-pageNumber="1"
+           asp-route-Search="@Model.Search"
+           asp-route-CategoryId="@Model.CategoryId"
+           asp-route-Status="@Model.Status"
+           asp-route-DepartmentId="@Model.DepartmentId"
+           asp-route-EmployeeId="@Model.EmployeeId"
+           class="btn btn-outline-primary">
+            اولین صفحه
+        </a>
+
+        <a asp-page="./Index"
+           asp-route-pageNumber="@(Model.PageNumber - 1)"
+           asp-route-Search="@Model.Search"
+           asp-route-CategoryId="@Model.CategoryId"
+           asp-route-Status="@Model.Status"
+           asp-route-DepartmentId="@Model.DepartmentId"
+           asp-route-EmployeeId="@Model.EmployeeId"
+           class="btn btn-outline-primary">
+            صفحه قبل
+        </a>
+
+        <input type="text"
+               value="@Model.PageNumber"
+               class="form-control text-center"
+               style="width:70px;"
+               readonly />
+
+        <span>
+            از @Model.TotalPages
+        </span>
+
+        <a asp-page="./Index"
+           asp-route-pageNumber="@(Model.PageNumber + 1)"
+           asp-route-Search="@Model.Search"
+           asp-route-CategoryId="@Model.CategoryId"
+           asp-route-Status="@Model.Status"
+           asp-route-DepartmentId="@Model.DepartmentId"
+           asp-route-EmployeeId="@Model.EmployeeId"
+           class="btn btn-outline-primary">
+            صفحه بعدی
+        </a>
+
+        <a asp-page="./Index"
+           asp-route-pageNumber="@Model.TotalPages"
+           asp-route-Search="@Model.Search"
+           asp-route-CategoryId="@Model.CategoryId"
+           asp-route-Status="@Model.Status"
+           asp-route-DepartmentId="@Model.DepartmentId"
+           asp-route-EmployeeId="@Model.EmployeeId"
+           class="btn btn-outline-primary">
+            آخرین صفحه
+        </a>
+
+    </div>
 </div>
 
 <style>

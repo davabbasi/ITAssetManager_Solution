@@ -40,14 +40,30 @@ builder.Services.AddAuthentication(options =>
 {
     options.LoginPath = "/Account/Login";
     options.LogoutPath = "/Account/Logout";
-    options.AccessDeniedPath = "/Account/Login";
+    options.AccessDeniedPath = "/Account/AccessDenied";
     options.ExpireTimeSpan = TimeSpan.FromDays(14);
     options.SlidingExpiration = false;
 });
 
 builder.Services.AddAuthorization(options =>
 {
-    options.AddPolicy("RequireAdminRole", policy => policy.RequireRole("Admin"));
+    // فقط مدیر سیستم
+    options.AddPolicy(
+        "RequireAdminRole",
+        policy => policy.RequireRole("Admin"));
+
+    // مدیر + IT
+    options.AddPolicy(
+        "RequireITRole",
+        policy => policy.RequireRole("Admin", "ITUser"));
+
+    // مدیر + IT + Finance
+    options.AddPolicy(
+        "RequireFinanceRole",
+        policy => policy.RequireRole(
+            "Admin",
+            "ITUser",
+            "FinanceUser"));
 });
 
 QuestPDF.Settings.License = QuestPDF.Infrastructure.LicenseType.Community;
@@ -90,7 +106,7 @@ using (var scope = app.Services.CreateScope())
     var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
     var userManager = scope.ServiceProvider.GetRequiredService<UserManager<IdentityUser>>();
 
-    string[] roles = { "Admin", "User" };
+    string[] roles = {  "Admin","ITUser","FinanceUser" };
     foreach (var role in roles)
     {
         if (!await roleManager.RoleExistsAsync(role))

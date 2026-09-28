@@ -54,20 +54,31 @@ public class UsersModel : PageModel
     public async Task<IActionResult> OnPostToggleRoleAsync(string userId)
     {
         var user = await _userManager.FindByIdAsync(userId);
-        if (user == null) return RedirectToPage();
+
+        if (user == null)
+            return RedirectToPage();
+
+        if (await _userManager.IsInRoleAsync(user, "FinanceUser"))
+        {
+            TempData["ToggleRoleError"] = "کاربر مالی قابل تغییر از این بخش نیست.";
+            return RedirectToPage();
+        }
 
         if (await _userManager.IsInRoleAsync(user, "Admin"))
         {
             await _userManager.RemoveFromRoleAsync(user, "Admin");
-            await _userManager.AddToRoleAsync(user, "User");
-            TempData["Success"] = "نقش کاربر به User تغییر یافت.";
+            await _userManager.AddToRoleAsync(user, "ITUser");
+
+            TempData["ToggleRoleSuccess"] = "نقش کاربر به ITUser تغییر یافت.";
         }
-        else
+        else if (await _userManager.IsInRoleAsync(user, "ITUser"))
         {
-            await _userManager.RemoveFromRoleAsync(user, "User");
+            await _userManager.RemoveFromRoleAsync(user, "ITUser");
             await _userManager.AddToRoleAsync(user, "Admin");
-            TempData["Success"] = "نقش کاربر به Admin تغییر یافت.";
+
+            TempData["ToggleRoleSuccess"] = "نقش کاربر به Admin تغییر یافت.";
         }
+
         return RedirectToPage();
     }
 

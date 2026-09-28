@@ -1,12 +1,15 @@
 ﻿using System.Threading.Tasks;
 using ITAssetManager.Data;
 using ITAssetManager.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
 
 namespace ITAssetManager.Pages.Admin
 {
+    [Authorize(Policy = "RequireAdminRole")]
+
     public class SpecificationIndex : PageModel
     {
         private readonly ApplicationDbContext _context;

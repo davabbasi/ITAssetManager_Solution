@@ -6,7 +6,8 @@ using Microsoft.EntityFrameworkCore;
 
 namespace ITAssetManager.Pages.Admin;
 
-[Authorize]
+[Authorize(Policy = "RequireAdminRole")]
+
 public class ViewEmployeesModel : PageModel
 {
     private readonly ApplicationDbContext _context;

@@ -4,16 +4,16 @@
     ViewData["Title"] = "مدیریت کاربران";
 }
 
-@if (TempData["Success"] != null)
+@if (TempData["ToggleRoleSuccess"] != null)
 {
     <div class="alert alert-success alert-dismissible">
-        @TempData["Success"] <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        @TempData["ToggleRoleSuccess"] <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
     </div>
 }
-@if (TempData["Error"] != null)
+@if (TempData["ToggleRoleSuccess"] != null)
 {
     <div class="alert alert-danger alert-dismissible">
-        @TempData["Error"] <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        @TempData["ToggleRoleSuccess"] <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
     </div>
 }
 
@@ -35,8 +35,10 @@
                     <div class="mb-3">
                         <label class="form-label">نقش</label>
                         <select name="role" class="form-select">
-                            <option value="User">کاربر عادی</option>
+                            <option value="ITUser">کاربر واحد انفورماتیک</option>
                             <option value="Admin">مدیر (Admin)</option>
+                            <option value="FinanceUser">کاربر واحد مالی</option>
+
                         </select>
                     </div>
                     <button type="submit" class="btn btn-primary btn-sm w-100">
@@ -95,7 +97,7 @@
                                 </td>
                                 <td>
                                     <span class="badge @(isAdmin ? "bg-primary" : "bg-secondary")">
-                                        @(isAdmin ? "Admin" : "User")
+                                        @(isAdmin ? "Admin" : "ITUser")
                                     </span>
                                 </td>
                                 <td>
@@ -105,7 +107,7 @@
                                             <form method="post" asp-page-handler="ToggleRole">
                                                 <input type="hidden" name="userId" value="@user.Id" />
                                                 <button type="submit" class="btn btn-xs @(isAdmin ? "btn-outline-secondary" : "btn-outline-primary")">
-                                                    @(isAdmin ? "تبدیل به User" : "تبدیل به Admin")
+                                                    @(isAdmin ? "تبدیل به ITUser" : "تبدیل به Admin")
                                                 </button>
                                             </form>
                                             <form method="post" asp-page-handler="DeleteUser"
