@@ -347,7 +347,7 @@ namespace ITAssetManager.Pages.Printers
                     x.Quantity > 0 &&
                     x.Product.Category != null &&
                     x.Product.Category.Type == AssetCategoryType.Consumable&&
-                    x.Product.CategoryId==31)
+                    x.Product.CategoryId==165)
                 .Select(x => new CartridgeProductViewModel
                 {
                     ProductId = x.ProductId,
