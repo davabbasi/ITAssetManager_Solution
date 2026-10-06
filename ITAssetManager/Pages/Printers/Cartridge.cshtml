@@ -121,6 +121,17 @@
                     </div>
                 </div>
 
+
+                <div class="col-md-4">
+                    <div class="text-muted small">
+                        توضیحات
+                    </div>
+
+                    <div class="fw-bold">
+                        @Model.Printer.Notes
+                    </div>
+                </div>
+
             </div>
 
         </div>
@@ -144,6 +155,17 @@
 
                 <div class="row">
 
+                    <!--انبار-->
+                    <div class="col-md-4 mb-3">
+                        <label class="form-label">انبار </label>
+                        <select asp-for="WarehouseIssue.WarehouseId"
+                                asp-items="Model.WarehouseList"
+                                id="fromWarehouseSelect"
+                                class="form-select">
+                            <option value="">انتخاب کنید...</option>
+                        </select>
+                    </div>
+
                     <!-- کارتریج -->
                     <div class="col-md-4 mb-3">
 
@@ -153,18 +175,12 @@
                         </label>
 
                         <select asp-for="ProductId"
+                                id="cartridgeSelect"
                                 class="form-select">
 
                             <option value="">
                                 انتخاب کارتریج...
                             </option>
-
-                            @foreach (var product in Model.CartridgeProducts)
-                            {
-                                <option value="@product.ProductId">
-                                    @product.ProductName - موجودی: @product.Quantity
-                                </option>
-                            }
 
                         </select>
 
@@ -350,3 +366,114 @@
     </div>
 
 </div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+
+        let warehouseStocks = [];
+
+        const warehouseSelect =
+            document.getElementById("fromWarehouseSelect");
+
+        const cartridgeSelect =
+            document.getElementById("cartridgeSelect");
+
+
+        warehouseSelect.addEventListener("change", async function () {
+
+            const warehouseId = this.value;
+
+
+            // -----------------------------
+            // اگر انبار انتخاب نشده
+            // -----------------------------
+
+            if (!warehouseId) {
+
+                warehouseStocks = [];
+
+                cartridgeSelect.innerHTML = `
+                    <option value="">
+                        انتخاب کارتریج...
+                    </option>
+                `;
+
+                return;
+            }
+
+
+            // -----------------------------
+            // دریافت موجودی کارتریج‌های انبار
+            // -----------------------------
+
+            try {
+
+                const response = await fetch(
+                    `/Printers/Cartridge?handler=WarehouseStock&warehouseId=${warehouseId}`
+                );
+
+
+                if (!response.ok) {
+
+                    alert("خطا در دریافت موجودی انبار");
+                    return;
+                }
+
+
+                warehouseStocks = await response.json();
+
+
+                console.log("Warehouse:", warehouseId);
+                console.log("Cartridge Stocks:", warehouseStocks);
+
+
+                // -----------------------------
+                // پاک کردن لیست قبلی
+                // -----------------------------
+
+                cartridgeSelect.innerHTML = `
+                    <option value="">
+                        انتخاب کارتریج...
+                    </option>
+                `;
+
+
+                // -----------------------------
+                // اضافه کردن کارتریج‌های جدید
+                // -----------------------------
+
+                warehouseStocks.forEach(item => {
+
+                    const option =
+                        document.createElement("option");
+
+
+                    option.value = item.productId;
+
+
+                    option.textContent =
+                        `${item.productName} - موجودی: ${item.quantity}`;
+
+
+                    cartridgeSelect.appendChild(option);
+
+                });
+
+            }
+            catch (error) {
+
+                console.error(
+                    "خطا در دریافت کارتریج‌ها:",
+                    error
+                );
+
+                alert("خطایی در دریافت کارتریج‌ها رخ داد.");
+
+            }
+
+        });
+
+    });
+</script>
+
+

@@ -5,6 +5,7 @@ using ITAssetManager.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 
 namespace ITAssetManager.Pages.Printers
@@ -23,6 +24,8 @@ namespace ITAssetManager.Pages.Printers
         public Asset Printer { get; set; } = null!;
 
         public List<CartridgeConsumption> Consumptions { get; set; } = new();
+        [BindProperty] public WarehouseIssue WarehouseIssue { get; set; } = default!;
+        public SelectList WarehouseList { get; set; } = null!;
 
         // -----------------------------
         // اطلاعات فرم مصرف کارتریج
@@ -42,6 +45,7 @@ namespace ITAssetManager.Pages.Printers
 
         public class CartridgeProductViewModel
         {
+            public string? WarehouseName { get; set; }
             public int ProductId { get; set; }
 
             public string ProductName { get; set; } = string.Empty;
@@ -49,6 +53,7 @@ namespace ITAssetManager.Pages.Printers
             public decimal Quantity { get; set; }
         }
 
+        [BindProperty]
         public List<CartridgeProductViewModel> CartridgeProducts { get; set; } = new();
 
         public async Task<IActionResult> OnGetAsync(int id)
@@ -58,12 +63,37 @@ namespace ITAssetManager.Pages.Printers
             if (Printer == null)
                 return NotFound();
 
-            await LoadCartridgeProducts();
+            //await LoadCartridgeProducts();
             await LoadConsumptions(id);
 
             ConsumptionShamsiDate = DateTime.Now.ToShamsi();
-
+            WarehouseList = new SelectList(
+                await _context.Warehouses.Where(w => w.IsITWarehouse == true && w.Type == WarehouseType.Main)
+                .OrderBy(x => x.WarehouseName)
+                .ToListAsync(),"Id","WarehouseName");
             return Page();
+        }
+        public async Task<IActionResult> OnGetWarehouseStockAsync(int warehouseId)
+        {
+            var stocks = await _context.WarehouseStocks
+                .Where(x =>
+                    x.WarehouseId == warehouseId &&
+                    x.Quantity > 0 &&
+                    x.Product.Category != null &&
+                    x.Product.Category.Type == AssetCategoryType.Consumable &&
+                    x.Product.CategoryId == 165
+                )
+                .Select(x => new
+                {
+                    productId = x.ProductId,
+                    productName = x.Product.ProductName,
+                    quantity = x.Quantity,
+                    warehouseName = x.Warehouse.WarehouseName
+                })
+                .OrderBy(x => x.productName)
+                .ToListAsync();
+
+            return new JsonResult(stocks);
         }
 
         // ==========================================
@@ -77,7 +107,7 @@ namespace ITAssetManager.Pages.Printers
             if (Printer == null)
                 return NotFound();
 
-            await LoadCartridgeProducts();
+            //await LoadCartridgeProducts();
 
             // -----------------------------
             // اعتبارسنجی اولیه
@@ -119,13 +149,14 @@ namespace ITAssetManager.Pages.Printers
             var warehouse = await _context.Warehouses
                 .FirstOrDefaultAsync(w =>
                     w.IsITWarehouse &&
-                    w.Type == WarehouseType.Main);
+                    w.Type == WarehouseType.Main&&
+                    w.Id== WarehouseIssue.WarehouseId);
 
             if (warehouse == null)
             {
                 ModelState.AddModelError(
                     "",
-                    "انبار اصلی انفورماتیک پیدا نشد.");
+                    "انبار  پیدا نشد.");
 
                 await LoadConsumptions(id);
                 return Page();
@@ -328,7 +359,7 @@ namespace ITAssetManager.Pages.Printers
         // کارتریج‌ها
         // ==========================================
 
-        private async Task LoadCartridgeProducts()
+        private async Task LoadCartridgeProducts(int warehouseID)
         {
             var warehouse = await _context.Warehouses
                 .FirstOrDefaultAsync(w =>
@@ -343,13 +374,15 @@ namespace ITAssetManager.Pages.Printers
 
             CartridgeProducts = await _context.WarehouseStocks
                 .Where(x =>
-                    x.WarehouseId == warehouse.Id &&
+                    x.Warehouse.Type == WarehouseType.Main &&
+                    x.WarehouseId== warehouseID &&
                     x.Quantity > 0 &&
                     x.Product.Category != null &&
                     x.Product.Category.Type == AssetCategoryType.Consumable&&
                     x.Product.CategoryId==165)
                 .Select(x => new CartridgeProductViewModel
                 {
+                    WarehouseName=x.Warehouse.WarehouseName,
                     ProductId = x.ProductId,
                     ProductName = x.Product.ProductName!,
                     Quantity = x.Quantity
