@@ -4,6 +4,7 @@
     ViewData["Title"] = "ثبت تعمیر / مشکل";
 }
 
+
 <div class="row justify-content-center">
     <div class="col-lg-7">
         <div class="card">
@@ -33,7 +34,7 @@
 
                             <select asp-for="Log.AssetId"
                                     asp-items="Model.AssetList"
-                                    class="form-select">
+                                    class="form-select" class="form-select searchable-select">
                                 <option value="">انتخاب تجهیز...</option>
                             </select>
                             <span asp-validation-for="Log.AssetId"
@@ -121,3 +122,21 @@
         </div>
     </div>
 </div>
+<script>
+    $(document).ready(function () {
+        $('.searchable-select').select2({
+            placeholder: 'جستجو و انتخاب کنید...',
+            allowClear: true,
+            width: '100%',
+            dir: 'rtl',
+            language: {
+                noResults: function () {
+                    return 'موردی پیدا نشد';
+                },
+                searching: function () {
+                    return 'در حال جستجو...';
+                }
+            }
+        });
+    });
+</script>

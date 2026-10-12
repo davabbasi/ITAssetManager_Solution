@@ -16,6 +16,7 @@ public class IndexModel : PageModel
     public int ActiveAssets { get; set; }
     public int UnderRepair { get; set; }
     public int WarrantyExpiringSoon { get; set; }
+    public List<MaintenanceLog> Logs { get; set; } = new();
 
     public List<Asset> RecentAssets { get; set; } = new();
     public List<Asset> ExpiringWarrantyAssets { get; set; } = new();
@@ -27,7 +28,6 @@ public class IndexModel : PageModel
 
         TotalAssets = await assets.CountAsync();
         ActiveAssets = await assets.CountAsync(a => a.Status == AssetStatus.Active);
-        UnderRepair = await assets.CountAsync(a => a.Status == AssetStatus.UnderRepair);
 
         var in60Days = DateTime.Today.AddDays(60);
         WarrantyExpiringSoon = await assets.CountAsync(a =>
@@ -46,6 +46,14 @@ public class IndexModel : PageModel
             .Select(g => new CategoryCount { CategoryName = g.Key, Count = g.Count() })
             .OrderByDescending(x => x.Count)
             .Take(6).ToListAsync();
+
+        Logs = await _context.MaintenanceLogs
+           .Include(m => m.Asset)
+           .OrderByDescending(m => m.StartDate)
+           .ToListAsync();
+
+        UnderRepair = Logs.Count(m => !m.IsResolved);
+
     }
 
     public class CategoryCount

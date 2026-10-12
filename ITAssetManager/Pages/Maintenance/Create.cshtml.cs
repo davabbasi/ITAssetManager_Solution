@@ -67,7 +67,7 @@ public class CreateModel : PageModel
     {
         AssetList = new SelectList(
             await _context.Assets.OrderBy(a => a.Name)
-                .Select(a => new { a.Id, Name = a.Name + (a.PropertyTag != null ? " (" + a.PropertyTag + ")" : "") })
+                .Select(a => new { a.Id, Name =a.Id + "_"+ a.Name+ "_"+a.Model + (a.PropertyTag != null ? " (" + a.PropertyTag + ")" : "") })
                 .ToListAsync(), "Id", "Name");
     }
 }
