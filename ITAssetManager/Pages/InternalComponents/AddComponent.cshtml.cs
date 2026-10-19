@@ -48,7 +48,7 @@ public class AddComponentModel : PageModel
         // 2. دسته‌بندی قطعات قابل نصب
 
         InstalledCategories = await _context.Categories
-            .Where(c => c.Type == AssetCategoryType.Installed)
+            .Where(c => c.Type == AssetCategoryType.Installed || c.Type==AssetCategoryType.Tagged_Installed)
             .OrderBy(c => c.Name)
             .ToListAsync();
 

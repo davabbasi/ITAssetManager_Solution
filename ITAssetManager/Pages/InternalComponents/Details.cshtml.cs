@@ -119,6 +119,8 @@ public class DetailsModel : PageModel
 
         try
         {
+
+
             // =====================================================
             // 6. پیدا کردن موجودی کالا
             // =====================================================
@@ -175,6 +177,7 @@ public class DetailsModel : PageModel
             component.EmployeeName = assetWarehouse.Keeper.FullName;
             component.DepartmentId= assetWarehouse.WarehouseOwnerID;
             component.DepartmentName = assetWarehouse.WarehouseOwner;
+            component.IsAssembled = false;
 
             // =====================================================
             // 10. ایجاد رسید برگشت
