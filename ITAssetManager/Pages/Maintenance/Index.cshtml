@@ -52,6 +52,8 @@
                         <th>تکنسین</th>
                         <th>هزینه</th>
                         <th>وضعیت</th>
+                        <th>تاریخ برگشت</th>
+
                         <th></th>
                     </tr>
                 </thead>
@@ -83,6 +85,8 @@
                                     @(m.IsResolved ? "حل شده" : "در جریان")
                                 </span>
                             </td>
+                            <td><small>@(m.EndDate.HasValue ? m.EndDate.Value.ToShamsi():"-") </small></td>
+
                             <td>
                                 <a href="/Maintenance/Edit/@m.Id" class="btn btn-xs btn-outline-secondary" title="ویرایش">
                                     <i class="bi bi-pencil"></i>

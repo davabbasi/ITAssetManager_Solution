@@ -163,66 +163,72 @@
     </div>
 </div>
 
-<div class="modal fade" id="removeComponentModal"tabindex="-1" aria-hidden="true">
+
+<div class="modal fade" id="removeComponentModal"
+     tabindex="-1" aria-hidden="true">
 
     <div class="modal-dialog modal-dialog-centered">
-
         <div class="modal-content">
 
-            <div class="modal-header">
-                <h5 class="modal-title">خارج‌کردن قطعه از اسمبل</h5>
+            <form method="post"
+                  asp-page-handler="RemoveComponent">
 
-                <button type="button"
-                        class="btn-close ms-0"
-                        data-bs-dismiss="modal"
-                        aria-label="بستن">
-                </button>
-            </div>
+                <div class="modal-header">
+                    <h5 class="modal-title">خارج‌کردن قطعه از اسمبل</h5>
 
-            <div class="modal-body">
+                    <button type="button"
+                            class="btn-close ms-0"
+                            data-bs-dismiss="modal"
+                            aria-label="بستن">
+                    </button>
+                </div>
 
-                <p>
-                    قطعه:
-                    <strong id="removeComponentName"></strong>
-                </p>
+                <div class="modal-body">
 
-                <input type="hidden"
-                       id="removeComponentId" />
+                    <p>
+                        قطعه:
+                        <strong id="removeComponentName"></strong>
+                    </p>
 
-                <label for="destinationWarehouseId"
-                       class="form-label">
-                    انبار مقصد
-                </label>
+                    <input type="hidden"
+                           id="removeComponentId"
+                           name="assemblyComponentId" />
 
-                <label for="destinationWarehouseId" class="form-label">
-                    انبار مقصد
-                </label>
+                    <label for="destinationWarehouseId"
+                           class="form-label">
+                        انبار مقصد
+                    </label>
 
-                <select id="destinationWarehouseId"
-                        name="destinationWarehouseId"
-                        class="form-select"
-                        required
-                        asp-items="Model.AssetWarehouses">
-                    <option value="">انتخاب انبار...</option>
-                </select>
+                    <select id="destinationWarehouseId"
+                            name="destinationWarehouseId"
+                            class="form-select"
+                            asp-items="Model.AssetWarehouses"
+                            required>
+                        <option value="">انتخاب انبار...</option>
+                    </select>
 
-            </div>
+                    <input type="hidden"
+                           name="id"
+                           value="@Model.PcAsset.Id" />
 
-            <div class="modal-footer">
+                </div>
 
-                <button type="button"
-                        class="btn btn-secondary"
-                        data-bs-dismiss="modal">
-                    انصراف
-                </button>
+                <div class="modal-footer">
 
-                <button type="button"
-                        class="btn btn-danger"
-                        id="confirmRemoveComponent">
-                    تأیید خروج
-                </button>
+                    <button type="button"
+                            class="btn btn-secondary"
+                            data-bs-dismiss="modal">
+                        انصراف
+                    </button>
 
-            </div>
+                    <button type="submit"
+                            class="btn btn-danger">
+                        تأیید خروج
+                    </button>
+
+                </div>
+
+            </form>
 
         </div>
     </div>

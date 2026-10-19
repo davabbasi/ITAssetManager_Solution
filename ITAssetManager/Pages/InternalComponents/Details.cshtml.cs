@@ -45,8 +45,7 @@ public class DetailsModel : PageModel
 
         var pc = await _context.Assets
             .FirstOrDefaultAsync(a =>
-                a.Id == id &&
-                a.IsAssembled);
+                a.Id == id );
 
         if (pc == null)
         {
