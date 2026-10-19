@@ -4,14 +4,14 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
-
+using Microsoft.AspNetCore.Mvc.Rendering;
 namespace ITAssetManager.Pages.Assembly;
 
 [Authorize(Policy = "RequireITRole")]
 public class AddComponentModel : PageModel
 {
     private readonly ApplicationDbContext _context;
-
+    public SelectList AssetWarehouses { get; set; } = null!;
     public AddComponentModel(ApplicationDbContext context)
     {
         _context = context;
@@ -28,6 +28,7 @@ public class AddComponentModel : PageModel
 
     public async Task<IActionResult> OnGetAsync(int pcId)
     {
+        await LoadAssetWarehousesAsync();
         // 1. پیدا کردن سیستم اسمبل‌شده
 
         var pc = await _context.Assets
@@ -379,5 +380,22 @@ public class AddComponentModel : PageModel
             .ToListAsync();
 
         return Page();
+    }
+    private async Task LoadAssetWarehousesAsync()
+    {
+        var warehouses = await _context.Warehouses
+            .Where(w => w.IsAssetWarehouse)
+            .OrderBy(w => w.WarehouseName)
+            .Select(w => new
+            {
+                w.Id,
+                w.WarehouseName
+            })
+            .ToListAsync();
+
+        AssetWarehouses = new SelectList(
+            warehouses,
+            "Id",
+            "WarehouseName");
     }
 }

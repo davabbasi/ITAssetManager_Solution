@@ -1,5 +1,6 @@
 ﻿@page
 @model ITAssetManager.Pages.Assembly.AddComponentModel
+
 @{
     ViewData["Title"] = "افزودن قطعه";
 }
@@ -8,9 +9,12 @@
     <div class="col-lg-6">
         <div class="card">
             <div class="card-header">
-                <i class="bi bi-plus-circle me-2"></i>افزودن قطعه به سیستم #@Model.PcAsset.AssemblyNumber
+                <i class="bi bi-plus-circle me-2"></i>
+                افزودن قطعه به سیستم #@Model.PcAsset.AssemblyNumber
             </div>
+
             <div class="card-body">
+
                 @if (!ViewData.ModelState.IsValid)
                 {
                     <div class="alert alert-danger">
@@ -23,31 +27,70 @@
                         </ul>
                     </div>
                 }
+
                 <form method="post">
-                    <input type="hidden" name="pcId" value="@Model.PcAsset.Id" />
+                    <input type="hidden"
+                           name="pcId"
+                           value="@Model.PcAsset.Id" />
 
                     <div class="mb-3">
-                        <label class="form-label">دسته‌بندی قطعه</label>
-                        <select id="categorySelect" class="form-select">
-                            <option value="">انتخاب دسته‌بندی...</option>
+                        <label for="warehouseSelect" class="form-label">
+                            انبار مبدأ
+                        </label>
+
+                        <select id="warehouseSelect"
+                                name="warehouseId"
+                                class="form-select"
+                                asp-items="Model.AssetWarehouses"
+                                required>
+                            <option value="">ابتدا انبار را انتخاب کنید</option>
+                        </select>
+
+                        <div class="form-text">
+                            فقط قطعات موجود در انبار انتخاب‌شده نمایش داده می‌شوند.
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="categorySelect" class="form-label">
+                            دسته‌بندی قطعه
+                        </label>
+
+                        <select id="categorySelect"
+                                class="form-select"
+                                disabled>
+                            <option value="">ابتدا انبار را انتخاب کنید</option>
                             @foreach (var cat in Model.InstalledCategories)
                             {
                                 <option value="@cat.Id">@cat.Name</option>
                             }
                         </select>
                     </div>
+
                     <div class="mb-4">
-                        <label class="form-label">قطعه آزاد</label>
-                        <select name="componentId" id="componentSelect" class="form-select" disabled required>
-                            <option value="">ابتدا دسته‌بندی را انتخاب کنید</option>
+                        <label for="componentSelect" class="form-label">
+                            قطعه آزاد
+                        </label>
+
+                        <select name="componentId"
+                                id="componentSelect"
+                                class="form-select"
+                                disabled
+                                required>
+                            <option value="">ابتدا انبار و دسته‌بندی را انتخاب کنید</option>
                         </select>
                     </div>
 
                     <div class="d-flex gap-2">
                         <button type="submit" class="btn btn-primary">
-                            <i class="bi bi-check-lg me-1"></i>افزودن
+                            <i class="bi bi-check-lg me-1"></i>
+                            افزودن
                         </button>
-                        <a href="/InternalComponents/Details/@Model.PcAsset.Id" class="btn btn-outline-secondary">انصراف</a>
+
+                        <a href="/InternalComponents/Details/@Model.PcAsset.Id"
+                           class="btn btn-outline-secondary">
+                            انصراف
+                        </a>
                     </div>
                 </form>
             </div>
@@ -57,32 +100,101 @@
 
 @section Scripts {
     <script>
-        document.getElementById('categorySelect').addEventListener('change', function () {
-            const categoryId = this.value;
-            const sel = document.getElementById('componentSelect');
-            sel.innerHTML = '<option>در حال بارگذاری...</option>';
-            sel.disabled = true;
+        document.addEventListener('DOMContentLoaded', function () {
 
-            if (!categoryId) {
-                sel.innerHTML = '<option value="">ابتدا دسته‌بندی را انتخاب کنید</option>';
-                return;
+            const warehouseSelect =
+                document.getElementById('warehouseSelect');
+
+            const categorySelect =
+                document.getElementById('categorySelect');
+
+            const componentSelect =
+                document.getElementById('componentSelect');
+
+            function resetComponents(message) {
+                componentSelect.innerHTML = '';
+
+                const option = document.createElement('option');
+                option.value = '';
+                option.textContent = message;
+
+                componentSelect.appendChild(option);
+                componentSelect.disabled = true;
             }
 
-            fetch('/Api/FreeComponents?categoryId=' + categoryId)
-                .then(r => r.json())
-                .then(items => {
-                    if (!items || items.length === 0) {
-                        sel.innerHTML = '<option value="">قطعه آزادی موجود نیست</option>';
-                        return;
+            function resetCategories(message) {
+                categorySelect.value = '';
+                categorySelect.disabled = true;
+                resetComponents('ابتدا انبار و دسته‌بندی را انتخاب کنید');
+            }
+
+            warehouseSelect.addEventListener('change', function () {
+
+                resetCategories('ابتدا انبار را انتخاب کنید');
+
+                if (!this.value) {
+                    return;
+                }
+
+                categorySelect.disabled = false;
+                categorySelect.value = '';
+
+                resetComponents('ابتدا دسته‌بندی را انتخاب کنید');
+            });
+
+            categorySelect.addEventListener('change', async function () {
+
+                const categoryId = this.value;
+                const warehouseId = warehouseSelect.value;
+
+                resetComponents('در حال بارگذاری قطعات...');
+
+                if (!warehouseId || !categoryId) {
+                    resetComponents('ابتدا انبار و دسته‌بندی را انتخاب کنید');
+                    return;
+                }
+
+                try {
+                    const url =
+                        `/Api/FreeComponents?warehouseId=${encodeURIComponent(warehouseId)}&categoryId=${encodeURIComponent(categoryId)}`;
+
+                    const response = await fetch(url);
+
+                    if (!response.ok) {
+                        throw new Error('دریافت قطعات ناموفق بود.');
                     }
-                    sel.innerHTML = '<option value="">انتخاب قطعه...</option>' +
-                        items.map(i => 
-                            `<option value="${i.id}">
-                                    کد قطعه  ${i.id}  : ${i.name}
-                  
-                          </option>`).join('-');
-                    sel.disabled = false;
-                });
+
+                    const items = await response.json();
+
+                    resetComponents(
+                        items.length === 0
+                            ? 'قطعه آزادی در این انبار موجود نیست'
+                            : 'انتخاب قطعه...'
+                    );
+
+                    items.forEach(function (item) {
+
+                        const option = document.createElement('option');
+                        option.value = item.id;
+
+                        let title = `کد ${item.id} : ${item.name}`;
+
+                        if (item.propertyTag) {
+                            title += ` (${item.propertyTag})`;
+                        }
+
+                        option.textContent = title;
+                        componentSelect.appendChild(option);
+                    });
+
+                    componentSelect.disabled = items.length === 0;
+                }
+                catch (error) {
+                    console.error(error);
+
+                    resetComponents('خطا در دریافت قطعات');
+                }
+            });
         });
     </script>
 }

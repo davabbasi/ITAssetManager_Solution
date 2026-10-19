@@ -91,8 +91,15 @@
                                         <form method="post" asp-page-handler="RemoveComponent"
                                               onsubmit="return confirm('این قطعه از سیستم خارج شود؟')">
                                             <input type="hidden" name="assemblyComponentId" value="@c.Id" />
-                                            <button type="submit" class="btn btn-xs btn-outline-danger">
-                                                <i class="bi bi-box-arrow-up me-1"></i>خارج‌کردن
+                                            <button type="button"
+                                                    class="btn btn-xs btn-outline-danger"
+                                                    data-bs-toggle="modal"
+                                                    data-bs-target="#removeComponentModal"
+                                                    data-component-id="@c.Id"
+                                                    data-component-name="@c.ComponentAsset?.Name">
+
+                                                <i class="bi bi-box-arrow-up me-1"></i>
+                                                خارج‌کردن
                                             </button>
                                         </form>
                                     </td>
@@ -156,8 +163,94 @@
     </div>
 </div>
 
+<div class="modal fade" id="removeComponentModal"tabindex="-1" aria-hidden="true">
+
+    <div class="modal-dialog modal-dialog-centered">
+
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <h5 class="modal-title">خارج‌کردن قطعه از اسمبل</h5>
+
+                <button type="button"
+                        class="btn-close ms-0"
+                        data-bs-dismiss="modal"
+                        aria-label="بستن">
+                </button>
+            </div>
+
+            <div class="modal-body">
+
+                <p>
+                    قطعه:
+                    <strong id="removeComponentName"></strong>
+                </p>
+
+                <input type="hidden"
+                       id="removeComponentId" />
+
+                <label for="destinationWarehouseId"
+                       class="form-label">
+                    انبار مقصد
+                </label>
+
+                <label for="destinationWarehouseId" class="form-label">
+                    انبار مقصد
+                </label>
+
+                <select id="destinationWarehouseId"
+                        name="destinationWarehouseId"
+                        class="form-select"
+                        required
+                        asp-items="Model.AssetWarehouses">
+                    <option value="">انتخاب انبار...</option>
+                </select>
+
+            </div>
+
+            <div class="modal-footer">
+
+                <button type="button"
+                        class="btn btn-secondary"
+                        data-bs-dismiss="modal">
+                    انصراف
+                </button>
+
+                <button type="button"
+                        class="btn btn-danger"
+                        id="confirmRemoveComponent">
+                    تأیید خروج
+                </button>
+
+            </div>
+
+        </div>
+    </div>
+</div>
+
+
+
 <style>
     .btn-xs {
         padding: 0.15rem 0.4rem;
         font-size: 0.75rem;
     }</style>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+
+        const modal = document.getElementById('removeComponentModal');
+
+        modal.addEventListener('show.bs.modal', function (event) {
+
+            const button = event.relatedTarget;
+
+            document.getElementById('removeComponentId').value =
+                button.dataset.componentId;
+
+            document.getElementById('removeComponentName').textContent =
+                button.dataset.componentName || '';
+        });
+
+    });
+</script>

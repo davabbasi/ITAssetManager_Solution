@@ -1,4 +1,5 @@
-﻿using ITAssetManager.Data;
+﻿
+using ITAssetManager.Data;
 using ITAssetManager.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -11,30 +12,48 @@ namespace ITAssetManager.Pages.API;
 public class FreeComponentsModel : PageModel
 {
     private readonly ApplicationDbContext _context;
-    public FreeComponentsModel(ApplicationDbContext context) => _context = context;
 
-    public async Task<IActionResult> OnGetAsync(int categoryId)
+    public FreeComponentsModel(ApplicationDbContext context)
     {
-        // قطعاتی که: دسته‌بندی نصبیه + الان توی هیچ PC فعالی نیستن + خودشون PC نیستن
-        var usedComponentIds = await _context.AssemblyComponents
-            .Where(ac => ac.RemovedAt == null)
-            .Select(ac => ac.ComponentAssetId)
-            .ToListAsync();
+        _context = context;
+    }
 
+    public async Task<IActionResult> OnGetAsync(
+        int warehouseId,
+        int categoryId)
+    {
+        if (warehouseId <= 0 || categoryId <= 0)
+            return BadRequest();
+
+        // اطمینان از اینکه انبار انتخاب‌شده، انبار تجهیزات است.
+        var warehouseExists = await _context.Warehouses
+            .AnyAsync(w =>
+                w.Id == warehouseId &&
+                w.IsAssetWarehouse);
+
+        if (!warehouseExists)
+            return BadRequest("انبار انتخاب‌شده معتبر نیست.");
+
+        // قطعاتی که در حال حاضر در یک اسمبل فعال هستند.
+        var usedComponentIds = _context.AssemblyComponents
+            .Where(ac => ac.RemovedAt == null)
+            .Select(ac => ac.ComponentAssetId);
+
+        // قطعات آزاد متعلق به انبار انتخاب‌شده.
         var items = await _context.Assets
-            .Include(a => a.Category)
-            .Where(a => a.CategoryId == categoryId
-                && !a.IsAssembled
-                && a.Status != AssetStatus.Scrapped
-                && !usedComponentIds.Contains(a.Id))
+            .Where(a =>
+                a.CategoryId == categoryId &&
+                a.WarehouseId == warehouseId &&
+                !a.IsAssembled &&
+                a.Status == AssetStatus.InStorage &&
+                !usedComponentIds.Contains(a.Id))
             .OrderBy(a => a.Name)
             .Select(a => new
             {
                 id = a.Id,
                 name = a.Name,
                 propertyTag = a.PropertyTag,
-                serialNumber = a.SerialNumber,
-                categoryName = a.Category!.Name,
+                serialNumber = a.SerialNumber
             })
             .ToListAsync();
 

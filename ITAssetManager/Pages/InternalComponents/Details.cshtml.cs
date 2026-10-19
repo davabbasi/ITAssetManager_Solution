@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace ITAssetManager.Pages.Assembly;
 
@@ -12,13 +13,14 @@ public class DetailsModel : PageModel
 {
     private readonly ApplicationDbContext _context;
     public DetailsModel(ApplicationDbContext context) => _context = context;
-
+    public SelectList AssetWarehouses { get; set; } = null!;
     public Asset PcAsset { get; set; } = null!;
     public List<AssemblyComponent> ActiveComponents { get; set; } = new();
     public List<AssemblyComponent> RemovedComponents { get; set; } = new();
 
     public async Task<IActionResult> OnGetAsync(int id)
     {
+        await LoadAssetWarehousesAsync();
         var pc = await _context.Assets.FirstOrDefaultAsync(a => a.Id == id );
         if (pc == null) return NotFound();
         PcAsset = pc;
@@ -35,7 +37,7 @@ public class DetailsModel : PageModel
 
         return Page();
     }
-    public async Task<IActionResult> OnPostRemoveComponentAsync(int id,int assemblyComponentId)
+    public async Task<IActionResult> OnPostRemoveComponentAsync(int id,int assemblyComponentId, int destinationWarehouseId)
     {
         // =========================================================
         // 1. پیدا کردن سیستم اسمبل‌شده
@@ -96,8 +98,9 @@ public class DetailsModel : PageModel
         // 4. پیدا کردن انبار تجهیزات
         // =========================================================
 
-        var assetWarehouse = await _context.Warehouses.Include(a=>a.Keeper)
-            .FirstOrDefaultAsync(w => w.IsAssetWarehouse);
+        var assetWarehouse = await _context.Warehouses.Include(w => w.Keeper).FirstOrDefaultAsync(w =>
+        w.Id == destinationWarehouseId &&
+        w.IsAssetWarehouse);
 
         if (assetWarehouse == null)
         {
@@ -284,5 +287,22 @@ public class DetailsModel : PageModel
 
             return RedirectToPage(new { id });
         }
+    }
+    private async Task LoadAssetWarehousesAsync()
+    {
+        var warehouses = await _context.Warehouses
+            .Where(w => w.IsAssetWarehouse)
+            .OrderBy(w => w.WarehouseName)
+            .Select(w => new
+            {
+                w.Id,
+                w.WarehouseName
+            })
+            .ToListAsync();
+
+        AssetWarehouses = new SelectList(
+            warehouses,
+            "Id",
+            "WarehouseName");
     }
 }
