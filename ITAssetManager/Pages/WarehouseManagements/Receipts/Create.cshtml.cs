@@ -100,12 +100,12 @@ namespace ITAssetManager.Pages.WarehouseManagements.Receipts
                 .OrderBy(x => x.ProductName)
                 .ToListAsync();
 
-            PurchaseList = new SelectList(
-                await _context.VwPurchaseRequests
-                    .OrderByDescending(x => x.RequestNo)
-                    .ToListAsync(),
-                "RequestNo",
-                "RequestNo");
+            var requestNos = await _context.VwPurchaseRequests
+                .Select(x => x.RequestNo)
+                .Distinct()
+                .OrderByDescending(x => x)
+                .ToListAsync();
+            PurchaseList = new SelectList(requestNos);
         }
     }
 }
